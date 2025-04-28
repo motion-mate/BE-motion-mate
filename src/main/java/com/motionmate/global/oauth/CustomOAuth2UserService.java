@@ -20,22 +20,47 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
+        String provider = userRequest.getClientRegistration().getRegistrationId(); // google, naver, kakao
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        String email = (String) attributes.get("email");
-        String nickname = (String) attributes.get("name"); // 구글은 name이 닉네임 느낌
-        String profileImageUrl = (String) attributes.get("picture"); // 구글은 picture 필드에 프로필 이미지
-        String provider = userRequest.getClientRegistration().getRegistrationId(); // google, kakao, naver
 
-        User user = userRepository.findByEmail(email)
+        String email = null;
+        String nickname = null;
+        String profileImageUrl = null;
+
+        if ("naver".equals(provider)) {
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+            email = (String) response.get("email");
+            nickname = (String) response.get("name");
+            profileImageUrl = (String) response.get("profile_image");
+        } else if ("kakao".equals(provider)) {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+            email = (String) kakaoAccount.get("email"); // 카카오는 email 없을 수도 있음
+            nickname = (String) profile.get("nickname");
+            profileImageUrl = (String) profile.get("profile_image_url");
+        } else { // google
+            email = (String) attributes.get("email");
+            nickname = (String) attributes.get("name");
+            profileImageUrl = (String) attributes.get("picture");
+        }
+
+        // ✅ email이 null이면 nickname을 대신 principalName으로 사용
+        String principalName = (email != null) ? email : nickname;
+
+        final String nicknameFinal = nickname;
+        final String profileImageUrlFinal = profileImageUrl;
+
+
+        User user = userRepository.findByEmail(principalName)
                 .orElseGet(() -> userRepository.save(
                         User.builder()
-                                .email(email)
-                                .nickname(nickname)
-                                .profileImageUrl(profileImageUrl)
+                                .email(principalName)
+                                .nickname(nicknameFinal)
+                                .profileImageUrl(profileImageUrlFinal)
                                 .provider(provider)
                                 .build()
                 ));
 
-        return oAuth2User;
+        return new CustomOAuth2User(user, attributes);
     }
 }
