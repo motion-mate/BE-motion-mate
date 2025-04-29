@@ -44,7 +44,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             profileImageUrl = (String) attributes.get("picture");
         }
 
-        // ✅ email이 null이면 nickname을 대신 principalName으로 사용
         String principalName = (email != null) ? email : nickname;
 
         final String nicknameFinal = nickname;
