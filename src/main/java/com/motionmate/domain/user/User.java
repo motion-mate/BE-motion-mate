@@ -1,7 +1,16 @@
 package com.motionmate.domain.user;
 
+import com.motionmate.domain.follow.Follow;
 import jakarta.persistence.*;
-import lombok.*;
+
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+
 
 @Entity
 @Getter
@@ -25,6 +34,12 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile profile;
+
+    @OneToMany(mappedBy="follower", fetch= FetchType.LAZY)
+    private List<Follow> followers;
+
+    @OneToMany(mappedBy="following", fetch= FetchType.LAZY)
+    private List<Follow> followings;
 
     @Builder
     public User(String email, String nickname, String profileImageUrl, String provider) {
