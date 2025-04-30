@@ -1,13 +1,60 @@
 package com.motionmate.controller;
 
+import com.motionmate.dto.follow.FollowResponseDto;
+import com.motionmate.global.oauth.CustomOAuth2User;
+import com.motionmate.service.FollowService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/follows")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class FollowController {
-    // POST /{userId}
-    // DELETE /{userId}
+
+    private final FollowService followService;
+
+    // 팔로우
+    @PostMapping("/{toUserId}")
+    public ResponseEntity<Void> follow(
+            @PathVariable Long toUserId,
+            @AuthenticationPrincipal CustomOAuth2User user) {
+        followService.follow(user.getUserId(), toUserId);
+        return ResponseEntity.ok().build();
+    }
+
+    // 언팔로우
+    @DeleteMapping("/{toUserId}")
+    public ResponseEntity<Void> unFollow(
+            @PathVariable Long toUserId,
+            @AuthenticationPrincipal CustomOAuth2User user) {
+        followService.unfollow(user.getUserId(), toUserId);
+        return ResponseEntity.ok().build();
+    }
+
+    // 나를 팔로우한 유저들(following)
+    @GetMapping("/followings/{userId}")
+    public ResponseEntity<List<FollowResponseDto>> getFollowings(@PathVariable Long userId) {
+        return ResponseEntity.ok(followService.getFollowings(userId));
+    }
+
+    // 내가 팔로우한 유저들(follower)
+    @GetMapping("/followers/{userId}")
+    public ResponseEntity<List<FollowResponseDto>> getFollowers(@PathVariable Long userId) {
+        return ResponseEntity.ok(followService.getFollowers(userId));
+    }
+
+    // 특정유저를 팔로우했는지 유무(중복체크)
+    // true, false 만 반환하면 되므로 Boolean 타입으로 반환
+    @GetMapping("status/{toUserId}")
+    public ResponseEntity<Boolean> isFollowing(
+            @PathVariable Long toUserId,
+            @AuthenticationPrincipal CustomOAuth2User user) {
+        boolean isFollowing = followService.isFollowing(user.getUserId(), toUserId);
+        return ResponseEntity.ok(isFollowing);
+    }
 }
