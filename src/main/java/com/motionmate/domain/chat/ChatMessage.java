@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatMessage {
+public class  ChatMessage {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,10 +20,10 @@ public class ChatMessage {
     private ChatRoom chatRoom;
 
     @ManyToOne
-    private User sender;
+    private User sender; // 수신자
 
-    private String message;
-    private LocalDateTime sentAt;
+    private String message; // 메시지
+    private LocalDateTime sentAt; // 보낸 시간
 
     public ChatMessage(ChatRoom chatRoom, User sender, String message) {
         this.chatRoom = chatRoom;
