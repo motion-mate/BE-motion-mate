@@ -6,14 +6,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FeedLike {
+public class FeedComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @ManyToOne
     private User user;
@@ -21,8 +23,15 @@ public class FeedLike {
     @ManyToOne
     private Feed feed;
 
-    public FeedLike(User user, Feed feed) {
+    private String content;
+
+
+    private LocalDateTime createdAt;
+
+    public FeedComment(User user, Feed feed, String content) {
         this.user = user;
         this.feed = feed;
+        this.content = content;
+        this.createdAt = LocalDateTime.now();
     }
 }

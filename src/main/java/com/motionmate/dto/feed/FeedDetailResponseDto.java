@@ -10,8 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-public class FeedResponseDto {
-
+public class FeedDetailResponseDto {
     private long id;
 
     private String nickname;
@@ -25,4 +24,8 @@ public class FeedResponseDto {
     private LocalDateTime createdAt;
 
     private FeedAccessType feedAccessType;
+
+    private int likeCount;
+
+    private int commentCount;
 }
