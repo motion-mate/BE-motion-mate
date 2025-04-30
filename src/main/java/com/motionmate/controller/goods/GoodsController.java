@@ -1,4 +1,4 @@
-package com.motionmate.controller;
+package com.motionmate.controller.goods;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

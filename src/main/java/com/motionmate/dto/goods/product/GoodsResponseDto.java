@@ -15,4 +15,5 @@ public class GoodsResponseDto {
     private String imageUrl;  // 상품 이미지 URL
     private int price;        // 상품 가격
     private int stock;        // 상품 재고
+    private boolean liked; // ✅ 찜 여부 필드 추가
 }
