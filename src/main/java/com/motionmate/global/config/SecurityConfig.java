@@ -1,5 +1,8 @@
 package com.motionmate.global.config;
 
+import com.motionmate.domain.user.UserRepository;
+import com.motionmate.global.jwt.JwtAuthenticationFilter;
+import com.motionmate.global.jwt.JwtTokenProvider;
 import com.motionmate.global.oauth.CustomOAuth2UserService;
 import com.motionmate.global.oauth.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -15,6 +19,9 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -23,6 +30,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.disable()) // CORS 따로 WebConfig에서 설정한다면 disable
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // ✅ 공개 허용 경로 (GET만 허용)
                         .requestMatchers("/ws-stomp/**").permitAll()
