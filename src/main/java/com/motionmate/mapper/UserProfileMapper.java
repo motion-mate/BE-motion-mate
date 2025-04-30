@@ -23,11 +23,12 @@ public class UserProfileMapper {
                 .userId(user.getId())
                 .nickname(user.getNickname())
                 .profileImageUrl(user.getProfileImageUrl())
-                .bio(profile.getBio())
-                .goal(profile.getGoal())
-                .birthDate(profile.getBirthDate())
+                .bio(profile != null ? profile.getBio() : "") // ✅ null-safe 처리
+                .goal(profile != null ? profile.getGoal() : "") // ✅ 필요시 기본값
+                .birthDate(profile != null ? profile.getBirthDate() : null) // ✅ 날짜는 null 허용
                 .build();
     }
+
 
     // 요청 DTO → 기존 엔티티에 업데이트
     public static void updateFromDto(UserProfile profile, UserProfileUpdateRequestDto dto) {
