@@ -24,11 +24,15 @@ public class Feed {
     private String description;
     private LocalDateTime createdAt;
 
-    public Feed(User user, String imageUrl, String description) {
+    @Enumerated(EnumType.STRING)
+    private FeedAccessType feedAccessType;
+
+    public Feed(User user, String imageUrl, String description, FeedAccessType feedAccessType) {
         this.user = user;
         this.imageUrl = imageUrl;
         this.description = description;
         this.createdAt = LocalDateTime.now();
+        this.feedAccessType = feedAccessType;
     }
 
     public void updateDescription(String description) {
