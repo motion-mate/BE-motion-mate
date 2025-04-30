@@ -4,12 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @Getter
 @AllArgsConstructor
 @Builder
-public class UserResponseDto {
-    private Long id;
-    private String email;
-    private String nickname;
-    private String profileImageUrl;
+public class UserProfileResponseDto {
+    private String bio;
+    private String goal;
+    private LocalDate birthDate;
+
+
 }
