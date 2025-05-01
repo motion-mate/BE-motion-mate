@@ -25,4 +25,6 @@ public class ChatRoomRequestDto {
 
     @NotNull
     private Long creatorId;
+public class ChatRoomRequestDto {
+
 }
