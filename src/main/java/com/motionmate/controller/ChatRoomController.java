@@ -41,7 +41,7 @@ public class ChatRoomController {
     }
 
     // 채팅방 필터 적용
-    @GetMapping
+    @GetMapping("/filter")
     public ResponseEntity<List<ChatRoomResponseDto>> filterChatRooms(
             @RequestParam(required = false) String exerciseType,
             @RequestParam(required = false) String address,
