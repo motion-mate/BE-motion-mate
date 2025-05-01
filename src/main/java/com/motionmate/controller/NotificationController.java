@@ -1,6 +1,7 @@
 package com.motionmate.controller;
 
 import com.motionmate.domain.notification.Notification;
+import com.motionmate.domain.user.User;
 import com.motionmate.dto.notification.NotificationRequestDto;
 import com.motionmate.dto.notification.NotificationResponseDto;
 import com.motionmate.mapper.NotificationMapper;
@@ -9,6 +10,7 @@ import com.motionmate.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,9 +33,9 @@ public class NotificationController {
     }
 
     // 알림 조회
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<NotificationResponseDto>> getNotifications(@PathVariable Long userId) {
-        List<Notification> notifications = notificationService.getNotificationByUserId(userId);
+    @GetMapping
+    public ResponseEntity<List<NotificationResponseDto>> getNotifications(@AuthenticationPrincipal User user) {
+        List<Notification> notifications = notificationService.getNotificationByUser(user);
         List<NotificationResponseDto> responseDto = notifications.stream()
                 .map(NotificationMapper::toDto)
                 .collect(Collectors.toList());

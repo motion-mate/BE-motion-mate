@@ -19,10 +19,9 @@ public class NotificationMapper {
                 .build();
     }
 
-    public static Notification toEntity(NotificationRequestDto requestDto, UserService userService) {
-        User user = userService.getUserById(requestDto.getUserId());
+    public static Notification toEntity(NotificationRequestDto requestDto, User user) {
         return Notification.builder()
-                .user(user)  // User 객체는 실제로 DB에서 조회하거나 서비스 로직을 통해 가져와야 함
+                .user(user)
                 .type(requestDto.getType())
                 .content(requestDto.getContent())
                 .build();
