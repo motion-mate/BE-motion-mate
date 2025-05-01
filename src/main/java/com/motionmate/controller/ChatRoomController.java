@@ -2,6 +2,7 @@ package com.motionmate.controller;
 
 import com.motionmate.dto.chat.ChatRoomRequestDto;
 import com.motionmate.dto.chat.ChatRoomResponseDto;
+import com.motionmate.dto.chat.ChatRoomUpdateDto;
 import com.motionmate.service.ChatRoomService;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ public class ChatRoomController {
     @PostMapping
     public ResponseEntity<ChatRoomResponseDto> createChatRoom(@RequestBody @Valid ChatRoomRequestDto dto,
                                                               @AuthenticationPrincipal CustomOAuth2User user) {
-        String username = user.getUser().getNickname();
+        String username = user.getUser().getProfile().getNickname();
         ChatRoomResponseDto response = chatRoomService.createChatRoom(dto, username);
         return ResponseEntity.ok(response);
     }
@@ -52,11 +53,23 @@ public class ChatRoomController {
         return ResponseEntity.ok(result);
     }
 
+    // 채팅방 수정
+    @PutMapping("/{roomId}")
+    public ResponseEntity<ChatRoomResponseDto> updateChatRoom(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestBody ChatRoomUpdateDto dto
+    ) {
+        String nickname = user.getUser().getProfile().getNickname();
+        ChatRoomResponseDto updated = chatRoomService.updateChatRoom(roomId, nickname, dto);
+        return ResponseEntity.ok(updated);
+    }
+
     // 채팅방 삭제
     @DeleteMapping("/{roomId}")
     public ResponseEntity<Void> deleteChatRoom(@PathVariable Long roomId,
                                                @AuthenticationPrincipal CustomOAuth2User user) {
-        String username = user.getUser().getNickname();
+        String username = user.getUser().getProfile().getNickname();
         chatRoomService.deleteChatRoomByCreator(roomId, username); // 생성자만 삭제 가능하도록 설계
         return ResponseEntity.noContent().build();
     }

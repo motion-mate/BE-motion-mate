@@ -15,7 +15,7 @@ public class ChatMessageMapper {
     public static ChatMessageResponseDto toDto(ChatMessage message) {
         return ChatMessageResponseDto.builder()
                 .id(message.getId())
-                .senderNickname(message.getSender().getNickname())
+                .senderNickname(message.getSender().getProfile().getNickname())
                 .message(message.getMessage())
                 .sentAt(message.getSentAt())
                 .build();

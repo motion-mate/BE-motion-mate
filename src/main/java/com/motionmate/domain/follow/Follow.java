@@ -14,11 +14,11 @@ public class Follow {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "follower_id")
     private User fromUser; // 나를 팔로우하는 유저
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "following_id")
     private User toUser; // 내가 팔로우하는 유저
 
