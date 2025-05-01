@@ -1,6 +1,7 @@
 package com.motionmate.domain.user;
 
 import com.motionmate.domain.follow.Follow;
+import com.motionmate.domain.notification.Notification;
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
@@ -40,6 +41,9 @@ public class User {
 
     @OneToMany(mappedBy="toUser", fetch= FetchType.LAZY)
     private List<Follow> followings;
+
+    @OneToMany(mappedBy = "user")
+    private List<Notification> notifications;
 
     @Builder
     public User(String email, String nickname, String profileImageUrl, String provider) {
