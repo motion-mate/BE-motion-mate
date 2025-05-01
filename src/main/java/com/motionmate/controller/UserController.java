@@ -1,6 +1,7 @@
 package com.motionmate.controller;
 
 import com.motionmate.dto.user.UserProfileDto;
+import com.motionmate.dto.user.UserProfileRegisterRequestDto;
 import com.motionmate.dto.user.UserProfileUpdateRequestDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.UserService;
@@ -14,6 +15,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    // 최초 닉네임 등록 (회원가입 이후 첫 프로필 설정)
+    @PatchMapping("/profile/register")
+    public void registerProfile(@AuthenticationPrincipal CustomOAuth2User user,
+                                @RequestBody UserProfileRegisterRequestDto dto) {
+        userService.registerUser(user.getUserId(), dto);
+    }
+
 
     // 내 정보 조회
     @GetMapping("/users/me")

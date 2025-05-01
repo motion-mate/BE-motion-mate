@@ -23,7 +23,7 @@ public class ChatRoomController {
     @PostMapping
     public ResponseEntity<ChatRoomResponseDto> createChatRoom(@RequestBody @Valid ChatRoomRequestDto dto,
                                                               @AuthenticationPrincipal CustomOAuth2User user) {
-        String username = user.getUser().getNickname();
+        String username = user.getUser().getProfile().getNickname();
         ChatRoomResponseDto response = chatRoomService.createChatRoom(dto, username);
         return ResponseEntity.ok(response);
     }
@@ -56,7 +56,7 @@ public class ChatRoomController {
     @DeleteMapping("/{roomId}")
     public ResponseEntity<Void> deleteChatRoom(@PathVariable Long roomId,
                                                @AuthenticationPrincipal CustomOAuth2User user) {
-        String username = user.getUser().getNickname();
+        String username = user.getUser().getProfile().getNickname();
         chatRoomService.deleteChatRoomByCreator(roomId, username); // 생성자만 삭제 가능하도록 설계
         return ResponseEntity.noContent().build();
     }

@@ -1,6 +1,7 @@
 package com.motionmate.global.oauth;
 
 import com.motionmate.domain.user.User;
+import com.motionmate.domain.user.UserProfile;
 import com.motionmate.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -47,18 +48,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String principalName = (email != null) ? email : nickname;
 
         final String nicknameFinal = nickname;
-        final String profileImageUrlFinal = profileImageUrl;
 
 
-        User user = userRepository.findByEmail(principalName)
-                .orElseGet(() -> userRepository.save(
-                        User.builder()
-                                .email(principalName)
-                                .nickname(nicknameFinal)
-                                .profileImageUrl(profileImageUrlFinal)
-                                .provider(provider)
-                                .build()
-                ));
+        UserProfile profile = UserProfile.builder().build();
+
+        User user = userRepository.save(
+                User.builder()
+                        .email(principalName)
+                        .oauthNickname(nicknameFinal)
+                        .provider(provider)
+                        .profile(profile)
+                        .build()
+        );
 
         return new CustomOAuth2User(user, attributes);
     }

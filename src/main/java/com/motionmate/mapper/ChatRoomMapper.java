@@ -33,7 +33,7 @@ public class ChatRoomMapper {
                 .promiseTime(room.getPromiseTime())
                 .promiseAt(room.getPromiseAt())
                 .creatorId(room.getCreator().getId())
-                .creatorNickname(room.getCreator().getNickname())
+                .creatorNickname(room.getCreator().getProfile().getNickname())
                 .build();
     }
 
