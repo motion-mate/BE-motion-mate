@@ -22,12 +22,12 @@ import java.util.List;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final UserProfileRepository userProfileRepository;
+    private final UserRepository userRepository;
 
     // 채팅방 생성 (nickname 기반)
     @Transactional
     public ChatRoomResponseDto createChatRoom(ChatRoomRequestDto dto, String creatorNickname) {
-        User creator = userProfileRepository.findUserByNickname(creatorNickname)
+        User creator = userRepository.findUserByNickname(creatorNickname)
                 .orElseThrow(() -> new EntityNotFoundException("해당 닉네임의 사용자가 존재하지 않습니다."));
 
         ChatRoom chatRoom = ChatRoomMapper.toEntity(dto, creator);
