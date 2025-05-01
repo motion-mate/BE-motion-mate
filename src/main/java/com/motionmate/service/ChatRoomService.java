@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -20,7 +21,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
 
-    // ✅ 채팅방 생성 (nickname 기반)
+    // 채팅방 생성 (nickname 기반)
     @Transactional
     public ChatRoomResponseDto createChatRoom(ChatRoomRequestDto dto, String creatorNickname) {
         User creator = userRepository.findByNickname(creatorNickname)
@@ -41,7 +42,7 @@ public class ChatRoomService {
         return new ChatRoomResponseDto(saved);
     }
 
-    // ✅ 전체 채팅방 조회
+    // 전체 채팅방 조회
     @Transactional(readOnly = true)
     public List<ChatRoomResponseDto> getAllChatRooms() {
         return chatRoomRepository.findAll().stream()
@@ -49,7 +50,7 @@ public class ChatRoomService {
                 .toList();
     }
 
-    // ✅ 단일 채팅방 조회
+    // 단일 채팅방 조회
     @Transactional(readOnly = true)
     public ChatRoomResponseDto getChatRoom(Long roomId) {
         ChatRoom room = chatRoomRepository.findById(roomId)
@@ -57,7 +58,25 @@ public class ChatRoomService {
         return new ChatRoomResponseDto(room);
     }
 
-    // ✅ 채팅방 삭제 (생성자 nickname 일치 시에만 허용)
+    // 필터 조건 기반 채팅방 검색
+    @Transactional(readOnly = true)
+    public List<ChatRoomResponseDto> filterChatRooms(String type, String address, String dateStr, String keyword) {
+        ChatRoom.ExerciseType exerciseType = (type != null && !type.isBlank())
+                ? ChatRoom.ExerciseType.valueOf(type.toUpperCase())
+                : null;
+
+        LocalDate date = (dateStr != null && !dateStr.isBlank())
+                ? LocalDate.parse(dateStr)
+                : null;
+
+        List<ChatRoom> filteredRooms = chatRoomRepository.filterBy(exerciseType, address, date, keyword);
+
+        return filteredRooms.stream()
+                .map(ChatRoomResponseDto::new)
+                .toList();
+    }
+
+    // 채팅방 삭제 (생성자 nickname 일치 시에만 허용)
     @Transactional
     public void deleteChatRoomByCreator(Long roomId, String nickname) {
         ChatRoom room = chatRoomRepository.findById(roomId)
