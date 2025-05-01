@@ -6,7 +6,7 @@ import com.motionmate.dto.user.UserProfileDto;
 import com.motionmate.dto.user.UserProfileResponseDto;
 import com.motionmate.dto.user.UserProfileUpdateRequestDto;
 
-public class UserProfileMapper {
+public class         UserProfileMapper {
 
     // 단독 프로필 조회 DTO 변환
     public static UserProfileResponseDto toResponseDto(UserProfile profile) {
