@@ -26,11 +26,14 @@ public class FeedDetailResponseDto {
 
     private FeedAccessType feedAccessType;
 
+    private boolean liked;
+
     private int likeCount;
 
     private int commentCount;
 
-    public static FeedDetailResponseDto fromEntity(Feed entity){
+
+    public static FeedDetailResponseDto fromEntity(Feed entity, boolean liked,int likeCount, int commentCount){
         return FeedDetailResponseDto.builder()
                 .id(entity.getId())
                 .nickname(entity.getUser().getNickname())
@@ -39,6 +42,9 @@ public class FeedDetailResponseDto {
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())
                 .feedAccessType(entity.getFeedAccessType())
+                .liked(liked)
+                .likeCount(likeCount)
+                .commentCount(commentCount)
                 .build();
 
     }

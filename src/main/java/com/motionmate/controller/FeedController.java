@@ -1,6 +1,7 @@
 package com.motionmate.controller;
 
 import com.motionmate.domain.user.User;
+import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
@@ -29,18 +30,38 @@ public class FeedController {
 
     //전체 피드 조회
     @GetMapping
-    public ResponseEntity<List<FeedResponseDto>> getAllFeed(){
-        return ResponseEntity.ok(service.getAllFeed());
+    public ResponseEntity<List<FeedResponseDto>> getAllFeed(@AuthenticationPrincipal CustomOAuth2User user){
+        return ResponseEntity.ok(service.getAllFeed(user.getUserId()));
     }
 
-    // GET /{id}
+
     //피드 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<FeedResponseDto> getFeedDetail(@PathVariable(name = "id") long id){
-        return ResponseEntity.ok(service.getFeedDetail(id));
+    public ResponseEntity<FeedDetailResponseDto> getFeedDetail(
+            @PathVariable(name = "id") Long id,
+            @AuthenticationPrincipal CustomOAuth2User user){
+        return ResponseEntity.ok(service.getFeedDetail(id, user.getUserId()));
     }
 
-    // PUT /{id}
+    //피드 게시글 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<FeedDetailResponseDto> updateFeed(
+            @PathVariable(name = "id") Long id,
+            @RequestBody FeedRequestDto request,
+            @AuthenticationPrincipal CustomOAuth2User user) {
+        return ResponseEntity.ok(service.update(id, request, user.getUserId()));
+    }
+
+    //피드 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFeed(
+            @PathVariable(name = "id") Long id,
+            @AuthenticationPrincipal CustomOAuth2User user) {
+        service.delete(id, user.getUserId());
+        return ResponseEntity.noContent().build();
+    }
+
+
     // DELETE /{id}
     // POST /{id}/like
     // DELETE /{id}/like

@@ -27,7 +27,10 @@ public class FeedResponseDto {
 
     private FeedAccessType feedAccessType;
 
-    public static FeedResponseDto fromEntity(Feed entity){
+    //좋아요 여부
+    private boolean liked;
+
+    public static FeedResponseDto fromEntity(Feed entity, boolean liked){
         return FeedResponseDto.builder()
                 .id(entity.getId())
                 .nickname(entity.getUser().getNickname())
@@ -36,6 +39,11 @@ public class FeedResponseDto {
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())
                 .feedAccessType(entity.getFeedAccessType())
+                .liked(liked)
                 .build();
+    }
+
+    public static FeedResponseDto fromEntity(Feed entity){
+        return fromEntity(entity, false);
     }
 }
