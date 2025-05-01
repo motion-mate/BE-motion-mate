@@ -2,12 +2,12 @@ package com.motionmate.domain.follow;
 
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Follow {
 
@@ -16,14 +16,14 @@ public class Follow {
 
     @ManyToOne
     @JoinColumn(name= "follower_id")
-    private User follower; // 나를 팔로우하는 유저
+    private User fromUser; // 나를 팔로우하는 유저
 
     @ManyToOne
     @JoinColumn(name= "following_id")
-    private User following; // 내가 팔로우하는 유저
+    private User toUser; // 내가 팔로우하는 유저
 
-    public Follow(User follower, User following) {
-        this.follower = follower;
-        this.following = following;
+    public Follow(User fromUser, User toUser) {
+        this.fromUser = fromUser;
+        this.toUser = toUser;
     }
 }

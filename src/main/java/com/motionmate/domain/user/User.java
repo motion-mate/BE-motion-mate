@@ -35,10 +35,10 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile profile;
 
-    @OneToMany(mappedBy="follower", fetch= FetchType.LAZY)
+    @OneToMany(mappedBy="fromUser", fetch= FetchType.LAZY)
     private List<Follow> followers;
 
-    @OneToMany(mappedBy="following", fetch= FetchType.LAZY)
+    @OneToMany(mappedBy="toUser", fetch= FetchType.LAZY)
     private List<Follow> followings;
 
     @Builder
