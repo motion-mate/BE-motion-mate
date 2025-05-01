@@ -1,5 +1,6 @@
 package com.motionmate.dto.feed;
 
+import com.motionmate.domain.feed.Feed;
 import com.motionmate.domain.feed.FeedAccessType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +26,16 @@ public class FeedResponseDto {
     private LocalDateTime createdAt;
 
     private FeedAccessType feedAccessType;
+
+    public static FeedResponseDto fromEntity(Feed entity){
+        return FeedResponseDto.builder()
+                .id(entity.getId())
+                .nickname(entity.getUser().getNickname())
+                .profileImageUrl(entity.getUser().getProfileImageUrl())
+                .imageUrl(entity.getImageUrl())
+                .description(entity.getDescription())
+                .createdAt(entity.getCreatedAt())
+                .feedAccessType(entity.getFeedAccessType())
+                .build();
+    }
 }
