@@ -26,11 +26,16 @@ public class ChatRoom {
     private String title; // 채팅방 제목
 
     @Enumerated(EnumType.STRING)
+    private ExerciseType exerciseType; // 운동 종류
+
+    @Column(nullable = true)
     private ExerciseType exerciseType;
 
     private String address; // 지도로 찍은게 아닌 생성자가 작성한 주소
 
+    @Column(nullable = false)
     private Double latitude; // 위도
+    @Column(nullable = false)
     private Double longitude; // 경도
 
     private LocalDateTime createdAt; // 생성일
