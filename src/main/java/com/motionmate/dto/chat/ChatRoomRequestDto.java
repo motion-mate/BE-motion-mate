@@ -31,4 +31,8 @@ public class ChatRoomRequestDto {
     @NotNull(message = "운동 예정 시간을 입력해주세요.")
     private LocalTime promiseTime;
 
+    @NotNull
+    private Long creatorId;
+public class ChatRoomRequestDto {
+
 }
