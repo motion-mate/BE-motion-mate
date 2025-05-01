@@ -28,8 +28,6 @@ public class ChatRoom {
     @Enumerated(EnumType.STRING)
     private ExerciseType exerciseType; // 운동 종류
 
-    @Column(nullable = true)
-    private ExerciseType exerciseType;
 
     private String address; // 지도로 찍은게 아닌 생성자가 작성한 주소
 

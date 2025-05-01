@@ -32,13 +32,14 @@ public class User {
 
     private String provider; // google, kakao, naver 등
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id") // 또는 name 생략 가능
     private UserProfile profile;
 
-    @OneToMany(mappedBy="fromUser", fetch= FetchType.LAZY)
+    @OneToMany(mappedBy="fromUser")
     private List<Follow> followers;
 
-    @OneToMany(mappedBy="toUser", fetch= FetchType.LAZY)
+    @OneToMany(mappedBy="toUser")
     private List<Follow> followings;
 
     @Builder
@@ -52,7 +53,6 @@ public class User {
 
     public void connectProfile(UserProfile profile) {
         this.profile = profile;
-        profile.setUser(this);
     }
 
     public void updateNickname(String nickname) {

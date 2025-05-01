@@ -10,13 +10,10 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserProfile {
 
-    @Id
-    private Long userId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id")
-    private User user;
+
 
     private String bio;
     private String goal;
@@ -29,9 +26,6 @@ public class UserProfile {
         this.birthDate = birthDate;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public void updateProfile(String bio, String goal, LocalDate birthDate) {
         this.bio = bio;
