@@ -6,6 +6,7 @@ import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.chat.ChatRoomRequestDto;
 import com.motionmate.dto.chat.ChatRoomResponseDto;
+import com.motionmate.mapper.ChatRoomMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,26 +28,16 @@ public class ChatRoomService {
         User creator = userRepository.findByNickname(creatorNickname)
                 .orElseThrow(() -> new EntityNotFoundException("해당 닉네임의 사용자가 존재하지 않습니다."));
 
-        ChatRoom chatRoom = new ChatRoom(
-                dto.getTitle(),
-                dto.getExerciseType(),
-                dto.getAddress(),
-                dto.getLatitude(),
-                dto.getLongitude(),
-                dto.getPromiseDate(),
-                dto.getPromiseTime(),
-                creator
-        );
-
+        ChatRoom chatRoom = ChatRoomMapper.toEntity(dto, creator);
         ChatRoom saved = chatRoomRepository.save(chatRoom);
-        return new ChatRoomResponseDto(saved);
+        return ChatRoomMapper.toDto(saved);
     }
 
     // 전체 채팅방 조회
     @Transactional(readOnly = true)
     public List<ChatRoomResponseDto> getAllChatRooms() {
         return chatRoomRepository.findAll().stream()
-                .map(ChatRoomResponseDto::new)
+                .map(ChatRoomMapper::toDto)
                 .toList();
     }
 
@@ -55,7 +46,7 @@ public class ChatRoomService {
     public ChatRoomResponseDto getChatRoom(Long roomId) {
         ChatRoom room = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
-        return new ChatRoomResponseDto(room);
+        return ChatRoomMapper.toDto(room);
     }
 
     // 필터 조건 기반 채팅방 검색
@@ -72,7 +63,7 @@ public class ChatRoomService {
         List<ChatRoom> filteredRooms = chatRoomRepository.filterBy(exerciseType, address, date, keyword);
 
         return filteredRooms.stream()
-                .map(ChatRoomResponseDto::new)
+                .map(ChatRoomMapper::toDto)
                 .toList();
     }
 

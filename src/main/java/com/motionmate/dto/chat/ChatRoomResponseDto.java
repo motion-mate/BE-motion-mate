@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
+@Builder
 public class ChatRoomResponseDto {
 
     private Long id;
@@ -25,19 +26,4 @@ public class ChatRoomResponseDto {
     private Long creatorId;
     private String creatorNickname;
 
-    @Builder
-    public ChatRoomResponseDto(ChatRoom chatRoom) {
-        this.id = chatRoom.getId();
-        this.title = chatRoom.getTitle();
-        this.exerciseType = chatRoom.getExerciseType();
-        this.address = chatRoom.getAddress();
-        this.latitude = chatRoom.getLatitude();
-        this.longitude = chatRoom.getLongitude();
-        this.createdAt = chatRoom.getCreatedAt();
-        this.promiseDate = chatRoom.getPromiseDate();
-        this.promiseTime = chatRoom.getPromiseTime();
-        this.promiseAt = chatRoom.getPromiseAt();
-        this.creatorId = chatRoom.getCreator().getId();
-        this.creatorNickname = chatRoom.getCreator().getNickname();
-    }
 }

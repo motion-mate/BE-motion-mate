@@ -15,13 +15,4 @@ public class ChatMessageResponseDto {
     private String message;
     private LocalDateTime sentAt;
 
-    public static ChatMessageResponseDto fromEntity(ChatMessage message) {
-        return ChatMessageResponseDto.builder()
-                .id(message.getId())
-                .senderNickname(message.getSender().getNickname())
-                .message(message.getMessage())
-                .sentAt(message.getSentAt())
-                .build();
-    }
-
 }
