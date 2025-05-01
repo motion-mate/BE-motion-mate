@@ -20,11 +20,11 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
 
-    // 채팅방 생성
+    // ✅ 채팅방 생성 (nickname 기반)
     @Transactional
-    public ChatRoomResponseDto createChatRoom(ChatRoomRequestDto dto) {
-        User creator = userRepository.findById(dto.getCreatorId())
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+    public ChatRoomResponseDto createChatRoom(ChatRoomRequestDto dto, String creatorNickname) {
+        User creator = userRepository.findByNickname(creatorNickname)
+                .orElseThrow(() -> new EntityNotFoundException("해당 닉네임의 사용자가 존재하지 않습니다."));
 
         ChatRoom chatRoom = new ChatRoom(
                 dto.getTitle(),
@@ -41,7 +41,7 @@ public class ChatRoomService {
         return new ChatRoomResponseDto(saved);
     }
 
-    // 전체 채팅방 조회
+    // ✅ 전체 채팅방 조회
     @Transactional(readOnly = true)
     public List<ChatRoomResponseDto> getAllChatRooms() {
         return chatRoomRepository.findAll().stream()
@@ -49,7 +49,7 @@ public class ChatRoomService {
                 .toList();
     }
 
-    // ID로 단일 채팅방 조회
+    // ✅ 단일 채팅방 조회
     @Transactional(readOnly = true)
     public ChatRoomResponseDto getChatRoom(Long roomId) {
         ChatRoom room = chatRoomRepository.findById(roomId)
@@ -57,12 +57,16 @@ public class ChatRoomService {
         return new ChatRoomResponseDto(room);
     }
 
-    // 채팅방 삭제
+    // ✅ 채팅방 삭제 (생성자 nickname 일치 시에만 허용)
     @Transactional
-    public void deleteChatRoom(Long roomId) {
-        if (!chatRoomRepository.existsById(roomId)) {
-            throw new EntityNotFoundException("삭제할 채팅방이 존재하지 않습니다.");
+    public void deleteChatRoomByCreator(Long roomId, String nickname) {
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("삭제할 채팅방이 존재하지 않습니다."));
+
+        if (!room.getCreator().getNickname().equals(nickname)) {
+            throw new SecurityException("채팅방 생성자만 삭제할 수 있습니다.");
         }
+
         chatRoomRepository.deleteById(roomId);
     }
 }
