@@ -2,6 +2,7 @@ package com.motionmate.controller;
 
 import com.motionmate.dto.chat.ChatRoomRequestDto;
 import com.motionmate.dto.chat.ChatRoomResponseDto;
+import com.motionmate.dto.chat.ChatRoomUpdateDto;
 import com.motionmate.service.ChatRoomService;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import jakarta.validation.Valid;
@@ -50,6 +51,18 @@ public class ChatRoomController {
     ) {
         List<ChatRoomResponseDto> result = chatRoomService.filterChatRooms(exerciseType, address, date, keyword);
         return ResponseEntity.ok(result);
+    }
+
+    // 채팅방 수정
+    @PutMapping("/{roomId}")
+    public ResponseEntity<ChatRoomResponseDto> updateChatRoom(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestBody ChatRoomUpdateDto dto
+    ) {
+        String nickname = user.getUser().getNickname();
+        ChatRoomResponseDto updated = chatRoomService.updateChatRoom(roomId, nickname, dto);
+        return ResponseEntity.ok(updated);
     }
 
     // 채팅방 삭제
