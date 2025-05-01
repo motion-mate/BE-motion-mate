@@ -60,7 +60,7 @@ public class ChatRoomController {
             @AuthenticationPrincipal CustomOAuth2User user,
             @RequestBody ChatRoomUpdateDto dto
     ) {
-        String nickname = user.getUser().getNickname();
+        String nickname = user.getUser().getProfile().getNickname();
         ChatRoomResponseDto updated = chatRoomService.updateChatRoom(roomId, nickname, dto);
         return ResponseEntity.ok(updated);
     }

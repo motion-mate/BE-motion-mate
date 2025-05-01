@@ -75,7 +75,7 @@ public class ChatRoomService {
         ChatRoom room = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
 
-        if (!room.getCreator().getNickname().equals(nickname)) {
+        if (!room.getCreator().getProfile().getNickname().equals(nickname)) {
             throw new SecurityException("채팅방 생성자만 수정할 수 있습니다.");
         }
 
