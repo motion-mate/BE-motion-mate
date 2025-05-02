@@ -4,6 +4,7 @@ import com.motionmate.domain.exercise.ExerciseImage;
 import com.motionmate.domain.exercise.ExerciseList;
 import com.motionmate.dto.exercise.ExerciseListRequest;
 import com.motionmate.dto.exercise.S3FileRequest;
+import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.dto.exercise.SaveImageResponse;
 
 import java.util.Collections;
@@ -37,6 +38,13 @@ public class ExerciseListMapper {
                 image.getUrl(),
                 image.getBucketKey(),
                 image.getOrgName()
+        );
+    }
+    public static S3FileRequest toS3FileRequest(S3FileResponse response){
+        return new S3FileRequest(
+                response.url(),
+                response.bucketKey(),
+                response.orgName()
         );
     }
 }

@@ -27,7 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable()) // CORS 따로 WebConfig에서 설정한다면 disable
+                .cors(cors -> {}) // CORS 따로 WebConfig에서 설정한다면 disable
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
@@ -38,6 +38,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/feeds/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/goods/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/chatrooms/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/images/temp").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/exercises").permitAll()
                         // ✅ 나머지는 전부 인증 필요
                         .anyRequest().authenticated()
                 )
