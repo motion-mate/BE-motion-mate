@@ -10,32 +10,41 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserProfile {
 
-    @Id
-    private Long userId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(unique = true)
+    private String nickname; // 사용자 설정 닉네임 (중복 불가)
+    private String profileImageUrl;
+
 
     private String bio;
     private String goal;
     private LocalDate birthDate;
 
     @Builder
-    public UserProfile(String bio, String goal, LocalDate birthDate) {
+    public UserProfile(String bio, String goal, LocalDate birthDate, String profileImageUrl) {
         this.bio = bio;
         this.goal = goal;
         this.birthDate = birthDate;
+        this.profileImageUrl = profileImageUrl;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 
-    public void updateProfile(String bio, String goal, LocalDate birthDate) {
+    public void updateProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl) {
+        this.nickname = nickname;
         this.bio = bio;
         this.goal = goal;
         this.birthDate = birthDate;
+        this.profileImageUrl = profileImageUrl;
     }
+
+//    public void updateNickname(String nickname) {
+//        this.nickname = nickname;
+//    }
+//    public void updateProfileImage(String profileImageUrl) {
+//        this.profileImageUrl = profileImageUrl;
+//    }
+
+
 }

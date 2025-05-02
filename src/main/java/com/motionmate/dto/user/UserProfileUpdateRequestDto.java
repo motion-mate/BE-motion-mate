@@ -6,7 +6,9 @@ import java.time.LocalDate;
 
 @Getter
 public class UserProfileUpdateRequestDto {
+    private String nickname;
     private String bio;
     private String goal;
     private LocalDate birthDate;
+    private String profileImageUrl;
 }

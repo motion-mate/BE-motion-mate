@@ -26,40 +26,33 @@ public class User {
 
     //private String password; // 소셜 로그인은 null 가능
 
-    private String nickname;
+    private String oauthNickname;
 
-    private String profileImageUrl;
 
     private String provider; // google, kakao, naver 등
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id") // 또는 name 생략 가능
     private UserProfile profile;
 
-    @OneToMany(mappedBy="follower", fetch= FetchType.LAZY)
+    @OneToMany(mappedBy="fromUser")
     private List<Follow> followers;
 
-    @OneToMany(mappedBy="following", fetch= FetchType.LAZY)
+    @OneToMany(mappedBy="toUser")
     private List<Follow> followings;
 
     @Builder
-    public User(String email, String nickname, String profileImageUrl, String provider) {
+    public User(String email, String oauthNickname, String provider, UserProfile profile) {
         this.email = email;
         //this.password = password;
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
+        this.oauthNickname = oauthNickname;
         this.provider = provider;
+        this.profile = profile;
     }
 
     public void connectProfile(UserProfile profile) {
         this.profile = profile;
-        profile.setUser(this);
     }
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
 
-    public void updateProfileImage(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
 }

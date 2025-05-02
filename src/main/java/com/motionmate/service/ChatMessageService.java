@@ -10,6 +10,8 @@ import com.motionmate.dto.chat.ChatMessageRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.motionmate.mapper.ChatMessageMapper.toEntity;
+
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
@@ -26,7 +28,7 @@ public class ChatMessageService {
         User sender = userRepository.findById(dto.getSenderId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        ChatMessage message = new ChatMessage(chatRoom, sender, dto.getMessage());
+        ChatMessage message = toEntity(chatRoom, sender, dto);
         return  chatMessageRepository.save(message);
 
     }
