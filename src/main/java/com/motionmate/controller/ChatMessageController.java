@@ -13,6 +13,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
+import static com.motionmate.mapper.ChatMessageMapper.toDto;
+
 @Controller
 @RequiredArgsConstructor
 public class ChatMessageController {
@@ -24,7 +26,7 @@ public class ChatMessageController {
     public void sendMessage(@DestinationVariable Long roomId, @Payload ChatMessageRequestDto dto) {
         // 메시지 저장 서비스 호출 → 저장 후 DTO 변환
         ChatMessage saved = chatService.saveMessage(roomId, dto);
-        ChatMessageResponseDto response = ChatMessageResponseDto.fromEntity(saved);
+        ChatMessageResponseDto response = toDto(saved);
 
         // 해당 채팅방 구독자에게 브로드캐스트
         template.convertAndSend("/sub/chat/" + roomId, response);

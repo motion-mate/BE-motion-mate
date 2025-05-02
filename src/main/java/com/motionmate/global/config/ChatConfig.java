@@ -30,9 +30,9 @@ public class ChatConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
 
-        registry.enableSimpleBroker("/sub");
+        registry.enableSimpleBroker("/sub"); // 방 입장 경로
 
-        registry.setApplicationDestinationPrefixes("/pub");
+        registry.setApplicationDestinationPrefixes("/pub"); // 메시지 전송 경로
 
     }
 

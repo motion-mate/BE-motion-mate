@@ -16,13 +16,23 @@ import java.time.LocalTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom {
 
+    public enum ExerciseType {
+        RUNNING, SWIMMING, CYCLING, GYM
+    }
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title; // 채팅방 제목
+
+    @Enumerated(EnumType.STRING)
+    private ExerciseType exerciseType; // 운동 종류
+
     private String address; // 지도로 찍은게 아닌 생성자가 작성한 주소
 
+    @Column(nullable = false)
     private Double latitude; // 위도
+    @Column(nullable = false)
     private Double longitude; // 경도
 
     private LocalDateTime createdAt; // 생성일
@@ -34,10 +44,42 @@ public class ChatRoom {
     @ManyToOne
     private User creator; // 방의 생성자
 
-    @ManyToOne
-    private ExerciseRecord exerciseType; // 운동 종류(수영, 러닝 등)
+    // 채팅방 제목 수정
+    public void updateTitle(String title) {
+        this.title = title;
+    }
 
-    public ChatRoom(String title, String address, Double latitude, Double longitude, LocalDate promiseDate, LocalTime promiseTime, User creator, ExerciseRecord exerciseType) {
+    // 운동 종류 수정
+    public void updateExerciseType(ExerciseType exerciseType) {
+        this.exerciseType = exerciseType;
+    }
+
+    // 주소 수정
+    public void updateAddress(String address) {
+        this.address = address;
+    }
+
+    // 좌표 수정
+    public void updateLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void updateLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    // 운동 날짜/시간 수정
+    public void updatePromiseDate(LocalDate promiseDate) {
+        this.promiseDate = promiseDate;
+        this.promiseAt = LocalDateTime.of(promiseDate, this.promiseTime);
+    }
+
+    public void updatePromiseTime(LocalTime promiseTime) {
+        this.promiseTime = promiseTime;
+        this.promiseAt = LocalDateTime.of(this.promiseDate, promiseTime);
+    }
+
+    public ChatRoom(String title, ExerciseType exerciseType, String address, Double latitude, Double longitude, LocalDate promiseDate, LocalTime promiseTime, User creator) {
         this.title = title;
         this.address = address;
         this.latitude = latitude;

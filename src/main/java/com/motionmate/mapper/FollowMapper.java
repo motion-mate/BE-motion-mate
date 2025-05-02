@@ -14,8 +14,8 @@ public class FollowMapper {
     public static FollowResponseDto toDto(User user) {
         return FollowResponseDto.builder()
                 .userId(user.getId())
-                .nickname(user.getNickname())
-                .profileImageUrl(user.getProfileImageUrl())
+                .nickname(user.getProfile().getNickname())
+                .profileImageUrl(user.getProfile().getProfileImageUrl())
                 .build();
     }
 
