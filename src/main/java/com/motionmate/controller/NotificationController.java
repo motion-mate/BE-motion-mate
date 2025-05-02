@@ -4,6 +4,7 @@ import com.motionmate.domain.notification.Notification;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.notification.NotificationRequestDto;
 import com.motionmate.dto.notification.NotificationResponseDto;
+import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.mapper.NotificationMapper;
 import com.motionmate.service.NotificationService;
 import com.motionmate.service.UserService;
@@ -33,9 +34,11 @@ public class NotificationController {
     }
 
     // 알림 조회
-    @GetMapping
-    public ResponseEntity<List<NotificationResponseDto>> getNotifications(@AuthenticationPrincipal User user) {
-        List<Notification> notifications = notificationService.getNotificationByUser(user);
+    @GetMapping(("/{userId}"))
+    public ResponseEntity<List<NotificationResponseDto>> getNotifications(
+            @AuthenticationPrincipal CustomOAuth2User oauthUser,
+            @PathVariable Long userId) {
+        List<Notification> notifications = notificationService.getNotificationByUser(userId);
         List<NotificationResponseDto> responseDto = notifications.stream()
                 .map(NotificationMapper::toDto)
                 .collect(Collectors.toList());
@@ -44,7 +47,7 @@ public class NotificationController {
     }
 
     // 알림 읽음 처리 API (PATCH 요청)
-    @PatchMapping("/{notificationId}/read")
+    @PatchMapping("/read/{notificationId}")
     public ResponseEntity<NotificationResponseDto> markAsRead(@PathVariable Long notificationId) {
         // NotificationService 에서 알림을 읽음으로 처리
         Notification updated = notificationService.markNotificationAsRead(notificationId);
@@ -54,9 +57,26 @@ public class NotificationController {
         return ResponseEntity.ok(responseDto);
     }
 
+     // 알림 전체 읽음처리
+    @PatchMapping("/readAll/{userId}")
+    public ResponseEntity<Void> markAsReadAll(@PathVariable Long userId) {
+        notificationService.markNotificationAsReadAll(userId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // 알림 단일삭제 요청
     @DeleteMapping("/delete/{notificationId}")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long notificationId) {
         notificationService.deleteNotification(notificationId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // 알림 전체삭제 요청
+    @DeleteMapping("/deleteAll/{userId}")
+    public ResponseEntity<Void> deleteAllNotifications(@PathVariable Long userId) {
+        notificationService.deleteAllNotification(userId);
 
         return ResponseEntity.noContent().build();
     }

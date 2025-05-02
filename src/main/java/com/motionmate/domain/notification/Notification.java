@@ -37,4 +37,8 @@ public class Notification {
     public void markAsRead() {
         this.isRead = true;
     }
+
+    public void markAsReadAll() {
+        this.isRead = true;
+    }
 }
