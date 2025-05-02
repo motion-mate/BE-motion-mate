@@ -3,6 +3,7 @@ package com.motionmate.domain.feed;
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "feeds")
 public class Feed {
 
     @Id
@@ -20,6 +23,8 @@ public class Feed {
     private User user;
     private String imageUrl;
     private String description;
+
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
@@ -29,7 +34,6 @@ public class Feed {
         this.user = user;
         this.imageUrl = imageUrl;
         this.description = description;
-        this.createdAt = LocalDateTime.now();
         this.feedAccessType = feedAccessType;
     }
 

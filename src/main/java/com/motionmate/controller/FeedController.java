@@ -6,7 +6,9 @@ import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.FeedService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +23,19 @@ public class FeedController {
     private final FeedService service;
 
     //피드 업로드
-    @PostMapping
+    @PostMapping("/upload")
     public ResponseEntity<FeedResponseDto> upload(
             @RequestBody FeedRequestDto request,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        return ResponseEntity.ok(service.upload(request, user.getUserId()));
+        FeedResponseDto response = service.upload(request, user.getUserId());
+        return ResponseEntity.ok(response);
         }
 
     //전체 피드 조회
     @GetMapping
-    public ResponseEntity<List<FeedResponseDto>> getAllFeed(@AuthenticationPrincipal CustomOAuth2User user){
-        return ResponseEntity.ok(service.getAllFeed(user.getUserId()));
+    public ResponseEntity<List<FeedResponseDto>> getAllFeed(@AuthenticationPrincipal  @Nullable CustomOAuth2User user){
+        Long userId = (user != null) ? user.getUserId() : null;
+        return ResponseEntity.ok(service.getAllFeed(userId));
     }
 
 
@@ -39,8 +43,9 @@ public class FeedController {
     @GetMapping("/{id}")
     public ResponseEntity<FeedDetailResponseDto> getFeedDetail(
             @PathVariable(name = "id") Long id,
-            @AuthenticationPrincipal CustomOAuth2User user){
-        return ResponseEntity.ok(service.getFeedDetail(id, user.getUserId()));
+            @AuthenticationPrincipal @Nullable CustomOAuth2User user){
+        Long userId = (user != null) ? user.getUserId() : null;
+        return ResponseEntity.ok(service.getFeedDetail(id, userId));
     }
 
     //피드 게시글 수정

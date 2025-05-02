@@ -5,6 +5,8 @@ import com.motionmate.domain.feed.FeedAccessType;
 import com.motionmate.domain.user.User;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class FeedRequestDto {
 
@@ -21,6 +23,5 @@ public class FeedRequestDto {
                 .description(description)
                 .feedAccessType(feedAccessType)
                 .build();
-
     }
 }

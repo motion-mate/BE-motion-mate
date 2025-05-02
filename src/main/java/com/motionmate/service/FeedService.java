@@ -9,8 +9,10 @@ import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
+import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,18 +28,21 @@ public class FeedService {
     //피드 업로드
     public FeedResponseDto upload(FeedRequestDto request, Long userId) {
         User user = userRePository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("유저를 찾을 수 없습니다"));
+                .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
         Feed saved = repository.save(request.toEntity(user));
         return FeedResponseDto.fromEntity(saved);
     }
 
     //전체 피드 조회
     public List<FeedResponseDto> getAllFeed(Long userId ) {
-        User user = userRePository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("유저를 찾을 수 없습니다"));
+        final User user = (userId != null) ? userRePository.findById(userId).orElse(null) : null;
+
         return repository.findAll().stream()
                 .map(feed -> {
-                    boolean liked = feedLikeRepository.existsByFeedAndUser(feed, user);
+                    boolean liked = false;
+                    if(user != null){
+                        liked = feedLikeRepository.existsByFeedAndUser(feed, user);
+                    }
                     return FeedResponseDto.fromEntity(feed, liked);
                 })
                 .toList();
@@ -47,11 +52,19 @@ public class FeedService {
     @Transactional
     public FeedDetailResponseDto getFeedDetail(Long feedId,Long userId) {
         Feed feed = repository.findById(feedId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 피드를 찾을 수 없습니다."));
-        User user = userRePository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("유저를 찾을 수 없습니다"));
+                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "해당 피드를 찾을 수 없습니다."));
 
-        boolean liked = feedLikeRepository.existsByFeedAndUser(feed, user);
+        User user = null;
+        if(userId != null){
+            user = userRePository.findById(userId)
+                    .orElse(null);
+        }
+
+        boolean liked = false;
+        if(user != null){
+            liked = feedLikeRepository.existsByFeedAndUser(feed, user);
+        }
+
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
 
@@ -62,11 +75,11 @@ public class FeedService {
     @Transactional
     public FeedDetailResponseDto update(Long feedId, FeedRequestDto request, Long userId) {
         Feed feed = repository.findById(feedId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 피드를 찾을 수 없습니다."));
+                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND ,"해당 피드를 찾을 수 없습니다."));
 
         //작성자 확인
         if(!feed.getUser().getId().equals(userId)){
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
+            throw new CustomException(HttpStatus.FORBIDDEN ,"수정 권한이 없습니다.");
         }
 
         //설명 수정
@@ -83,10 +96,10 @@ public class FeedService {
     @Transactional
     public void delete(Long feedId, Long userId) {
         Feed feed = repository.findById(feedId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 피드를 찾을 수 없습니다."));
+                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND,"해당 피드를 찾을 수 없습니다."));
 
         if(!feed.getUser().getId().equals(userId)){
-            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+            throw new CustomException(HttpStatus.FORBIDDEN,"삭제 권한이 없습니다.");
         }
         repository.delete(feed);
     }
