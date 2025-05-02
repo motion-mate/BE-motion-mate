@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class FeedDetailResponseDto {
+
     private long id;
 
     private String nickname;
@@ -36,8 +37,8 @@ public class FeedDetailResponseDto {
     public static FeedDetailResponseDto fromEntity(Feed entity, boolean liked,int likeCount, int commentCount){
         return FeedDetailResponseDto.builder()
                 .id(entity.getId())
-                .nickname(entity.getUser().getNickname())
-                .profileImageUrl(entity.getUser().getProfileImageUrl())
+                .nickname(entity.getUser().getProfile().getNickname())
+                .profileImageUrl(entity.getUser().getProfile().getProfileImageUrl())
                 .imageUrl(entity.getImageUrl())
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())

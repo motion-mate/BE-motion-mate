@@ -49,7 +49,6 @@ public class FeedService {
     }
 
     //피드 상세 페이지
-    @Transactional
     public FeedDetailResponseDto getFeedDetail(Long feedId,Long userId) {
         Feed feed = repository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "해당 피드를 찾을 수 없습니다."));

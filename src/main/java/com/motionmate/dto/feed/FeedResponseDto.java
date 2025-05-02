@@ -33,8 +33,8 @@ public class FeedResponseDto {
     public static FeedResponseDto fromEntity(Feed entity, boolean liked){
         return FeedResponseDto.builder()
                 .id(entity.getId())
-                .nickname(entity.getUser().getNickname())
-                .profileImageUrl(entity.getUser().getProfileImageUrl())
+                .nickname(entity.getUser().getProfile().getNickname())
+                .profileImageUrl(entity.getUser().getProfile().getProfileImageUrl())
                 .imageUrl(entity.getImageUrl())
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())

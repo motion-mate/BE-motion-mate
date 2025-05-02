@@ -5,6 +5,7 @@ import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
+import com.motionmate.service.FeedLikeService;
 import com.motionmate.service.FeedService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/feeds")
@@ -66,8 +69,6 @@ public class FeedController {
         return ResponseEntity.noContent().build();
     }
 
-
-    // DELETE /{id}
     // POST /{id}/like
     // DELETE /{id}/like
 }

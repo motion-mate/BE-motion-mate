@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -25,13 +26,16 @@ public class FeedComment {
 
     private String content;
 
-
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     public FeedComment(User user, Feed feed, String content) {
         this.user = user;
         this.feed = feed;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
+    }
+
+    public void updateContent(String content){
+        this.content = content;
     }
 }
