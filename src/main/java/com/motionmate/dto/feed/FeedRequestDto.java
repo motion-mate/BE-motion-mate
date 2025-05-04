@@ -16,12 +16,4 @@ public class FeedRequestDto {
 
     private FeedAccessType feedAccessType;
 
-    public Feed toEntity(User user){
-        return  Feed.builder()
-                .user(user)
-                .imageUrl(imageUrl)
-                .description(description)
-                .feedAccessType(feedAccessType)
-                .build();
-    }
 }

@@ -10,6 +10,7 @@ import com.motionmate.dto.feed.FeedCommentRequestDto;
 import com.motionmate.dto.feed.FeedCommentResponseDto;
 import com.motionmate.dto.feed.FeedCommentUpdateDto;
 import com.motionmate.global.exception.CustomException;
+import com.motionmate.mapper.FeedCommentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,8 @@ public class FeedCommentService {
       User user = userRepository.findById(userId)
               .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다"));
 
-      FeedComment comment = new FeedComment(user, feed, dto.getContent());
-      FeedComment saved = feedCommentRepository.save(comment);
-
-      return new FeedCommentResponseDto(saved);
+      FeedComment saved = feedCommentRepository.save(FeedCommentMapper.toEntity(dto, user, feed));
+      return FeedCommentMapper.fromEntity(saved);
     }
 
     //댓글 전체 조회
@@ -44,7 +43,7 @@ public class FeedCommentService {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
         return feedCommentRepository.findByFeed(feed).stream()
-                .map(FeedCommentResponseDto::new)
+                .map(FeedCommentMapper::fromEntity)
                 .toList();
     }
 
@@ -52,8 +51,8 @@ public class FeedCommentService {
     public List<FeedCommentResponseDto> getPreviewComments(Long feedId){
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
-        return feedCommentRepository.findTop10ByFeed(feed).stream()
-                .map(FeedCommentResponseDto::new)
+        return feedCommentRepository.findTop10ByFeedOrderByCreatedAtDesc(feed).stream()
+                .map(FeedCommentMapper::fromEntity)
                 .toList();
     }
 
@@ -68,7 +67,7 @@ public class FeedCommentService {
         }
 
         comment.updateContent(dto.getContent());
-        return new FeedCommentResponseDto(comment);
+        return FeedCommentMapper.fromEntity(comment);
     }
 
     //댓글 삭제

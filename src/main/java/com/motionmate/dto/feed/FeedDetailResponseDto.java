@@ -1,5 +1,6 @@
 package com.motionmate.dto.feed;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.motionmate.domain.feed.Feed;
 import com.motionmate.domain.feed.FeedAccessType;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class FeedDetailResponseDto {
 
     private String description;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
     private FeedAccessType feedAccessType;
@@ -32,21 +34,4 @@ public class FeedDetailResponseDto {
     private int likeCount;
 
     private int commentCount;
-
-
-    public static FeedDetailResponseDto fromEntity(Feed entity, boolean liked,int likeCount, int commentCount){
-        return FeedDetailResponseDto.builder()
-                .id(entity.getId())
-                .nickname(entity.getUser().getProfile().getNickname())
-                .profileImageUrl(entity.getUser().getProfile().getProfileImageUrl())
-                .imageUrl(entity.getImageUrl())
-                .description(entity.getDescription())
-                .createdAt(entity.getCreatedAt())
-                .feedAccessType(entity.getFeedAccessType())
-                .liked(liked)
-                .likeCount(likeCount)
-                .commentCount(commentCount)
-                .build();
-
-    }
 }

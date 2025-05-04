@@ -3,6 +3,7 @@ package com.motionmate.domain.feed;
 import com.motionmate.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
@@ -15,4 +16,7 @@ public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
 
     //좋아요 엔터티 가져오기(취소용)
     Optional<FeedLike> findByFeedAndUser(Feed feed, User user);
+
+    //좋아요 누른 피드 목록 조회
+    List<FeedLike> findByUser(User user);
 }

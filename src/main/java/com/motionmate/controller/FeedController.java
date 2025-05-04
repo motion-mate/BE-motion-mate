@@ -43,32 +43,39 @@ public class FeedController {
 
 
     //피드 상세 조회
-    @GetMapping("/{id}")
+    @GetMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> getFeedDetail(
-            @PathVariable(name = "id") Long id,
+            @PathVariable Long feedId,
             @AuthenticationPrincipal @Nullable CustomOAuth2User user){
         Long userId = (user != null) ? user.getUserId() : null;
-        return ResponseEntity.ok(service.getFeedDetail(id, userId));
+        return ResponseEntity.ok(service.getFeedDetail(feedId, userId));
     }
 
     //피드 게시글 수정
-    @PutMapping("/{id}")
+    @PutMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> updateFeed(
-            @PathVariable(name = "id") Long id,
+            @PathVariable Long feedId,
             @RequestBody FeedRequestDto request,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        return ResponseEntity.ok(service.update(id, request, user.getUserId()));
+        return ResponseEntity.ok(service.update(feedId, request, user.getUserId()));
     }
 
     //피드 삭제
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{feedId}")
     public ResponseEntity<Void> deleteFeed(
-            @PathVariable(name = "id") Long id,
+            @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        service.delete(id, user.getUserId());
+        service.delete(feedId, user.getUserId());
         return ResponseEntity.noContent().build();
     }
 
-    // POST /{id}/like
-    // DELETE /{id}/like
+    //좋아요 누른 피드 조회
+    @GetMapping("/liked")
+    public ResponseEntity<List<FeedResponseDto>> getFeedsLikedByUser(
+            @AuthenticationPrincipal CustomOAuth2User user) {
+       List<FeedResponseDto> likedFeeds = service.getFeedsLikedByUser(user.getUserId());
+       return ResponseEntity.ok(likedFeeds);
+    }
+
+
 }

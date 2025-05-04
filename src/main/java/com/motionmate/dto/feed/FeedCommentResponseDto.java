@@ -1,12 +1,15 @@
 package com.motionmate.dto.feed;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.motionmate.domain.feed.FeedComment;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Getter
+@AllArgsConstructor
 public class FeedCommentResponseDto {
 
     private final Long id;
@@ -15,14 +18,7 @@ public class FeedCommentResponseDto {
 
     private final String writer;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private final LocalDateTime createdAt;
-
-    public FeedCommentResponseDto(FeedComment comment){
-        this.id = comment.getId();
-        this.content = comment.getContent();
-        this.writer = comment.getUser().getProfile().getNickname();
-        this.createdAt = comment.getCreatedAt();
-
-    }
 
 }

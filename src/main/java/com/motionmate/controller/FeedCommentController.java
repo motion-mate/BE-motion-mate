@@ -21,7 +21,7 @@ public class FeedCommentController {
     private final FeedCommentService feedCommentService;
 
     //댓글 등록
-    @PostMapping("/{feedId}/comments")
+    @PostMapping("/comments/{feedId}")
     public ResponseEntity<FeedCommentResponseDto> createComment(
             @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user,
@@ -31,14 +31,14 @@ public class FeedCommentController {
     }
 
     //댓글 전체 조회
-    @GetMapping("/{feedId}/comments")
+    @GetMapping("/comments/{feedId}")
     public  ResponseEntity<List<FeedCommentResponseDto>> getAllComments(
             @PathVariable Long feedId) {
         return ResponseEntity.ok(feedCommentService.getAllComments(feedId));
     }
 
     //댓글 미리 보기
-    @GetMapping("/{feedId}/comments/preview")
+    @GetMapping("/comments/{feedId}/preview")
     public ResponseEntity<List<FeedCommentResponseDto>> getPreviewComments(
             @PathVariable Long feedId) {
         return ResponseEntity.ok(feedCommentService.getPreviewComments(feedId));
