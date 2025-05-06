@@ -36,9 +36,12 @@ public class FeedController {
 
     //전체 피드 조회
     @GetMapping
-    public ResponseEntity<List<FeedResponseDto>> getAllFeed(@AuthenticationPrincipal  @Nullable CustomOAuth2User user){
+    public ResponseEntity<List<FeedResponseDto>> getFeeds(
+            @RequestParam(required = false) Long lastFeedId,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomOAuth2User user) {
         Long userId = (user != null) ? user.getUserId() : null;
-        return ResponseEntity.ok(service.getAllFeed(userId));
+        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, userId));
     }
 
 

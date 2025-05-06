@@ -10,6 +10,9 @@ import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.mapper.FeedMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,15 +35,23 @@ public class FeedService {
     }
 
     //전체 피드 조회
-    public List<FeedResponseDto> getAllFeed(Long userId ) {
-        final User user = (userId != null) ? userRePository.findById(userId).orElse(null) : null;
+    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, Long userId) {
+      User user =  (userId != null) ? userRePository.findById(userId).orElse(null) : null;
 
-        return repository.findAll().stream()
-                .map(feed -> {
-                    boolean liked = (user != null) && feedLikeRepository.existsByFeedAndUser(feed, user);
-                    return FeedMapper.fromEntity(feed, liked);
-                })
-                .toList();
+      Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
+      List<Feed> feeds;
+
+      if(lastFeedId == null) {
+          feeds = repository.findAll(pageable).getContent();
+      } else {
+         feeds = repository.findByIdLessThanOrderByIdDesc(lastFeedId, pageable);
+      }
+
+      return feeds.stream().map(feed -> {
+          boolean liked = (user != null) && feedLikeRepository.existsByFeedAndUser(feed, user);
+          return FeedMapper.fromEntity(feed, liked);
+      })
+              .toList();
     }
 
     //피드 상세 페이지
