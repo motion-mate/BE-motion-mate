@@ -79,11 +79,14 @@ public class FeedService {
         //설명 수정
         feed.updateDescription(request.getDescription());
 
-        boolean liked = feedLikeRepository.existsByFeedAndUser(feed, feed.getUser());
-        int likeCount = feedLikeRepository.countByFeed(feed);
-        int commentCount = feedCommentRepository.countByFeed(feed);
+       Feed updated = repository.findById(feedId)
+                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "수정 후 피드를 다시 불러오지 못했습니다."));
 
-        return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
+        boolean liked = feedLikeRepository.existsByFeedAndUser(updated, updated.getUser());
+        int likeCount = feedLikeRepository.countByFeed(updated);
+        int commentCount = feedCommentRepository.countByFeed(updated);
+
+        return FeedMapper.fromEntity(updated, liked, likeCount, commentCount);
     }
 
     //피드 삭제

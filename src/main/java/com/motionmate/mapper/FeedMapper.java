@@ -27,6 +27,7 @@ public class FeedMapper {
                 .imageUrl(entity.getImageUrl())
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .feedAccessType(entity.getFeedAccessType())
                 .liked(liked)
                 .build();
@@ -46,6 +47,7 @@ public class FeedMapper {
                 .imageUrl(entity.getImageUrl())
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .feedAccessType(entity.getFeedAccessType())
                 .liked(liked)
                 .likeCount(likeCount)

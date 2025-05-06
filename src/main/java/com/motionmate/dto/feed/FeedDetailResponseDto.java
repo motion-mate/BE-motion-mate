@@ -1,6 +1,7 @@
 package com.motionmate.dto.feed;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.motionmate.domain.feed.Feed;
 import com.motionmate.domain.feed.FeedAccessType;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,10 @@ public class FeedDetailResponseDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+    private LocalDateTime updatedAt;
 
     private FeedAccessType feedAccessType;
 

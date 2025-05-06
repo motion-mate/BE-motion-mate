@@ -19,7 +19,8 @@ public class FeedCommentMapper {
                 entity.getId(),
                 entity.getContent(),
                 entity.getUser().getProfile().getNickname(),
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 

@@ -67,7 +67,10 @@ public class FeedCommentService {
         }
 
         comment.updateContent(dto.getContent());
-        return FeedCommentMapper.fromEntity(comment);
+
+       FeedComment updated = feedCommentRepository.findById(commentId)
+                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "댓글을 다시 불러오지 못했습니다."));
+        return FeedCommentMapper.fromEntity(updated);
     }
 
     //댓글 삭제

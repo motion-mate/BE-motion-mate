@@ -4,13 +4,12 @@ import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "feeds")
 public class Feed {
@@ -25,11 +24,16 @@ public class Feed {
     private String description;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     private FeedAccessType feedAccessType;
 
+    @Builder
     public Feed(User user, String imageUrl, String description, FeedAccessType feedAccessType) {
         this.user = user;
         this.imageUrl = imageUrl;
