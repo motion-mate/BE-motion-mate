@@ -9,4 +9,7 @@ import java.util.List;
 
 public interface FeedRepository extends JpaRepository<Feed, Long> {
     List<Feed> findByIdLessThanOrderByIdDesc(Long lastFeedId, Pageable pageable);
+
+    List<Feed> findByUserId(Long userId);
+
 }

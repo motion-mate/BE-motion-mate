@@ -1,5 +1,6 @@
 package com.motionmate.controller;
 
+import com.motionmate.dto.goods.order.OrderResponseDto;
 import com.motionmate.dto.user.UserProfileDto;
 import com.motionmate.dto.user.UserProfileRegisterRequestDto;
 import com.motionmate.dto.user.UserProfileUpdateRequestDto;
@@ -8,6 +9,8 @@ import com.motionmate.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,10 +58,10 @@ public class UserController {
 //        return userService.getMyRecords(user.getUserId());
 //    }
 //
-//    @GetMapping("/mypage/my-orders")
-//    public List<OrderDto> getMyOrders(@AuthenticationPrincipal CustomOAuth2User user) {
-//        return userService.getMyOrders(user.getUserId());
-//    }
+    @GetMapping("/mypage/my-orders")
+    public List<OrderResponseDto> getMyOrders(@AuthenticationPrincipal CustomOAuth2User user) {
+        return userService.getMyOrders(user.getUserId());
+    }
 
 
 

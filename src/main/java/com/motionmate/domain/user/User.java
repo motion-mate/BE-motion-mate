@@ -57,6 +57,4 @@ public class User {
     public void connectProfile(UserProfile profile) {
         this.profile = profile;
     }
-
-
 }
