@@ -29,6 +29,7 @@ public class Order {
     @ManyToOne // 주문한 상품과 다대일 관계
     private Goods goods;
 
+//    private Integer price;
     private Integer quantity;           // 주문 수량
     private LocalDateTime orderedAt;    // 주문 시각
 
@@ -38,5 +39,6 @@ public class Order {
         this.goods = goods;
         this.quantity = quantity;
         this.orderedAt = LocalDateTime.now(); // 주문 생성 시 자동 기록
+//        this.price = goods.getPrice()*quantity;
     }
 }

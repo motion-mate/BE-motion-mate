@@ -1,8 +1,14 @@
 package com.motionmate.service;
 
+import com.motionmate.domain.feed.Feed;
+import com.motionmate.domain.feed.FeedRepository;
+import com.motionmate.domain.goods.Order;
+import com.motionmate.domain.goods.OrderRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfile;
 import com.motionmate.domain.user.UserRepository;
+import com.motionmate.dto.feed.FeedResponseDto;
+import com.motionmate.dto.goods.order.OrderResponseDto;
 import com.motionmate.dto.user.*;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.mapper.UserMapper;
@@ -12,11 +18,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FeedRepository feedRepository;
+    private final OrderRepository orderRepository;
 
     @Transactional
     public void registerUser(Long userId, UserProfileRegisterRequestDto dto) {
@@ -93,22 +103,49 @@ public class UserService {
 
 
     // TODO 피드 목록
-    /*
     @Transactional(readOnly = true)
-    public List<FeedDto> getMyFeeds(Long userId) {
-        // feedRepository.findByUserId(userId) 등
+    public List<FeedResponseDto> getMyFeeds(Long userId) {
+        List<Feed> feeds = feedRepository.findByUserId(userId);
+
+        return feeds.stream()
+                .map(feed -> FeedResponseDto.builder()
+                        .id(feed.getId())
+                        .nickname(feed.getUser().getProfile().getNickname())
+                        .profileImageUrl(feed.getUser().getProfile().getProfileImageUrl())
+                        .imageUrl(feed.getImageUrl())
+                        .description(feed.getDescription())
+                        .createdAt(feed.getCreatedAt())
+                        .updatedAt(feed.getUpdatedAt())
+                        .feedAccessType(feed.getFeedAccessType())
+                        .liked(false) // 또는 좋아요 여부 판단 로직 추가
+                        .build())
+                .toList();
     }
 
-    // TODO 운동 기록
-    @Transactional(readOnly = true)
-    public List<ExerciseRecordDto> getMyRecords(Long userId) {
-        // exerciseRecordRepository.findByUserId(userId) 등
-    }
+
+//    // TODO 운동 기록
+//    @Transactional(readOnly = true)
+//    public List<ExerciseRecordDto> getMyRecords(Long userId) {
+//        // exerciseRecordRepository.findByUserId(userId) 등
+//    }
 
     // TODO 주문 내역
     @Transactional(readOnly = true)
-    public List<OrderDto> getMyOrders(Long userId) {
-        // orderRepository.findByUserId(userId) 등
+    public List<OrderResponseDto> getMyOrders(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        List<Order> orders = orderRepository.findByUser(user);
+
+        return orders.stream()
+                .map(order -> OrderResponseDto.builder()
+                        .orderId(order.getId())
+                        .goodsName(order.getGoods().getName())
+                        .quantity(order.getQuantity())
+//                        .price(order.getPrice())
+                        .orderedAt(order.getOrderedAt())
+                        .build())
+                .toList();
     }
-    */
+
 }
