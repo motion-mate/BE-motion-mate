@@ -1,5 +1,6 @@
 package com.motionmate.controller;
 
+import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
 import com.motionmate.dto.user.UserProfileDto;
 import com.motionmate.dto.user.UserProfileRegisterRequestDto;
@@ -48,10 +49,10 @@ public class UserController {
 
 
 
-//    @GetMapping("/mypage/my-feeds")
-//    public List<FeedDto> getMyFeeds(@AuthenticationPrincipal CustomOAuth2User user) {
-//        return userService.getMyFeeds(user.getUserId());
-//    }
+    @GetMapping("/mypage/my-feeds")
+    public List<FeedResponseDto> getMyFeeds(@AuthenticationPrincipal CustomOAuth2User user) {
+        return userService.getMyFeeds(user.getUserId());
+    }
 //
 //    @GetMapping("/mypage/my-records")
 //    public List<ExerciseRecordDto> getMyRecords(@AuthenticationPrincipal CustomOAuth2User user) {
