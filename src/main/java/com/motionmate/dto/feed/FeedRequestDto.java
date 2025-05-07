@@ -1,10 +1,13 @@
 package com.motionmate.dto.feed;
 
+import com.motionmate.domain.feed.Feed;
 import com.motionmate.domain.feed.FeedAccessType;
+import com.motionmate.domain.user.User;
 import lombok.Getter;
 
-@Getter
+import java.time.LocalDateTime;
 
+@Getter
 public class FeedRequestDto {
 
     private String imageUrl;
@@ -12,4 +15,5 @@ public class FeedRequestDto {
     private String description;
 
     private FeedAccessType feedAccessType;
+
 }
