@@ -5,12 +5,16 @@ import com.motionmate.dto.goods.order.OrderResponseDto;
 
 public class OrderMapper {
     public static OrderResponseDto toDto(Order order) {
+        int price = order.getGoods().getPrice();
+        int quantity = order.getQuantity();
         return OrderResponseDto.builder()
                 .orderId(order.getId())
                 .goodsName(order.getGoods().getName())
-                .price(order.getGoods().getPrice())
-                .quantity(order.getQuantity())
+                .price(price)
+                .quantity(quantity)
+                .totalPrice(price * quantity) // ✅ 총 가격 계산
                 .orderedAt(order.getOrderedAt())
                 .build();
     }
+
 }
