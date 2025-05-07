@@ -11,8 +11,10 @@ import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
 import com.motionmate.dto.user.*;
 import com.motionmate.global.exception.CustomException;
+import com.motionmate.mapper.FeedMapper;
 import com.motionmate.mapper.UserMapper;
 import com.motionmate.mapper.UserProfileMapper;
+import com.motionmate.mapper.goods.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -39,13 +41,8 @@ public class UserService {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 닉네임이 설정되어 있습니다.");
         }
 
-        profile.updateProfile(
-                dto.getNickname(),
-                dto.getBio(),
-                dto.getGoal(),
-                dto.getBirthDate(),
-                dto.getProfileImageUrl()
-        );
+        UserProfileMapper.updateFromDto(profile, dto);
+
     }
 
 
@@ -92,13 +89,8 @@ public class UserService {
         }
 
         // 닉네임은 여기서도 수정 가능 (인스타그램처럼 바꾸는 구조 허용)
-        profile.updateProfile(
-                dto.getNickname(), // ✅ 닉네임도 수정 허용
-                dto.getBio(),
-                dto.getGoal(),
-                dto.getBirthDate(),
-                dto.getProfileImageUrl()
-        );
+        UserProfileMapper.updateFromDto(profile, dto);
+
     }
 
 
@@ -108,17 +100,7 @@ public class UserService {
         List<Feed> feeds = feedRepository.findByUserId(userId);
 
         return feeds.stream()
-                .map(feed -> FeedResponseDto.builder()
-                        .id(feed.getId())
-                        .nickname(feed.getUser().getProfile().getNickname())
-                        .profileImageUrl(feed.getUser().getProfile().getProfileImageUrl())
-                        .imageUrl(feed.getImageUrl())
-                        .description(feed.getDescription())
-                        .createdAt(feed.getCreatedAt())
-                        .updatedAt(feed.getUpdatedAt())
-                        .feedAccessType(feed.getFeedAccessType())
-                        .liked(false) // 또는 좋아요 여부 판단 로직 추가
-                        .build())
+                .map(FeedMapper::fromEntity)
                 .toList();
     }
 
@@ -138,13 +120,7 @@ public class UserService {
         List<Order> orders = orderRepository.findByUser(user);
 
         return orders.stream()
-                .map(order -> OrderResponseDto.builder()
-                        .orderId(order.getId())
-                        .goodsName(order.getGoods().getName())
-                        .quantity(order.getQuantity())
-//                        .price(order.getPrice())
-                        .orderedAt(order.getOrderedAt())
-                        .build())
+                .map(OrderMapper::toDto)
                 .toList();
     }
 

@@ -3,6 +3,7 @@ package com.motionmate.controller.goods;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.cart.CartItemRequestDto;
 import com.motionmate.dto.goods.cart.CartItemResponseDto;
+import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.goods.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,17 +21,17 @@ public class CartController {
 
     // ✅ 장바구니 항목 추가
     @PostMapping
-    public void addToCart(@AuthenticationPrincipal User user,
+    public void addToCart(@AuthenticationPrincipal CustomOAuth2User user,
                           @RequestBody @Valid CartItemRequestDto dto) {
-        cartService.addToCart(user, dto);
+        cartService.addToCart(user.getUser(), dto);
     }
 
     // ✅ 수량 수정
     @PatchMapping("/{cartItemId}")
-    public void updateQuantity(@AuthenticationPrincipal User user,
+    public void updateQuantity(@AuthenticationPrincipal CustomOAuth2User user,
                                @PathVariable Long cartItemId,
                                @RequestBody @Valid CartItemRequestDto dto) {
-        cartService.updateQuantity(user, cartItemId, dto.getQuantity());
+        cartService.updateQuantity(user.getUser(), cartItemId, dto.getQuantity());
     }
 
     // ✅ 항목 삭제
