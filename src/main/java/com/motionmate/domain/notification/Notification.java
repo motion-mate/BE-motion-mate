@@ -2,21 +2,23 @@ package com.motionmate.domain.notification;
 
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.sql.ConnectionBuilder;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notification {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
     private User user;
 
     private String type;
@@ -33,6 +35,10 @@ public class Notification {
     }
 
     public void markAsRead() {
+        this.isRead = true;
+    }
+
+    public void markAsReadAll() {
         this.isRead = true;
     }
 }
