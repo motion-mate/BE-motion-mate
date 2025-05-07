@@ -3,6 +3,7 @@ package com.motionmate.mapper;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfile;
 import com.motionmate.dto.user.UserProfileDto;
+import com.motionmate.dto.user.UserProfileRegisterRequestDto;
 import com.motionmate.dto.user.UserProfileResponseDto;
 import com.motionmate.dto.user.UserProfileUpdateRequestDto;
 
@@ -32,6 +33,10 @@ public class         UserProfileMapper {
 
     // 요청 DTO → 기존 엔티티에 업데이트
     public static void updateFromDto(UserProfile profile, UserProfileUpdateRequestDto dto) {
+        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl());
+    }
+
+    public static void updateFromDto(UserProfile profile, UserProfileRegisterRequestDto dto) {
         profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl());
     }
 }

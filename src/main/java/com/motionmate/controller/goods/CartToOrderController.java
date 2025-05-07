@@ -2,6 +2,7 @@ package com.motionmate.controller.goods;
 
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.cart.CartItemRequestDto;
+import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.goods.CartToOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,9 @@ public class CartToOrderController {
     private final CartToOrderService cartToOrderService;
 
     @PostMapping
-    public ResponseEntity<Void> convertToOrder(@AuthenticationPrincipal User user,
+    public ResponseEntity<Void> convertToOrder(@AuthenticationPrincipal CustomOAuth2User user,
                                                @RequestBody List<CartItemRequestDto> cartItemRequestDtos) {
-        cartToOrderService.convertCartToOrder(user, cartItemRequestDtos);
+        cartToOrderService.convertCartToOrder(user.getUser(), cartItemRequestDtos);
         return ResponseEntity.ok().build();
     }
 }
