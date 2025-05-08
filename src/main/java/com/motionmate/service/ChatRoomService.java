@@ -1,6 +1,8 @@
 package com.motionmate.service;
 
 import com.motionmate.domain.chat.ChatRoom;
+import com.motionmate.domain.chat.ChatRoomParticipant;
+import com.motionmate.domain.chat.ChatRoomParticipantRepository;
 import com.motionmate.domain.chat.ChatRoomRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfileRepository;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ChatRoomParticipantRepository chatRoomParticipantRepository;
 
     // 채팅방 생성 (nickname 기반)
     @Transactional
@@ -89,6 +93,42 @@ public class ChatRoomService {
 
         return ChatRoomMapper.toDto(room);
     }
+
+    // 채팅방 입장
+    @Transactional
+    public void enterRoom(Long roomId, String nickname) {
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
+        User user = userProfileRepository.findUserByNickname(nickname)
+                .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
+
+        Optional<ChatRoomParticipant> existing = chatRoomParticipantRepository.findByChatRoomAndUser(room, user);
+        if (existing.isPresent()) {
+            existing.get().reconnect();
+        } else {
+            chatRoomParticipantRepository.save(new ChatRoomParticipant(room, user));
+        }
+    }
+
+    // 채팅방 퇴장
+    @Transactional
+    public void exitRoom(Long roomId, String nickname) {
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
+        User user = userProfileRepository.findUserByNickname(nickname)
+                .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
+
+        ChatRoomParticipant participant = chatRoomParticipantRepository.findByChatRoomAndUser(room, user)
+                .orElseThrow(() -> new EntityNotFoundException("채팅방 참가 정보가 없습니다."));
+        participant.disconnect();
+
+        // 필요 시, 아무도 없으면 채팅방 삭제
+        boolean noParticipants = chatRoomParticipantRepository.countByChatRoomAndConnectedTrue(room) == 0;
+        if (noParticipants) {
+            chatRoomRepository.delete(room);
+        }
+    }
+
     // 채팅방 삭제 (생성자 nickname 일치 시에만 허용)
     @Transactional
     public void deleteChatRoomByCreator(Long roomId, String nickname) {
@@ -101,4 +141,5 @@ public class ChatRoomService {
 
         chatRoomRepository.deleteById(roomId);
     }
+
 }
