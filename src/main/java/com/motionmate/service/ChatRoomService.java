@@ -7,6 +7,7 @@ import com.motionmate.domain.chat.ChatRoomRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfileRepository;
 import com.motionmate.domain.user.UserRepository;
+import com.motionmate.dto.chat.ChatRoomMemberDto;
 import com.motionmate.dto.chat.ChatRoomRequestDto;
 import com.motionmate.dto.chat.ChatRoomResponseDto;
 import com.motionmate.dto.chat.ChatRoomUpdateDto;
@@ -127,6 +128,23 @@ public class ChatRoomService {
         if (noParticipants) {
             chatRoomRepository.delete(room);
         }
+    }
+
+    // 전체 멤버 조회
+    @Transactional(readOnly = true)
+    public List<ChatRoomMemberDto> getParticipants(Long roomId) {
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
+
+        List<ChatRoomParticipant> participants = chatRoomParticipantRepository.findByChatRoom(room);
+
+        return participants.stream()
+                .map(p -> ChatRoomMemberDto.builder()
+                        .userId(p.getUser().getId())
+                        .nickname(p.getUser().getProfile().getNickname())
+                        .connected(p.isConnected())
+                        .build())
+                .toList();
     }
 
     // 채팅방 삭제 (생성자 nickname 일치 시에만 허용)
