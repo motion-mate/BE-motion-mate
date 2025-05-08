@@ -35,10 +35,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final FeedRepository feedRepository;
-    private final OrderRepository orderRepository;
-    private final FollowRepository followRepository;
-    private final CartItemRepository cartItemRepository;
+
 
     @Transactional
     public void registerUser(Long userId, UserProfileRegisterRequestDto dto) {
@@ -104,15 +101,15 @@ public class UserService {
     }
 
 
-    // TODO 피드 목록
-    @Transactional(readOnly = true)
-    public List<FeedResponseDto> getMyFeeds(Long userId) {
-        List<Feed> feeds = feedRepository.findByUserId(userId);
-
-        return feeds.stream()
-                .map(FeedMapper::fromEntity)
-                .toList();
-    }
+//    // TODO 피드 목록
+//    @Transactional(readOnly = true)
+//    public List<FeedResponseDto> getMyFeeds(Long userId) {
+//        List<Feed> feeds = feedRepository.findByUserId(userId);
+//
+//        return feeds.stream()
+//                .map(FeedMapper::fromEntity)
+//                .toList();
+//    }
 
 
 //    // TODO 운동 기록
@@ -121,45 +118,45 @@ public class UserService {
 //        // exerciseRecordRepository.findByUserId(userId) 등
 //    }
 
-    // TODO 주문 내역
-    @Transactional(readOnly = true)
-    public List<OrderResponseDto> getMyOrders(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
-
-        List<Order> orders = orderRepository.findByUser(user);
-
-        return orders.stream()
-                .map(OrderMapper::toDto)
-                .toList();
-    }
-
-
-    @Transactional(readOnly = true)
-    public List<FollowResponseDto> getMyFollowing(Long userId) {
-        List<Follow> followings = followRepository.findAllByFromUser_Id(userId);
-        return followings.stream()
-                .map(f -> FollowMapper.toDto(f.getToUser()))
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<FollowResponseDto> getMyFollowers(Long userId) {
-        List<Follow> followers = followRepository.findAllByToUser_Id(userId);
-        return followers.stream()
-                .map(f -> FollowMapper.toDto(f.getFromUser()))
-                .toList();
-    }
-
-    public List<CartItemResponseDto> getMyCartItems(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
-
-        List<CartItem> cartItems = cartItemRepository.findAllByUser(user);
-        return cartItems.stream()
-                .map(CartItemMapper::toDto)
-                .toList();
-    }
+//    // TODO 주문 내역
+//    @Transactional(readOnly = true)
+//    public List<OrderResponseDto> getMyOrders(Long userId) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+//
+//        List<Order> orders = orderRepository.findByUser(user);
+//
+//        return orders.stream()
+//                .map(OrderMapper::toDto)
+//                .toList();
+//    }
+//
+//
+//    @Transactional(readOnly = true)
+//    public List<FollowResponseDto> getMyFollowing(Long userId) {
+//        List<Follow> followings = followRepository.findAllByFromUser_Id(userId);
+//        return followings.stream()
+//                .map(f -> FollowMapper.toDto(f.getToUser()))
+//                .toList();
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public List<FollowResponseDto> getMyFollowers(Long userId) {
+//        List<Follow> followers = followRepository.findAllByToUser_Id(userId);
+//        return followers.stream()
+//                .map(f -> FollowMapper.toDto(f.getFromUser()))
+//                .toList();
+//    }
+//
+//    public List<CartItemResponseDto> getMyCartItems(Long userId) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+//
+//        List<CartItem> cartItems = cartItemRepository.findAllByUser(user);
+//        return cartItems.stream()
+//                .map(CartItemMapper::toDto)
+//                .toList();
+//    }
 
 
 

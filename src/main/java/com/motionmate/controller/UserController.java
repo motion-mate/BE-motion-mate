@@ -51,11 +51,11 @@ public class UserController {
 
 
 
-    // 내 피드
-    @GetMapping("/mypage/my-feeds")
-    public List<FeedResponseDto> getMyFeeds(@AuthenticationPrincipal CustomOAuth2User user) {
-        return userService.getMyFeeds(user.getUserId());
-    }
+//    // 내 피드
+//    @GetMapping("/mypage/my-feeds")
+//    public List<FeedResponseDto> getMyFeeds(@AuthenticationPrincipal CustomOAuth2User user) {
+//        return userService.getMyFeeds(user.getUserId());
+//    }
 //
 //    @GetMapping("/mypage/my-records")
 //    public List<ExerciseRecordDto> getMyRecords(@AuthenticationPrincipal CustomOAuth2User user) {
@@ -63,31 +63,31 @@ public class UserController {
 //    }
 //
 
-    // 내 주문 목록
-    @GetMapping("/mypage/my-orders")
-    public List<OrderResponseDto> getMyOrders(@AuthenticationPrincipal CustomOAuth2User user) {
-        return userService.getMyOrders(user.getUserId());
-    }
-
-
-
-    // 내가 팔로우하고 있는 사람들 (팔로잉)
-    @GetMapping("/mypage/my-following")
-    public List<FollowResponseDto> getMyFollowing(@AuthenticationPrincipal CustomOAuth2User user) {
-        return userService.getMyFollowing(user.getUserId());
-    }
-
-    // 나를 팔로우하는 사람들 (팔로워)
-    @GetMapping("/mypage/my-followers")
-    public List<FollowResponseDto> getMyFollowers(@AuthenticationPrincipal CustomOAuth2User user) {
-        return userService.getMyFollowers(user.getUserId());
-    }
-
-    // 나의 장바구니
-    @GetMapping("/mypage/my-cart")
-    public List<CartItemResponseDto> getMyCartItems(@AuthenticationPrincipal CustomOAuth2User user) {
-        return userService.getMyCartItems(user.getUserId());
-    }
+//    // 내 주문 목록
+//    @GetMapping("/mypage/my-orders")
+//    public List<OrderResponseDto> getMyOrders(@AuthenticationPrincipal CustomOAuth2User user) {
+//        return userService.getMyOrders(user.getUserId());
+//    }
+//
+//
+//
+//    // 내가 팔로우하고 있는 사람들 (팔로잉)
+//    @GetMapping("/mypage/my-following")
+//    public List<FollowResponseDto> getMyFollowing(@AuthenticationPrincipal CustomOAuth2User user) {
+//        return userService.getMyFollowing(user.getUserId());
+//    }
+//
+//    // 나를 팔로우하는 사람들 (팔로워)
+//    @GetMapping("/mypage/my-followers")
+//    public List<FollowResponseDto> getMyFollowers(@AuthenticationPrincipal CustomOAuth2User user) {
+//        return userService.getMyFollowers(user.getUserId());
+//    }
+//
+//    // 나의 장바구니
+//    @GetMapping("/mypage/my-cart")
+//    public List<CartItemResponseDto> getMyCartItems(@AuthenticationPrincipal CustomOAuth2User user) {
+//        return userService.getMyCartItems(user.getUserId());
+//    }
 
 
 }
