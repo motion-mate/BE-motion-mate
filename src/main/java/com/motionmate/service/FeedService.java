@@ -10,7 +10,9 @@ import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.mapper.FeedMapper;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,6 +31,9 @@ public class FeedService {
     private final FeedLikeRepository feedLikeRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final FollowRepository followRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     //피드 업로드
     public FeedResponseDto upload(FeedRequestDto request, Long userId) {
@@ -119,6 +124,9 @@ public class FeedService {
 
         //설명 수정
         feed.updateDescription(request.getDescription());
+
+        entityManager.flush();
+        entityManager.refresh(feed);
 
        Feed updated = repository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "수정 후 피드를 다시 불러오지 못했습니다."));
