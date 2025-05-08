@@ -12,5 +12,6 @@ public class OrderResponseDto {
     private String goodsName;
     private Integer quantity;
     private Integer price;
+    private Integer totalPrice; // 총가격
     private LocalDateTime orderedAt;
 }

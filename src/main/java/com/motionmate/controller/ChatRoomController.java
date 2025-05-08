@@ -1,5 +1,6 @@
 package com.motionmate.controller;
 
+import com.motionmate.dto.chat.ChatRoomMemberDto;
 import com.motionmate.dto.chat.ChatRoomRequestDto;
 import com.motionmate.dto.chat.ChatRoomResponseDto;
 import com.motionmate.dto.chat.ChatRoomUpdateDto;
@@ -65,6 +66,28 @@ public class ChatRoomController {
         return ResponseEntity.ok(updated);
     }
 
+    // 채팅방 입장
+    @PostMapping("/{roomId}/enter")
+    public ResponseEntity<Void> enterRoom(@PathVariable Long roomId,
+                                          @AuthenticationPrincipal CustomOAuth2User user) {
+        chatRoomService.enterRoom(roomId, user.getUser().getProfile().getNickname());
+        return ResponseEntity.ok().build();
+    }
+
+    // 채팅방 퇴장
+    @PostMapping("/{roomId}/exit")
+    public ResponseEntity<Void> exitRoom(@PathVariable Long roomId,
+                                         @AuthenticationPrincipal CustomOAuth2User user) {
+        chatRoomService.exitRoom(roomId, user.getUser().getProfile().getNickname());
+        return ResponseEntity.ok().build();
+    }
+
+    // 채팅방 멤버 조회
+    @GetMapping("/{roomId}/members")
+    public ResponseEntity<List<ChatRoomMemberDto>> getRoomMembers(@PathVariable Long roomId) {
+        return ResponseEntity.ok(chatRoomService.getParticipants(roomId));
+    }
+    
     // 채팅방 삭제
     @DeleteMapping("/{roomId}")
     public ResponseEntity<Void> deleteChatRoom(@PathVariable Long roomId,

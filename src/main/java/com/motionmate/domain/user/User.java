@@ -1,6 +1,7 @@
 package com.motionmate.domain.user;
 
 import com.motionmate.domain.follow.Follow;
+import com.motionmate.domain.notification.Notification;
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
@@ -41,6 +42,9 @@ public class User {
     @OneToMany(mappedBy="toUser")
     private List<Follow> followings;
 
+    @OneToMany(mappedBy = "user")
+    private List<Notification> notifications;
+
     @Builder
     public User(String email, String oauthNickname, String provider, UserProfile profile) {
         this.email = email;
@@ -53,6 +57,4 @@ public class User {
     public void connectProfile(UserProfile profile) {
         this.profile = profile;
     }
-
-
 }

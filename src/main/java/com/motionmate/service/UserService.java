@@ -1,22 +1,34 @@
 package com.motionmate.service;
 
+import com.motionmate.domain.feed.Feed;
+import com.motionmate.domain.feed.FeedRepository;
+import com.motionmate.domain.goods.Order;
+import com.motionmate.domain.goods.OrderRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfile;
 import com.motionmate.domain.user.UserRepository;
+import com.motionmate.dto.feed.FeedResponseDto;
+import com.motionmate.dto.goods.order.OrderResponseDto;
 import com.motionmate.dto.user.*;
 import com.motionmate.global.exception.CustomException;
+import com.motionmate.mapper.FeedMapper;
 import com.motionmate.mapper.UserMapper;
 import com.motionmate.mapper.UserProfileMapper;
+import com.motionmate.mapper.goods.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FeedRepository feedRepository;
+    private final OrderRepository orderRepository;
 
     @Transactional
     public void registerUser(Long userId, UserProfileRegisterRequestDto dto) {
@@ -29,13 +41,8 @@ public class UserService {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 닉네임이 설정되어 있습니다.");
         }
 
-        profile.updateProfile(
-                dto.getNickname(),
-                dto.getBio(),
-                dto.getGoal(),
-                dto.getBirthDate(),
-                dto.getProfileImageUrl()
-        );
+        UserProfileMapper.updateFromDto(profile, dto);
+
     }
 
 
@@ -82,33 +89,39 @@ public class UserService {
         }
 
         // 닉네임은 여기서도 수정 가능 (인스타그램처럼 바꾸는 구조 허용)
-        profile.updateProfile(
-                dto.getNickname(), // ✅ 닉네임도 수정 허용
-                dto.getBio(),
-                dto.getGoal(),
-                dto.getBirthDate(),
-                dto.getProfileImageUrl()
-        );
+        UserProfileMapper.updateFromDto(profile, dto);
+
     }
 
 
     // TODO 피드 목록
-    /*
     @Transactional(readOnly = true)
-    public List<FeedDto> getMyFeeds(Long userId) {
-        // feedRepository.findByUserId(userId) 등
+    public List<FeedResponseDto> getMyFeeds(Long userId) {
+        List<Feed> feeds = feedRepository.findByUserId(userId);
+
+        return feeds.stream()
+                .map(FeedMapper::fromEntity)
+                .toList();
     }
 
-    // TODO 운동 기록
-    @Transactional(readOnly = true)
-    public List<ExerciseRecordDto> getMyRecords(Long userId) {
-        // exerciseRecordRepository.findByUserId(userId) 등
-    }
+
+//    // TODO 운동 기록
+//    @Transactional(readOnly = true)
+//    public List<ExerciseRecordDto> getMyRecords(Long userId) {
+//        // exerciseRecordRepository.findByUserId(userId) 등
+//    }
 
     // TODO 주문 내역
     @Transactional(readOnly = true)
-    public List<OrderDto> getMyOrders(Long userId) {
-        // orderRepository.findByUserId(userId) 등
+    public List<OrderResponseDto> getMyOrders(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        List<Order> orders = orderRepository.findByUser(user);
+
+        return orders.stream()
+                .map(OrderMapper::toDto)
+                .toList();
     }
-    */
+
 }
