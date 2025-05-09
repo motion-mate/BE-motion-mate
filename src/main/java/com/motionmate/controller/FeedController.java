@@ -55,6 +55,7 @@ public class FeedController {
     }
 
     //피드 게시글 수정
+
     @PutMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> updateFeed(
             @PathVariable Long feedId,

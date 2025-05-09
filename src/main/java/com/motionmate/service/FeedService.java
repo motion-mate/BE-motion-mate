@@ -32,8 +32,8 @@ public class FeedService {
     private final FeedCommentRepository feedCommentRepository;
     private final FollowRepository followRepository;
 
-    @Autowired
-    private EntityManager entityManager;
+    // @Autowired
+//    private EntityManager entityManager;
 
     //피드 업로드
     public FeedResponseDto upload(FeedRequestDto request, Long userId) {
@@ -122,11 +122,16 @@ public class FeedService {
             throw new CustomException(HttpStatus.FORBIDDEN ,"수정 권한이 없습니다.");
         }
 
-        //설명 수정
-        feed.updateDescription(request.getDescription());
+        //글, 이미지, 접근권한 수정
+        feed.update(
+                request.getDescription(),
+                request.getImageUrl(),
+                request.getFeedAccessType()
+        );
 
-        entityManager.flush();
-        entityManager.refresh(feed);
+
+//        entityManager.flush();
+//        entityManager.refresh(feed);
 
        Feed updated = repository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "수정 후 피드를 다시 불러오지 못했습니다."));
