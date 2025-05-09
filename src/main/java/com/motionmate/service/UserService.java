@@ -52,6 +52,15 @@ public class UserService {
 
     }
 
+    @Transactional(readOnly = true)
+    public boolean isProfileRegistered(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        UserProfile profile = user.getProfile();
+        return profile != null && profile.getNickname() != null && !profile.getNickname().isBlank();
+    }
+
 
 
     // 내 정보 조회
