@@ -50,17 +50,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         final String nicknameFinal = nickname;
 
 
-        UserProfile profile = UserProfile.builder().build();
-
-        User user = userRepository.save(
-                User.builder()
-                        .email(principalName)
-                        .oauthNickname(nicknameFinal)
-                        .provider(provider)
-                        .profile(profile)
-                        .build()
-        );
-
+        User user = userRepository.findByEmail(principalName)
+            .orElseGet(() -> {
+                UserProfile profile = UserProfile.builder().build();
+                return userRepository.save(
+                        User.builder()
+                                .email(principalName)
+                                .oauthNickname(nicknameFinal)
+                                .provider(provider)
+                                .profile(profile)
+                                .build()
+                );
+            });
         return new CustomOAuth2User(user, attributes);
     }
 }

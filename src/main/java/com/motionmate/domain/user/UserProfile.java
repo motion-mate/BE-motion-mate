@@ -22,7 +22,7 @@ public class UserProfile {
     private String goal;
     private LocalDate birthDate;
 
-    @Builder
+    @Builder    
     public UserProfile(String bio, String goal, LocalDate birthDate, String profileImageUrl) {
         this.bio = bio;
         this.goal = goal;
