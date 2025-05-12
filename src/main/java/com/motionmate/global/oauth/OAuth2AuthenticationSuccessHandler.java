@@ -37,7 +37,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         boolean isRegistered = userService.isProfileRegistered(userId);
 
         // ✅ 리다이렉트 URL 분기
-        String redirectUrl;
+        String redirectUrl; 
         if (isRegistered) {
             redirectUrl = "http://localhost:3000/social/success?token=" + token + "&userId=" + userId;
         } else {
