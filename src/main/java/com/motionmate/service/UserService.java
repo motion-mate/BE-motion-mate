@@ -36,6 +36,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
+    public MainPageUserProfileDto getMainPageUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        return UserProfileMapper.toMainPageUserProfileDto(user);
+    }
 
     @Transactional
     public void registerUser(Long userId, UserProfileRegisterRequestDto dto) {
@@ -74,6 +81,16 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         UserProfile profile = user.getProfile();
+
+        int followerCount = user.getFollowers().size();
+        int followingCount = user.getFollowings().size();
+
+        List<FollowResponseDto> followers = user.getFollowers().stream()
+                .map(f -> FollowMapper.toDto(f.getFromUser()))
+                .toList();
+        List<FollowResponseDto> followings = user.getFollowings().stream()
+                .map(f -> FollowMapper.toDto(f.getToUser()))
+                .toList();
         return UserProfileMapper.toUserProfileDto(user, profile);
     }
 
@@ -84,6 +101,18 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         UserProfile profile = user.getProfile();
+
+        int followerCount = user.getFollowers().size();
+        int followingCount = user.getFollowings().size();
+
+        List<FollowResponseDto> followers = user.getFollowers().stream()
+                .map(f -> FollowMapper.toDto(f.getFromUser()))
+                .toList();
+
+        List<FollowResponseDto> followings = user.getFollowings().stream()
+                .map(f -> FollowMapper.toDto(f.getToUser()))
+                .toList();
+
         return UserProfileMapper.toUserProfileDto(user, profile);
     }
 

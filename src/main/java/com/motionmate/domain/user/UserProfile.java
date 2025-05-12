@@ -22,12 +22,17 @@ public class UserProfile {
     private String goal;
     private LocalDate birthDate;
 
+    private int followerCount;
+    private int followingCount;
+
     @Builder    
-    public UserProfile(String bio, String goal, LocalDate birthDate, String profileImageUrl) {
+    public UserProfile(String bio, String goal, LocalDate birthDate, String profileImageUrl, int followerCount, int followingCount) {
         this.bio = bio;
         this.goal = goal;
         this.birthDate = birthDate;
         this.profileImageUrl = profileImageUrl;
+        this.followerCount = followerCount;
+        this.followingCount = followingCount;
     }
 
 
