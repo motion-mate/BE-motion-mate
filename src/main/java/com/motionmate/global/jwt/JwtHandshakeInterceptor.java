@@ -23,6 +23,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                                    Map<String, Object> attributes) {
 
         String token = extractTokenFromRequest(request);
+        System.out.println("webSocket 연결 시 받은 토큰: " + token);
 
         if (token == null) {
             System.out.println("❌ WebSocket 연결 실패: 토큰 없음");
