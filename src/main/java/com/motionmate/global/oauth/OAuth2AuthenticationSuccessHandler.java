@@ -3,6 +3,7 @@ package com.motionmate.global.oauth;
 import com.motionmate.domain.user.UserRepository;
 import com.motionmate.global.jwt.JwtTokenProvider;
 import com.motionmate.service.UserService;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -39,12 +40,29 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         // ✅ 리다이렉트 URL 분기
         String redirectUrl; 
         if (isRegistered) {
-            redirectUrl = "http://localhost:3000/social/success?token=" + token + "&userId=" + userId;
+            redirectUrl = "http://localhost:3000/social/success?userId=" + userId;
         } else {
-            redirectUrl = "http://localhost:3000/profile/register?token=" + token + "&userId=" + userId;
+            redirectUrl = "http://localhost:3000/profile/register?&userId=" + userId;
         }
 
         log.info("🔀 리다이렉트 URL: {}", redirectUrl); // ✅ 로그 추가
+
+        // 개발환경(localhost)이라면 임시로 Secure, SameSite 조정
+        String tokenCookie = String.format(
+                "token=%s; Max-Age=%d; Path=/", // ↓ Secure, HttpOnly, SameSite 제거
+                token,
+                60 * 60 * 24
+        );
+        String userIdCookie = String.format(
+                "userId=%d; Max-Age=%d; Path=/",
+                userId,
+                60 * 60 * 24
+        );
+
+
+        response.setHeader("Set-Cookie", tokenCookie);
+        response.addHeader("Set-Cookie", userIdCookie);
+
         response.sendRedirect(redirectUrl);
     }
 }

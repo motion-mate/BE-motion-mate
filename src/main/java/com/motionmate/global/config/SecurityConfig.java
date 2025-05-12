@@ -4,6 +4,7 @@ import com.motionmate.domain.user.UserRepository;
 import com.motionmate.global.jwt.JwtAuthenticationFilter;
 import com.motionmate.global.jwt.JwtTokenProvider;
 import com.motionmate.global.oauth.CustomOAuth2UserService;
+import com.motionmate.global.oauth.JwtLogoutSuccessHandler;
 import com.motionmate.global.oauth.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -47,6 +48,12 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                         .successHandler(oAuth2AuthenticationSuccessHandler)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("token")
+                        .logoutSuccessUrl("http://localhost:3000/main")
                 );
 
         return http.build();
