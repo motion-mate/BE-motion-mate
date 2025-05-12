@@ -20,12 +20,12 @@ public class ChatMessageService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-    public ChatMessage saveMessage(Long roomId, ChatMessageRequestDto dto) {
+    public ChatMessage saveMessage(Long roomId, ChatMessageRequestDto dto, Long userId) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
 
-        User sender = userRepository.findById(dto.getSenderId())
+        User sender = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         ChatMessage message = toEntity(chatRoom, sender, dto);

@@ -4,6 +4,7 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
@@ -23,7 +24,13 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
         String token = extractTokenFromRequest(request);
 
-        if (token == null || !jwtTokenProvider.validateToken(token)) {
+        if (token == null) {
+            System.out.println("❌ WebSocket 연결 실패: 토큰 없음");
+            return false;
+        }
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            System.out.println("❌ WebSocket 연결 실패: 유효하지 않은 토큰");
             return false;
         }
 
@@ -43,12 +50,11 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     }
 
     private String extractTokenFromRequest(ServerHttpRequest request) {
-        // 예: 쿼리에서 token 가져오기
-        String uri = request.getURI().toString();
-        if (uri.contains("token=")) {
-            return uri.substring(uri.indexOf("token=") + 6);
-        }
-        return null;
+        return UriComponentsBuilder.fromUri(request.getURI())
+                .build()
+                .getQueryParams()
+                .getFirst("token");
     }
+
 
 }
