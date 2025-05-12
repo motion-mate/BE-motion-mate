@@ -18,7 +18,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository; // ✅ 추가: 유저 조회를 위해 리포지토리 주입
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -28,20 +28,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Long userId = jwtTokenProvider.getUserIdFromToken(token);
-
-            // ✅ userId로 DB에서 유저 조회
             User user = userRepository.findById(userId).orElse(null);
+
             if (user != null) {
-                // ✅ CustomOAuth2User 생성 후 Authentication에 주입
-                CustomOAuth2User customUser = new CustomOAuth2User(user, null); // attributes는 null 처리
+                CustomOAuth2User customUser = new CustomOAuth2User(user, null);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(customUser, null, null);
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                filterChain.doFilter(request, response); // ✅ 인증 성공 시 필터 계속 진행
+                return;
             }
         }
 
-        filterChain.doFilter(request, response);
+        // ✅ 인증 실패 시 401 반환 (302 리다이렉트 방지)
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"Unauthorized - Invalid or missing token\"}");
     }
 
     private String resolveToken(HttpServletRequest request) {
