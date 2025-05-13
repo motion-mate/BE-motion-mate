@@ -84,13 +84,6 @@ public class ChatRoomService {
             throw new SecurityException("채팅방 생성자만 수정할 수 있습니다.");
         }
 
-        if (dto.getTitle() != null) room.updateTitle(dto.getTitle());
-        if (dto.getExerciseType() != null) room.updateExerciseType(dto.getExerciseType());
-        if (dto.getAddress() != null) room.updateAddress(dto.getAddress());
-        if (dto.getLatitude() != null) room.updateLatitude(dto.getLatitude());
-        if (dto.getLongitude() != null) room.updateLongitude(dto.getLongitude());
-        if (dto.getPromiseDate() != null) room.updatePromiseDate(dto.getPromiseDate());
-        if (dto.getPromiseTime() != null) room.updatePromiseTime(dto.getPromiseTime());
 
         return ChatRoomMapper.toDto(room);
     }
