@@ -9,8 +9,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 
 
 @Entity
@@ -37,10 +38,10 @@ public class User {
     private UserProfile profile;
 
     @OneToMany(mappedBy="fromUser")
-    private List<Follow> followers;
+    private Set<Follow> followers = new HashSet<>();
 
     @OneToMany(mappedBy="toUser")
-    private List<Follow> followings;
+    private Set<Follow> followings = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     private List<Notification> notifications;
