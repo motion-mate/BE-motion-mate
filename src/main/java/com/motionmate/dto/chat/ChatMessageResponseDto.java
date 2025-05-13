@@ -14,5 +14,6 @@ public class ChatMessageResponseDto {
     private String senderNickname;
     private String message;
     private LocalDateTime sentAt;
+    private ChatMessage.MessageType type;
 
 }

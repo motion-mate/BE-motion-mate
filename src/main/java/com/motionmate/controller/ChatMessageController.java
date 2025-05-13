@@ -33,6 +33,10 @@ public class ChatMessageController {
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
         User user = (User) sessionAttributes.get("user"); // 전체 User 객체 호출
 
+        if (dto.getType() == null) {
+            throw new IllegalArgumentException("메시지 타입이 누락되었습니다.");
+        }
+
         ChatMessage saved = chatService.saveMessage(roomId, dto, user);
         ChatMessageResponseDto response = toDto(saved);
         template.convertAndSend("/sub/chat/" + roomId, response);

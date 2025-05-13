@@ -9,7 +9,7 @@ import com.motionmate.dto.chat.ChatMessageResponseDto;
 public class ChatMessageMapper {
 
     public static ChatMessage toEntity(ChatRoom room, User sender, ChatMessageRequestDto dto) {
-        return new ChatMessage(room, sender, dto.getMessage());
+        return new ChatMessage(room, sender, dto.getMessage(), dto.getType());
     }
 
     public static ChatMessageResponseDto toDto(ChatMessage message) {
@@ -18,6 +18,7 @@ public class ChatMessageMapper {
                 .senderNickname(message.getSender().getProfile().getNickname())
                 .message(message.getMessage())
                 .sentAt(message.getSentAt())
+                .type(message.getType())
                 .build();
     }
 
