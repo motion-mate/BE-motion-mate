@@ -17,6 +17,9 @@ public class ChatRoomRequestDto {
     @NotNull(message = "운동 종류를 선택해주세요.")
     private ExerciseType exerciseType;
 
+    @NotBlank(message = "도로명 주소는 필수입니다.")
+    private String roadAddress;
+
     private String address; // 선택 입력
 
     @NotNull(message = "위도는 필수입니다.")

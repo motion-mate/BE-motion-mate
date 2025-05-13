@@ -28,6 +28,9 @@ public class ChatRoom {
     @Enumerated(EnumType.STRING)
     private ExerciseType exerciseType; // 운동 종류
 
+    @Column(nullable = false)
+    private String roadAddress;
+
     private String address; // 지도로 찍은게 아닌 생성자가 작성한 주소
 
     @Column(nullable = false)
@@ -79,8 +82,10 @@ public class ChatRoom {
         this.promiseAt = LocalDateTime.of(this.promiseDate, promiseTime);
     }
 
-    public ChatRoom(String title, ExerciseType exerciseType, String address, Double latitude, Double longitude, LocalDate promiseDate, LocalTime promiseTime, User creator) {
+    public ChatRoom(String title, ExerciseType exerciseType, String roadAddress, String address, Double latitude, Double longitude, LocalDate promiseDate, LocalTime promiseTime, User creator) {
         this.title = title;
+        this.exerciseType = exerciseType;
+        this.roadAddress = roadAddress;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -89,6 +94,5 @@ public class ChatRoom {
         this.promiseTime = promiseTime;
         this.promiseAt = LocalDateTime.of(promiseDate, promiseTime);
         this.creator = creator;
-        this.exerciseType = exerciseType;
     }
 }
