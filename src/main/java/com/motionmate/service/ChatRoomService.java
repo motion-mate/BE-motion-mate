@@ -1,9 +1,6 @@
 package com.motionmate.service;
 
-import com.motionmate.domain.chat.ChatRoom;
-import com.motionmate.domain.chat.ChatRoomParticipant;
-import com.motionmate.domain.chat.ChatRoomParticipantRepository;
-import com.motionmate.domain.chat.ChatRoomRepository;
+import com.motionmate.domain.chat.*;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfileRepository;
 import com.motionmate.domain.user.UserRepository;
@@ -28,6 +25,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserProfileRepository userProfileRepository;
     private final ChatRoomParticipantRepository chatRoomParticipantRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     // 채팅방 생성 (nickname 기반)
     @Transactional
@@ -150,7 +148,15 @@ public class ChatRoomService {
             throw new SecurityException("채팅방 생성자만 삭제할 수 있습니다.");
         }
 
+        // ✅ 1. 메시지 먼저 삭제
+        chatMessageRepository.deleteByChatRoomId(roomId);
+
+        // ✅ 2. 참가자 삭제
+        chatRoomParticipantRepository.deleteByChatRoomId(roomId);
+
+        // ✅ 3. 채팅방 삭제
         chatRoomRepository.deleteById(roomId);
     }
+
 
 }
