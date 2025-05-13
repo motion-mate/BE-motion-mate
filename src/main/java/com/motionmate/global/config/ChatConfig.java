@@ -1,5 +1,6 @@
 package com.motionmate.global.config;
 
+import com.motionmate.domain.user.UserRepository;
 import com.motionmate.global.jwt.JwtHandshakeInterceptor;
 import com.motionmate.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -14,16 +15,15 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class ChatConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
 
     // 클라이언트에서 websocket에 접속하는 endpoint 등록
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
         registry.addEndpoint( "/ws-stomp")
-                .addInterceptors(new JwtHandshakeInterceptor(jwtTokenProvider))
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .addInterceptors(jwtHandshakeInterceptor)
+                .setAllowedOrigins("http://localhost:3000");
 
     }
 
