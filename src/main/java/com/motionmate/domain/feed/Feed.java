@@ -41,7 +41,10 @@ public class Feed {
         this.feedAccessType = feedAccessType;
     }
 
-    public void updateDescription(String description) {
+    public void update(String description, String imageUrl, FeedAccessType feedAccessType) {
         this.description = description;
+        this.imageUrl = imageUrl;
+        this.feedAccessType = feedAccessType;
     }
+
 }

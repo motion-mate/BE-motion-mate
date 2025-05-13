@@ -27,7 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // CORS 따로 WebConfig에서 설정한다면 disable
+                .cors(cors -> cors.disable()) // CORS 따로 WebConfig에서 설정한다면 disable
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
@@ -50,6 +50,12 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                         .successHandler(oAuth2AuthenticationSuccessHandler)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("token")
+                        .logoutSuccessUrl("http://localhost:3000/main")
                 );
 
         return http.build();

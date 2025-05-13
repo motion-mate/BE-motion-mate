@@ -8,7 +8,7 @@ import com.motionmate.dto.feed.FeedResponseDto;
 
 public class FeedMapper {
 
-    //dto -> entity
+    //FeedRequestDto -> entity
     public static Feed toEntity(FeedRequestDto dto, User user){
         return  Feed.builder()
                 .user(user)
