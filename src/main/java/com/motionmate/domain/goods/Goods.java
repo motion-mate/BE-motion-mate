@@ -24,11 +24,12 @@ public class Goods {
     private Integer stock;
     private Integer price;
 
-    // ✅ 새 필드
     private boolean isLimited;
     private String category;
+    private String subCategory;
 
-    public Goods(String name, String description, String imageUrl, Integer stock, Integer price, boolean isLimited, String category) {
+    public Goods(String name, String description, String imageUrl, Integer stock, Integer price,
+                 boolean isLimited, String category, String subCategory) {
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
@@ -36,6 +37,7 @@ public class Goods {
         this.price = price;
         this.isLimited = isLimited;
         this.category = category;
+        this.subCategory = subCategory; // ✅ 여기에 포함
     }
 
     public void decreaseStock(int quantity) {

@@ -16,6 +16,7 @@ public class GoodsMapper {
                 .liked(liked)
                 .isLimited(goods.isLimited()) // ✅
                 .category(goods.getCategory()) // ✅
+                .subCategory(goods.getSubCategory())
                 .build();
     }
 
@@ -27,7 +28,8 @@ public class GoodsMapper {
                 dto.getStock(),
                 dto.getPrice(),
                 dto.getIsLimited(), // ✅
-                dto.getCategory()   // ✅
+                dto.getCategory(),   // ✅
+                dto.getSubCategory()
         );
     }
 }

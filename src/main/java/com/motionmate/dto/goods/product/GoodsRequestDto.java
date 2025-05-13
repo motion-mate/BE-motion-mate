@@ -27,10 +27,12 @@ public class GoodsRequestDto {
     @Min(value = 0, message = "재고는 0 이상이어야 합니다.")
     private Integer stock;
 
-    // ✅ 추가 필드
     @NotNull(message = "한정 여부는 필수입니다.")
     private Boolean isLimited;
 
     @NotBlank(message = "카테고리는 필수입니다.")
     private String category;
+
+    @NotBlank(message = "하위 카테고리는 필수입니다.") // ✅ 추가 필드
+    private String subCategory;
 }

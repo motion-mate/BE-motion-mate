@@ -20,4 +20,5 @@ public class GoodsResponseDto {
     // ✅ 추가 필드
     private boolean isLimited;
     private String category;
+    private String subCategory;
 }
