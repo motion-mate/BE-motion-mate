@@ -25,8 +25,9 @@ public class UserProfile {
     private int followerCount;
     private int followingCount;
 
-    @Builder    
-    public UserProfile(String bio, String goal, LocalDate birthDate, String profileImageUrl, int followerCount, int followingCount) {
+    @Builder
+    public UserProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl, int followerCount, int followingCount) {
+        this.nickname = nickname;
         this.bio = bio;
         this.goal = goal;
         this.birthDate = birthDate;
@@ -50,6 +51,18 @@ public class UserProfile {
 //    public void updateProfileImage(String profileImageUrl) {
 //        this.profileImageUrl = profileImageUrl;
 //    }
+
+    public static UserProfile createEmptyProfile() {
+        return UserProfile.builder()
+                .nickname("") // 혹은 null 허용하면 null
+                .bio(null)
+                .goal(null)
+                .birthDate(null)
+                .profileImageUrl(null)
+                .followerCount(0)
+                .followingCount(0)
+                .build();
+    }
 
 
 }

@@ -49,15 +49,21 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
+        // ✅ 프로필이 없으면 새로 만들어 연결
+        if (user.getProfile() == null) {
+            UserProfile newProfile = UserProfile.createEmptyProfile();
+            user.connectProfile(newProfile);
+        }
+
         UserProfile profile = user.getProfile();
 
-        if (profile.getNickname() != null) {
+        if (profile.getNickname() != null && !profile.getNickname().isBlank()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 닉네임이 설정되어 있습니다.");
         }
 
         UserProfileMapper.updateFromDto(profile, dto);
-
     }
+
 
     @Transactional(readOnly = true)
     public boolean isProfileRegistered(Long userId) {
