@@ -77,7 +77,7 @@ public class UserService {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
         }
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findWithProfileAndFollowById(userId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         UserProfile profile = user.getProfile();
@@ -97,7 +97,7 @@ public class UserService {
     // 다른 유저 프로필 조회
     @Transactional(readOnly = true)
     public UserProfileDto getUserProfile(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findWithProfileAndFollowById(userId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         UserProfile profile = user.getProfile();

@@ -57,7 +57,7 @@ public class FollowService {
 
     // 내가 팔로우한 유저 목록
     public List<FollowResponseDto> getFollowings(Long userId) {
-        List<Follow> followings = followRepository.findAllByFromUser_Id(userId);
+        List<Follow> followings = followRepository.findAllByToUser_IdWithUser(userId);
         return followings.stream()
                 .map(follow -> FollowMapper.toDto(follow.getToUser()))
                 .toList();
@@ -65,7 +65,7 @@ public class FollowService {
 
     // 나를 팔로우한 유저 목록
     public List<FollowResponseDto> getFollowers(Long userId) {
-        List<Follow> followers = followRepository.findAllByToUser_Id(userId);
+        List<Follow> followers = followRepository.findAllByToUser_IdWithUser(userId);
         return followers.stream()
                 .map(follow -> FollowMapper.toDto(follow.getFromUser()))
                 .toList();
