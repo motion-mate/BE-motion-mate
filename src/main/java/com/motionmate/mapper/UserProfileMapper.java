@@ -2,12 +2,26 @@ package com.motionmate.mapper;
 
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfile;
-import com.motionmate.dto.user.UserProfileDto;
-import com.motionmate.dto.user.UserProfileRegisterRequestDto;
-import com.motionmate.dto.user.UserProfileResponseDto;
-import com.motionmate.dto.user.UserProfileUpdateRequestDto;
+import com.motionmate.dto.follow.FollowResponseDto;
+import com.motionmate.dto.user.*;
 
-public class         UserProfileMapper {
+import java.util.List;
+
+public class UserProfileMapper {
+
+    // 메인페이지용 간단 프로필 DTO 변환
+    public static MainPageUserProfileDto toMainPageUserProfileDto(User user) {
+        int followerCount = user.getFollowers().size();
+        int followingCount = user.getFollowings().size();
+
+        return MainPageUserProfileDto.builder()
+                .userId(user.getId())
+                .nickname(user.getProfile().getNickname())
+                .profileImageUrl(user.getProfile().getProfileImageUrl())
+                .followerCount(followerCount)
+                .followingCount(followingCount)
+                .build();
+    }
 
     // 단독 프로필 조회 DTO 변환
     public static UserProfileResponseDto toResponseDto(UserProfile profile) {
@@ -20,13 +34,18 @@ public class         UserProfileMapper {
 
     // 마이페이지 통합 응답 DTO 변환
     public static UserProfileDto toUserProfileDto(User user, UserProfile profile) {
+        int followerCount = user.getFollowers().size();
+        int followingCount = user.getFollowings().size();
+
         return UserProfileDto.builder()
                 .userId(user.getId())
                 .nickname(profile.getNickname())
                 .profileImageUrl(profile.getProfileImageUrl())
-                .bio(profile != null ? profile.getBio() : "") // ✅ null-safe 처리
-                .goal(profile != null ? profile.getGoal() : "") // ✅ 필요시 기본값
-                .birthDate(profile != null ? profile.getBirthDate() : null) // ✅ 날짜는 null 허용
+                .bio(profile != null ? profile.getBio() : "")
+                .goal(profile != null ? profile.getGoal() : "")
+                .birthDate(profile != null ? profile.getBirthDate() : null)
+                .followerCount(followerCount)
+                .followingCount(followingCount)
                 .build();
     }
 

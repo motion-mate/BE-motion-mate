@@ -4,11 +4,13 @@ import com.motionmate.domain.user.UserRepository;
 import com.motionmate.global.jwt.JwtAuthenticationFilter;
 import com.motionmate.global.jwt.JwtTokenProvider;
 import com.motionmate.global.oauth.CustomOAuth2UserService;
+import com.motionmate.global.oauth.JwtLogoutSuccessHandler;
 import com.motionmate.global.oauth.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -27,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable()) // CORS 따로 WebConfig에서 설정한다면 disable
+                .cors(Customizer.withDefaults()) // ✅ 이렇게 해야 WebConfig의 CORS 설정이 적용됨
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
@@ -46,6 +48,12 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                         .successHandler(oAuth2AuthenticationSuccessHandler)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("token")
+                        .logoutSuccessUrl("http://localhost:3000/main")
                 );
 
         return http.build();
