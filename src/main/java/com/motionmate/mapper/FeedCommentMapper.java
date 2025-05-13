@@ -14,15 +14,34 @@ public class FeedCommentMapper {
     }
 
     //entity -> FeedCommentResponseDto
-    public static FeedCommentResponseDto fromEntity(FeedComment entity){
+    //댓글 등록/수정용
+    public static FeedCommentResponseDto fromEntity(FeedComment entity, Long currentUserId){
+      boolean isAuthor =  entity.getUser().getId().equals(currentUserId);
+
         return new FeedCommentResponseDto(
                 entity.getId(),
                 entity.getContent(),
                 entity.getUser().getProfile().getNickname(),
+                entity.getUser().getProfile().getProfileImageUrl(),
                 entity.getCreatedAt(),
-                entity.getUpdatedAt()
+                entity.getUpdatedAt(),
+                isAuthor
         );
     }
+
+    public static FeedCommentResponseDto fromEntity(FeedComment entity){
+
+        return new FeedCommentResponseDto(
+                entity.getId(),
+                entity.getContent(),
+                entity.getUser().getProfile().getNickname(),
+                entity.getUser().getProfile().getProfileImageUrl(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
+                true
+        );
+    }
+
 
 
 }
