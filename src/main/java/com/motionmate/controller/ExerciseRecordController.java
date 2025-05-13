@@ -31,7 +31,7 @@ public class ExerciseRecordController {
         return ResponseEntity.ok("운동 스케줄이 등록되었습니다.");
     }
     @GetMapping("/schedule/{userId}")
-    public ResponseEntity<List<ExerciseScheduleResponse>> getSchedules(@PathVariable Long userId){
+    public ResponseEntity<List<ExerciseScheduleResponse>> getSchedules(@PathVariable("userId") Long userId){
         List<ExerciseScheduleResponse> response = service.getSchedulesByUserId(userId);
         return ResponseEntity.ok(response);
     }
