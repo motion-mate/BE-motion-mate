@@ -33,8 +33,9 @@ public class FeedCommentController {
     //댓글 전체 조회
     @GetMapping("/comments/{feedId}")
     public  ResponseEntity<List<FeedCommentResponseDto>> getAllComments(
-            @PathVariable Long feedId) {
-        return ResponseEntity.ok(feedCommentService.getAllComments(feedId));
+            @PathVariable Long feedId,
+            @AuthenticationPrincipal CustomOAuth2User user) {
+        return ResponseEntity.ok(feedCommentService.getAllComments(feedId, user.getUserId()));
     }
 
     //댓글 미리 보기
