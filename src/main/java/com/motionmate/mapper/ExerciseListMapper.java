@@ -2,10 +2,9 @@ package com.motionmate.mapper;
 
 import com.motionmate.domain.exercise.ExerciseImage;
 import com.motionmate.domain.exercise.ExerciseList;
-import com.motionmate.dto.exercise.ExerciseListRequest;
-import com.motionmate.dto.exercise.S3FileRequest;
-import com.motionmate.dto.exercise.S3FileResponse;
-import com.motionmate.dto.exercise.SaveImageResponse;
+import com.motionmate.domain.exercise.ExerciseSchedule;
+import com.motionmate.domain.user.User;
+import com.motionmate.dto.exercise.*;
 
 import java.util.Collections;
 
@@ -45,6 +44,39 @@ public class ExerciseListMapper {
                 response.url(),
                 response.bucketKey(),
                 response.orgName()
+        );
+    }
+    public static ExerciseListWithImageResponse from(ExerciseList exercise, SaveImageResponse imageDto){
+        return new ExerciseListWithImageResponse(
+                exercise.getExerciseId(),
+                exercise.getName(),
+                exercise.getDescription(),
+                exercise.getCategory(),
+                imageDto
+        );
+    }
+    public static ExerciseSchedule toScheduleEntity(ExerciseScheduleRequest request, User user, ExerciseList exercise) {
+        return new ExerciseSchedule(
+                null,
+                user,
+                exercise,
+                request.getDate(),
+                request.getSetNumber(),
+                request.getKg(),
+                request.getReps(),
+                request.getTime()
+        );
+    }
+    public static ExerciseScheduleResponse toScheduleResponseDto(ExerciseSchedule schedule){
+        return new ExerciseScheduleResponse(
+                schedule.getId(),
+                schedule.getExercise().getName(),
+                schedule.getExercise().getCategory().name(),
+                schedule.getDate(),
+                schedule.getSetNumber(),
+                schedule.getKg(),
+                schedule.getReps(),
+                schedule.getTime()
         );
     }
 }

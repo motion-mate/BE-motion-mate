@@ -1,6 +1,5 @@
 package com.motionmate.domain.chat;
 
-import com.motionmate.domain.exercise.ExerciseRecord;
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

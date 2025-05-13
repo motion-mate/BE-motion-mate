@@ -26,13 +26,6 @@ public class ExerciseList {
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExerciseImage> imageUrl;
 
-    public ExerciseList(String name, String description, ExerciseCategory category, List<ExerciseImage> imageUrl)
-    {
-        this.name=name;
-        this.description=description;
-        this.category=category;
-        this.imageUrl=imageUrl;
-    }
 
 
 }
