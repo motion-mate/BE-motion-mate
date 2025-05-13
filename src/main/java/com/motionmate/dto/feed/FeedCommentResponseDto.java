@@ -19,11 +19,15 @@ public class FeedCommentResponseDto {
 
     private final String writer;
 
+    private final String profileImageUrl;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private final LocalDateTime createdAt;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private final LocalDateTime updatedAt;
+
+    private final boolean isAuthor;
 
 }

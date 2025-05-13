@@ -39,11 +39,11 @@ public class FeedCommentService {
     }
 
     //댓글 전체 조회
-    public List<FeedCommentResponseDto> getAllComments(Long feedId) {
+    public List<FeedCommentResponseDto> getAllComments(Long feedId, Long userId) {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
         return feedCommentRepository.findByFeed(feed).stream()
-                .map(FeedCommentMapper::fromEntity)
+                .map(comment -> FeedCommentMapper.fromEntity(comment, userId))
                 .toList();
     }
 
