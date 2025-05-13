@@ -4,6 +4,8 @@ import com.motionmate.domain.user.User;
 import com.motionmate.dto.follow.FollowResponseDto;
 import com.motionmate.dto.follow.IsFollowingDto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +19,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     List<Follow> findAllByFromUser_Id(Long userId);
 
     List<Follow> findAllByToUser_Id(Long userId);
+
+    @Query("SELECT f FROM Follow f JOIN FETCH f.fromUser WHERE f.toUser.id = :userId")
+    List<Follow> findAllByToUser_IdWithUser(@Param("userId") Long userId);
 }

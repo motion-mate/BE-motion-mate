@@ -46,11 +46,11 @@ public class ChatRoomController {
     @GetMapping("/filter")
     public ResponseEntity<List<ChatRoomResponseDto>> filterChatRooms(
             @RequestParam(required = false) String exerciseType,
-            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String roadAddress,
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String keyword
     ) {
-        List<ChatRoomResponseDto> result = chatRoomService.filterChatRooms(exerciseType, address, date, keyword);
+        List<ChatRoomResponseDto> result = chatRoomService.filterChatRooms(exerciseType, roadAddress, date, keyword);
         return ResponseEntity.ok(result);
     }
 

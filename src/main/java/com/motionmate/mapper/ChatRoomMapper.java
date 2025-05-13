@@ -11,6 +11,7 @@ public class ChatRoomMapper {
         return new ChatRoom(
                 dto.getTitle(),
                 dto.getExerciseType(),
+                dto.getRoadAddress(),
                 dto.getAddress(),
                 dto.getLatitude(),
                 dto.getLongitude(),
@@ -25,6 +26,7 @@ public class ChatRoomMapper {
                 .id(room.getId())
                 .title(room.getTitle())
                 .exerciseType(room.getExerciseType())
+                .roadAddress(room.getRoadAddress())
                 .address(room.getAddress())
                 .latitude(room.getLatitude())
                 .longitude(room.getLongitude())

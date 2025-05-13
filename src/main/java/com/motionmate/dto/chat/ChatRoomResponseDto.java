@@ -16,6 +16,7 @@ public class ChatRoomResponseDto {
     private Long id;
     private String title;
     private ExerciseType exerciseType;
+    private String roadAddress;
     private String address;
     private Double latitude;
     private Double longitude;

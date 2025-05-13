@@ -58,7 +58,7 @@ public class ChatRoomService {
 
     // 필터 조건 기반 채팅방 검색
     @Transactional(readOnly = true)
-    public List<ChatRoomResponseDto> filterChatRooms(String type, String address, String dateStr, String keyword) {
+    public List<ChatRoomResponseDto> filterChatRooms(String type, String roadAddress, String dateStr, String keyword) {
         ChatRoom.ExerciseType exerciseType = (type != null && !type.isBlank())
                 ? ChatRoom.ExerciseType.valueOf(type.toUpperCase())
                 : null;
@@ -67,7 +67,7 @@ public class ChatRoomService {
                 ? LocalDate.parse(dateStr)
                 : null;
 
-        List<ChatRoom> filteredRooms = chatRoomRepository.filterBy(exerciseType, address, date, keyword);
+        List<ChatRoom> filteredRooms = chatRoomRepository.filterBy(exerciseType, roadAddress, date, keyword);
 
         return filteredRooms.stream()
                 .map(ChatRoomMapper::toDto)
