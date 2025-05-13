@@ -15,11 +15,14 @@ public class CartToOrderProcessor {
     private final GoodsRepository goodsRepository;
     private final OrderRepository orderRepository;
 
-    public void process(User user, Long goodsId, int quantity) {
+    // ✅ 변경: void → Long
+    public Long process(User user, Long goodsId, int quantity) {
         Goods goods = goodsRepository.findById(goodsId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
         Order order = new Order(user, goods, quantity);
         orderRepository.save(order);
+
+        return order.getId(); // ✅ 주문 ID 반환
     }
 }
