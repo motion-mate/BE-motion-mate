@@ -41,7 +41,8 @@ public class FeedController {
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomOAuth2User user) {
         Long userId = (user != null) ? user.getUserId() : null;
-        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, userId));
+        String nickname = (user != null) ? user.getUser().getProfile().getNickname(): null;
+        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, nickname, userId));
     }
 
 

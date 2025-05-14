@@ -36,4 +36,8 @@ public class FeedResponseDto {
 
     //좋아요 여부
     private boolean liked;
+
+    private int likeCount;
+
+    private int commentCount;
 }
