@@ -1,6 +1,7 @@
 package com.motionmate.controller;
 
 import com.motionmate.domain.chat.ChatMessage;
+import com.motionmate.domain.user.User;
 import com.motionmate.dto.chat.ChatMessageRequestDto;
 import com.motionmate.dto.chat.ChatMessageResponseDto;
 import com.motionmate.service.ChatMessageService;
@@ -30,8 +31,13 @@ public class ChatMessageController {
     public void sendMessage(@DestinationVariable Long roomId,
                             @Payload ChatMessageRequestDto dto,
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
-        Long userId = (Long) sessionAttributes.get("userId");
-        ChatMessage saved = chatService.saveMessage(roomId, dto, userId);
+        User user = (User) sessionAttributes.get("user"); // 전체 User 객체 호출
+
+        if (dto.getType() == null) {
+            throw new IllegalArgumentException("메시지 타입이 누락되었습니다.");
+        }
+
+        ChatMessage saved = chatService.saveMessage(roomId, dto, user);
         ChatMessageResponseDto response = toDto(saved);
         template.convertAndSend("/sub/chat/" + roomId, response);
     }

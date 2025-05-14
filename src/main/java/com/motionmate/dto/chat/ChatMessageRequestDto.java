@@ -1,5 +1,6 @@
 package com.motionmate.dto.chat;
 
+import com.motionmate.domain.chat.ChatMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,4 +11,5 @@ import lombok.Setter;
 public class ChatMessageRequestDto {
     private Long chatRoomId; // 채팅방 ID
     private String message; // 메시지 내용
+    private ChatMessage.MessageType type;
 }

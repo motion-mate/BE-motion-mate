@@ -1,6 +1,5 @@
 package com.motionmate.domain.chat;
 
-import com.motionmate.domain.exercise.ExerciseRecord;
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,7 +19,8 @@ public class ChatRoom {
         RUNNING, SWIMMING, CYCLING, GYM
     }
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title; // 채팅방 제목
@@ -28,21 +28,30 @@ public class ChatRoom {
     @Enumerated(EnumType.STRING)
     private ExerciseType exerciseType; // 운동 종류
 
+    @Column(nullable = false)
+    private String roadAddress;
+
     private String address; // 지도로 찍은게 아닌 생성자가 작성한 주소
 
     @Column(nullable = false)
     private Double latitude; // 위도
+
     @Column(nullable = false)
     private Double longitude; // 경도
 
     private LocalDateTime createdAt; // 생성일
+
     private LocalDateTime promiseAt; // 운동 예정일 및 시간
 
     private LocalDate promiseDate; // 운동 예정일
+
     private LocalTime promiseTime; // 운동 예정 시간
 
     @ManyToOne
     private User creator; // 방의 생성자
+
+    // 방장 위임
+    public void setCreator(User user) { this.creator = user; }
 
     // 채팅방 제목 수정
     public void updateTitle(String title) {
@@ -79,8 +88,12 @@ public class ChatRoom {
         this.promiseAt = LocalDateTime.of(this.promiseDate, promiseTime);
     }
 
-    public ChatRoom(String title, ExerciseType exerciseType, String address, Double latitude, Double longitude, LocalDate promiseDate, LocalTime promiseTime, User creator) {
+    // 최종 생성자 (develop 브랜치 기준)
+    public ChatRoom(String title, ExerciseType exerciseType, String roadAddress, String address,
+                    Double latitude, Double longitude, LocalDate promiseDate, LocalTime promiseTime, User creator) {
         this.title = title;
+        this.exerciseType = exerciseType;
+        this.roadAddress = roadAddress;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -89,6 +102,5 @@ public class ChatRoom {
         this.promiseTime = promiseTime;
         this.promiseAt = LocalDateTime.of(promiseDate, promiseTime);
         this.creator = creator;
-        this.exerciseType = exerciseType;
     }
 }

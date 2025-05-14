@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class  ChatMessage {
 
+    public enum MessageType {
+        ENTER, TALK, QUIT
+    }
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -25,10 +29,14 @@ public class  ChatMessage {
     private String message; // 메시지
     private LocalDateTime sentAt; // 보낸 시간
 
-    public ChatMessage(ChatRoom chatRoom, User sender, String message) {
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
+
+    public ChatMessage(ChatRoom chatRoom, User sender, String message, MessageType type) {
         this.chatRoom = chatRoom;
         this.sender = sender;
         this.message = message;
         this.sentAt = LocalDateTime.now();
+        this.type = type;
     }
 }

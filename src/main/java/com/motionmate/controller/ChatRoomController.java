@@ -42,15 +42,28 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRoomService.getChatRoom(roomId));
     }
 
+    // 사용자가 참여한 채팅방 조회
+    @GetMapping("/me")
+    public ResponseEntity<List<ChatRoomResponseDto>> getMyChatRooms(@AuthenticationPrincipal CustomOAuth2User user) {
+//        if (user == null) {
+//            return ResponseEntity.status(401).build(); // 혹은 throw new UnauthorizedException();
+//        }
+
+        String nickname = user.getUser().getProfile().getNickname();
+        List<ChatRoomResponseDto> result = chatRoomService.getChatRoomsByParticipant(nickname);
+        return ResponseEntity.ok(result);
+    }
+
+
     // 채팅방 필터 적용
     @GetMapping("/filter")
     public ResponseEntity<List<ChatRoomResponseDto>> filterChatRooms(
             @RequestParam(required = false) String exerciseType,
-            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String roadAddress,
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String keyword
     ) {
-        List<ChatRoomResponseDto> result = chatRoomService.filterChatRooms(exerciseType, address, date, keyword);
+        List<ChatRoomResponseDto> result = chatRoomService.filterChatRooms(exerciseType, roadAddress, date, keyword);
         return ResponseEntity.ok(result);
     }
 
@@ -74,11 +87,19 @@ public class ChatRoomController {
         return ResponseEntity.ok().build();
     }
 
-    // 채팅방 퇴장
+    // 채팅방 탈퇴
     @PostMapping("/{roomId}/exit")
+    public ResponseEntity<Void> leaveRoom(@PathVariable Long roomId,
+                                          @AuthenticationPrincipal CustomOAuth2User user) {
+        chatRoomService.exitRoom(roomId, user.getUser().getProfile().getNickname());
+        return ResponseEntity.ok().build();
+    }
+
+    // 채팅방 나가기
+    @PostMapping("/{roomId}/leave")
     public ResponseEntity<Void> exitRoom(@PathVariable Long roomId,
                                          @AuthenticationPrincipal CustomOAuth2User user) {
-        chatRoomService.exitRoom(roomId, user.getUser().getProfile().getNickname());
+        chatRoomService.leaveRoom(roomId, user.getUser().getProfile().getNickname());
         return ResponseEntity.ok().build();
     }
 

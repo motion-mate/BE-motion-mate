@@ -4,7 +4,6 @@ import com.motionmate.domain.user.UserRepository;
 import com.motionmate.global.jwt.JwtAuthenticationFilter;
 import com.motionmate.global.jwt.JwtTokenProvider;
 import com.motionmate.global.oauth.CustomOAuth2UserService;
-import com.motionmate.global.oauth.JwtLogoutSuccessHandler;
 import com.motionmate.global.oauth.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +28,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults()) // ✅ 이렇게 해야 WebConfig의 CORS 설정이 적용됨
+                .cors(Customizer.withDefaults()) // CORS 따로 WebConfig에서 설정한다면 disable
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
@@ -40,6 +39,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/feeds/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/goods/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/chatrooms/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/exercises/list").permitAll()
+
+
                         // ✅ 나머지는 전부 인증 필요
                         .anyRequest().authenticated()
                 )
