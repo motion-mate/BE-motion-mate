@@ -159,7 +159,7 @@ public class ChatRoomService {
 
     // 채팅방 나가기
     @Transactional
-    public void leaveRoom(Long roomId, String nickname) {
+    public void disconnectFromRoom(Long roomId, String nickname) {
         ChatRoom room = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
         User user = userProfileRepository.findUserByNickname(nickname)
@@ -167,8 +167,11 @@ public class ChatRoomService {
 
         ChatRoomParticipant participant = chatRoomParticipantRepository.findByChatRoomAndUser(room, user)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방 참가 정보가 없습니다."));
+
         participant.disconnect();
+        chatRoomParticipantRepository.save(participant); // 반드시 저장!
     }
+
 
     // 전체 멤버 조회
     @Transactional(readOnly = true)

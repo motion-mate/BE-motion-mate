@@ -89,19 +89,20 @@ public class ChatRoomController {
 
     // 채팅방 탈퇴
     @PostMapping("/{roomId}/exit")
-    public ResponseEntity<Void> leaveRoom(@PathVariable Long roomId,
+    public ResponseEntity<Void> exitRoom(@PathVariable Long roomId,
                                           @AuthenticationPrincipal CustomOAuth2User user) {
         chatRoomService.exitRoom(roomId, user.getUser().getProfile().getNickname());
         return ResponseEntity.ok().build();
     }
 
-    // 채팅방 나가기
-    @PostMapping("/{roomId}/leave")
-    public ResponseEntity<Void> exitRoom(@PathVariable Long roomId,
-                                         @AuthenticationPrincipal CustomOAuth2User user) {
-        chatRoomService.leaveRoom(roomId, user.getUser().getProfile().getNickname());
+    // 접속 해제
+    @PostMapping("/{roomId}/disconnect")
+    public ResponseEntity<Void> disconnect(@PathVariable Long roomId,
+                                           @AuthenticationPrincipal CustomOAuth2User user) {
+        chatRoomService.disconnectFromRoom(roomId, user.getUser().getProfile().getNickname());
         return ResponseEntity.ok().build();
     }
+
 
     // 채팅방 멤버 조회
     @GetMapping("/{roomId}/members")
