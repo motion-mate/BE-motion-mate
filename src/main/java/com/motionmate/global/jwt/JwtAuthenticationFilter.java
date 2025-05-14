@@ -36,15 +36,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(customUser, null, null);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                filterChain.doFilter(request, response); // ✅ 인증 성공 시 필터 계속 진행
-                return;
+
             }
         }
 
-        // ✅ 인증 실패 시 401 반환 (302 리다이렉트 방지)
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"Unauthorized - Invalid or missing token\"}");
+        // ✅ 인증이 안됐더라도 필터는 항상 진행해야 한다
+        filterChain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {
