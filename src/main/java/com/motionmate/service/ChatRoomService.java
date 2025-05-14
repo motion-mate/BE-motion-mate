@@ -35,6 +35,9 @@ public class ChatRoomService {
 
         ChatRoom chatRoom = ChatRoomMapper.toEntity(dto, creator);
         ChatRoom saved = chatRoomRepository.save(chatRoom);
+
+        chatRoomParticipantRepository.save(new ChatRoomParticipant(saved, creator));
+
         return ChatRoomMapper.toDto(saved);
     }
 
@@ -53,6 +56,21 @@ public class ChatRoomService {
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
         return ChatRoomMapper.toDto(room);
     }
+    
+    // 사용자가 참가한 채팅방 검색
+    @Transactional(readOnly = true)
+    public List<ChatRoomResponseDto> getChatRoomsByParticipant(String nickname) {
+        User user = userProfileRepository.findUserByNickname(nickname)
+                .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
+
+        List<ChatRoomParticipant> participations = chatRoomParticipantRepository.findByUser(user);
+
+        return participations.stream()
+                .map(ChatRoomParticipant::getChatRoom)
+                .map(ChatRoomMapper::toDto)
+                .toList();
+    }
+
 
     // 필터 조건 기반 채팅방 검색
     @Transactional(readOnly = true)
@@ -102,7 +120,7 @@ public class ChatRoomService {
         }
     }
 
-    // 채팅방 퇴장
+    // 채팅방 탈퇴
     @Transactional
     public void exitRoom(Long roomId, String nickname) {
         ChatRoom room = chatRoomRepository.findById(roomId)
@@ -112,13 +130,44 @@ public class ChatRoomService {
 
         ChatRoomParticipant participant = chatRoomParticipantRepository.findByChatRoomAndUser(room, user)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방 참가 정보가 없습니다."));
-        participant.disconnect();
 
-        // 필요 시, 아무도 없으면 채팅방 삭제
-        boolean noParticipants = chatRoomParticipantRepository.countByChatRoomAndConnectedTrue(room) == 0;
-        if (noParticipants) {
-            chatRoomRepository.delete(room);
+        // ✅ 현재 유저가 방장일 경우 → 방장 위임 시도
+        if (room.getCreator().getId().equals(user.getId())) {
+            // 자신 제외하고 남은 참가자 중 한 명을 새로운 방장으로 설정
+            List<ChatRoomParticipant> otherParticipants =
+                    chatRoomParticipantRepository.findByChatRoom(room).stream()
+                            .filter(p -> !p.getUser().getId().equals(user.getId()))
+                            .toList();
+
+            if (otherParticipants.isEmpty()) {
+                // ✅ 참가자 없으면 방 삭제
+                chatMessageRepository.deleteByChatRoomId(roomId);
+                chatRoomParticipantRepository.delete(participant);
+                chatRoomRepository.delete(room);
+                return;
+            } else {
+                // ✅ 방장 위임
+                User newCreator = otherParticipants.get(0).getUser();
+                room.setCreator(newCreator); // 엔티티에 setter가 있어야 함
+            }
         }
+
+        // ✅ 일반 탈퇴 로직
+        chatRoomParticipantRepository.delete(participant);
+    }
+
+
+    // 채팅방 나가기
+    @Transactional
+    public void leaveRoom(Long roomId, String nickname) {
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
+        User user = userProfileRepository.findUserByNickname(nickname)
+                .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
+
+        ChatRoomParticipant participant = chatRoomParticipantRepository.findByChatRoomAndUser(room, user)
+                .orElseThrow(() -> new EntityNotFoundException("채팅방 참가 정보가 없습니다."));
+        participant.disconnect();
     }
 
     // 전체 멤버 조회

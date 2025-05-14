@@ -50,6 +50,9 @@ public class ChatRoom {
     @ManyToOne
     private User creator; // 방의 생성자
 
+    // 방장 위임
+    public void setCreator(User user) { this.creator = user; }
+
     // 채팅방 제목 수정
     public void updateTitle(String title) {
         this.title = title;
