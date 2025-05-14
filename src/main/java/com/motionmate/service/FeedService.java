@@ -3,6 +3,7 @@ package com.motionmate.service;
 import com.motionmate.domain.feed.*;
 import com.motionmate.domain.follow.FollowRepository;
 import com.motionmate.domain.user.User;
+import com.motionmate.domain.user.UserProfileRepository;
 import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
@@ -28,6 +29,7 @@ import java.util.Objects;
 public class FeedService {
     private final FeedRepository repository;
     private final UserRepository userRePository;
+    private final UserProfileRepository userProfileRepository;
     private final FeedLikeRepository feedLikeRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final FollowRepository followRepository;
@@ -44,7 +46,8 @@ public class FeedService {
     }
 
     //전체 피드 조회
-    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, Long userId) {
+    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, String nickname, Long userId) {
+      boolean isLoggedIn =  (nickname != null) && userProfileRepository.existsByNickname(nickname);
       User user =  (userId != null) ? userRePository.findById(userId).orElse(null) : null;
 
       Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
@@ -63,8 +66,8 @@ public class FeedService {
                   // 전체 공개 피드는 누구나 볼 수 있음
                  if (accessType == FeedAccessType.PUBLIC) return true;
 
-                  // FOLLOWERS 피드인데 비로그인인 경우는 볼 수 없음
-                 if (accessType == FeedAccessType.FOLLOWERS && userId == null) return false;
+                  // 비회원은 퍼블릭만 조회 가능
+                 if (!isLoggedIn) return false;
 
                   // 자신의 피드는 항상 볼 수 있음
                  if (Objects.equals(feed.getUser().getId(), userId)) return true;
