@@ -39,10 +39,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/feeds/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/goods/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/chatrooms/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/images/temp").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/exercises").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/exercises/list").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/exercises/schedule").permitAll()
+                        
+
                         // ✅ 나머지는 전부 인증 필요
                         .anyRequest().authenticated()
                 )
