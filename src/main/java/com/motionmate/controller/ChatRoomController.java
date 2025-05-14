@@ -45,6 +45,10 @@ public class ChatRoomController {
     // 사용자가 참여한 채팅방 조회
     @GetMapping("/me")
     public ResponseEntity<List<ChatRoomResponseDto>> getMyChatRooms(@AuthenticationPrincipal CustomOAuth2User user) {
+//        if (user == null) {
+//            return ResponseEntity.status(401).build(); // 혹은 throw new UnauthorizedException();
+//        }
+
         String nickname = user.getUser().getProfile().getNickname();
         List<ChatRoomResponseDto> result = chatRoomService.getChatRoomsByParticipant(nickname);
         return ResponseEntity.ok(result);
