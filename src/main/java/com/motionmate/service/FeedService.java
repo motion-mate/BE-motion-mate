@@ -80,7 +80,9 @@ public class FeedService {
               })
               .map(feed -> {
           boolean liked = (user != null) && feedLikeRepository.existsByFeedAndUser(feed, user);
-          return FeedMapper.fromEntity(feed, liked);
+          int likeCount = feedLikeRepository.countByFeed(feed);
+          int commentCount = feedCommentRepository.countByFeed(feed);
+          return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
       })
               .toList();
     }
@@ -111,7 +113,7 @@ public class FeedService {
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
 
-        return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount);
     }
 
     //피드 수정
@@ -143,7 +145,7 @@ public class FeedService {
         int likeCount = feedLikeRepository.countByFeed(updated);
         int commentCount = feedCommentRepository.countByFeed(updated);
 
-        return FeedMapper.fromEntity(updated, liked, likeCount, commentCount);
+        return FeedMapper.fromEntityDetail(updated, liked, likeCount, commentCount);
     }
 
     //피드 삭제
@@ -165,6 +167,12 @@ public class FeedService {
         List<FeedLike> likeFeeds = feedLikeRepository.findByUser(user);
 
         return likeFeeds.stream()
-                .map(feedLike -> FeedMapper.fromEntity(feedLike.getFeed(), true)).toList();
+                .map(feedLike -> {
+                    Feed feed = feedLike.getFeed();
+                    int likeCount = feedLikeRepository.countByFeed(feed);
+                    int commentCount = feedCommentRepository.countByFeed(feed);
+                    return FeedMapper.fromEntity(feed, true, likeCount, commentCount);
+                })
+                .toList();
     }
 }
