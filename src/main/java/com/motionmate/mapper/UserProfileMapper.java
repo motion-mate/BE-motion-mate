@@ -15,6 +15,7 @@ public class UserProfileMapper {
         return MainPageUserProfileDto.builder()
                 .userId(user.getId())
                 .nickname(user.getProfile().getNickname())
+                .bio(user.getProfile().getBio())
                 .profileImageUrl(user.getProfile().getProfileImageUrl())
                 .followerCount(user.getProfile().getFollowerCount())
                 .followingCount(user.getProfile().getFollowingCount())
