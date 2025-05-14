@@ -16,7 +16,7 @@ public class FeedCommentMapper {
     //entity -> FeedCommentResponseDto
     //댓글 등록/수정용
     public static FeedCommentResponseDto fromEntity(FeedComment entity, Long currentUserId){
-      boolean isAuthor =  entity.getUser().getId().equals(currentUserId);
+      boolean isAuthor = entity.getUser().getId().equals(currentUserId);
 
         return new FeedCommentResponseDto(
                 entity.getId(),
