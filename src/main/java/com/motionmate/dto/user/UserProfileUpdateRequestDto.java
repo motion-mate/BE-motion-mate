@@ -11,4 +11,6 @@ public class UserProfileUpdateRequestDto {
     private String goal;
     private LocalDate birthDate;
     private String profileImageUrl;
+    private int followerCount;
+    private int followingCount;
 }
