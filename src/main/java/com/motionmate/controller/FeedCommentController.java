@@ -35,7 +35,8 @@ public class FeedCommentController {
     public  ResponseEntity<List<FeedCommentResponseDto>> getAllComments(
             @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        return ResponseEntity.ok(feedCommentService.getAllComments(feedId, user.getUserId()));
+        Long userId = (user != null) ? user.getUserId() : null;
+        return ResponseEntity.ok(feedCommentService.getAllComments(feedId, userId));
     }
 
     //댓글 미리 보기
