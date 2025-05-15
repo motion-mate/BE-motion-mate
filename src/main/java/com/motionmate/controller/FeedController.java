@@ -82,5 +82,15 @@ public class FeedController {
        return ResponseEntity.ok(likedFeeds);
     }
 
+    //본인 피드 조회
+    @GetMapping("/my")
+    public ResponseEntity<List<FeedResponseDto>> getMyFeeds(
+            @AuthenticationPrincipal CustomOAuth2User user) {
+        Long userId = user.getUserId();
+        List<FeedResponseDto> myFeeds = service.getMyFeeds(userId);
+        return ResponseEntity.ok(myFeeds);
+    }
+
+
 
 }

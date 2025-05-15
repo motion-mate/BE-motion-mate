@@ -175,4 +175,21 @@ public class FeedService {
                 })
                 .toList();
     }
+
+    //본인 피드 조회
+    public List<FeedResponseDto> getMyFeeds(Long userId) {
+     User user = userRePository.findById(userId)
+             .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
+     List<Feed> myFeeds = repository.findByUserIdOrderByIdDesc(userId);
+
+     return myFeeds.stream()
+             .map(feed -> {
+                 int likeCount = feedLikeRepository.countByFeed(feed);
+                 int commentCount = feedCommentRepository.countByFeed(feed);
+                 boolean liked = feedLikeRepository.existsByFeedAndUser(feed, user);
+                 return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
+             })
+             .toList();
+    }
+
 }
