@@ -19,7 +19,7 @@ public class FeedMapper {
     }
 
     //entity -> FeedResponseDto
-    public static FeedResponseDto fromEntity(Feed entity, boolean liked){
+    public static FeedResponseDto fromEntity(Feed entity, boolean liked, int likeCount, int commentCount){
         return FeedResponseDto.builder()
                 .id(entity.getId())
                 .nickname(entity.getUser().getProfile().getNickname())
@@ -30,16 +30,18 @@ public class FeedMapper {
                 .updatedAt(entity.getUpdatedAt())
                 .feedAccessType(entity.getFeedAccessType())
                 .liked(liked)
+                .likeCount(likeCount)
+                .commentCount(commentCount)
                 .build();
     }
 
     //entity -> FeedResponseDto
     public static FeedResponseDto fromEntity(Feed entity){
-        return fromEntity(entity, false);
+        return fromEntity(entity, false, 0, 0);
     }
 
     //entity -> FeedDetailResponseDto
-    public static FeedDetailResponseDto fromEntity(Feed entity, boolean liked, int likeCount, int commentCount){
+    public static FeedDetailResponseDto fromEntityDetail(Feed entity, boolean liked, int likeCount, int commentCount){
         return FeedDetailResponseDto.builder()
                 .id(entity.getId())
                 .nickname(entity.getUser().getProfile().getNickname())

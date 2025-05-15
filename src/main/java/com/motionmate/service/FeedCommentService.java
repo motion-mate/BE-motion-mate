@@ -31,6 +31,10 @@ public class FeedCommentService {
       Feed feed =  feedRepository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
 
+      if (userId == null) {
+          throw new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다");
+      }
+
       User user = userRepository.findById(userId)
               .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다"));
 
@@ -42,8 +46,13 @@ public class FeedCommentService {
     public List<FeedCommentResponseDto> getAllComments(Long feedId, Long userId) {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
-        return feedCommentRepository.findByFeed(feed).stream()
-                .map(comment -> FeedCommentMapper.fromEntity(comment, userId))
+
+        List<FeedComment> comments = feedCommentRepository.findByFeed(feed);
+
+        return comments.stream()
+                .map(comment -> {
+                    return FeedCommentMapper.fromEntity(comment, userId);
+                })
                 .toList();
     }
 

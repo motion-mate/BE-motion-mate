@@ -41,12 +41,13 @@ public class FeedController {
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomOAuth2User user) {
         Long userId = (user != null) ? user.getUserId() : null;
-        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, userId));
+        String nickname = (user != null) ? user.getUser().getProfile().getNickname(): null;
+        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, nickname, userId));
     }
 
 
     //피드 상세 조회
-    @GetMapping("/{feedId}")
+    @GetMapping("feedsdetail/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> getFeedDetail(
             @PathVariable Long feedId,
             @AuthenticationPrincipal @Nullable CustomOAuth2User user){
