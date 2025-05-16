@@ -11,6 +11,7 @@ import com.motionmate.dto.chat.ChatRoomUpdateDto;
 import com.motionmate.mapper.ChatRoomMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -107,18 +108,32 @@ public class ChatRoomService {
     // 채팅방 입장
     @Transactional
     public void enterRoom(Long roomId, String nickname) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
-        User user = userProfileRepository.findUserByNickname(nickname)
-                .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
+        try {
+            ChatRoom room = chatRoomRepository.findById(roomId)
+                    .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
+            User user = userProfileRepository.findUserByNickname(nickname)
+                    .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
 
-        Optional<ChatRoomParticipant> existing = chatRoomParticipantRepository.findByChatRoomAndUser(room, user);
-        if (existing.isPresent()) {
-            existing.get().reconnect();
-        } else {
-            chatRoomParticipantRepository.save(new ChatRoomParticipant(room, user));
+            if (chatRoomParticipantRepository.existsByChatRoomAndUser(room, user)) {
+                ChatRoomParticipant participant = chatRoomParticipantRepository
+                        .findByChatRoomAndUser(room, user)
+                        .orElseThrow();
+                participant.reconnect();
+            } else {
+                chatRoomParticipantRepository.save(new ChatRoomParticipant(room, user));
+                chatMessageRepository.save(new ChatMessage(room, user, "입장했습니다.", ChatMessage.MessageType.ENTER));
+            }
+
+        } catch (Exception e) {
+            System.err.println("🔥 [enterRoom] 예외 발생: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
+
+
+
+
 
     // 채팅방 탈퇴
     @Transactional
