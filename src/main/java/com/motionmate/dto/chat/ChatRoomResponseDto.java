@@ -8,6 +8,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -26,5 +27,6 @@ public class ChatRoomResponseDto {
     private LocalDateTime promiseAt;
     private Long creatorId;
     private String creatorNickname;
+    private List<ChatRoomMemberDto> members;
 
 }

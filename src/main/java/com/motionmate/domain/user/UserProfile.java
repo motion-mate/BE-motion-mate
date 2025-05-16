@@ -37,12 +37,14 @@ public class UserProfile {
     }
 
 
-    public void updateProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl) {
+    public void updateProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl, int followerCount, int followingCount) {
         this.nickname = nickname;
         this.bio = bio;
         this.goal = goal;
         this.birthDate = birthDate;
         this.profileImageUrl = profileImageUrl;
+        this.followerCount = followerCount;
+        this.followingCount = followingCount;
     }
 
 //    public void updateNickname(String nickname) {

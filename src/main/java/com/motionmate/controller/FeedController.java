@@ -47,7 +47,7 @@ public class FeedController {
 
 
     //피드 상세 조회
-    @GetMapping("feedsdetail/{feedId}")
+    @GetMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> getFeedDetail(
             @PathVariable Long feedId,
             @AuthenticationPrincipal @Nullable CustomOAuth2User user){
@@ -81,6 +81,16 @@ public class FeedController {
        List<FeedResponseDto> likedFeeds = service.getFeedsLikedByUser(user.getUserId());
        return ResponseEntity.ok(likedFeeds);
     }
+
+    //본인 피드 조회
+    @GetMapping("/my")
+    public ResponseEntity<List<FeedResponseDto>> getMyFeeds(
+            @AuthenticationPrincipal CustomOAuth2User user) {
+        Long userId = user.getUserId();
+        List<FeedResponseDto> myFeeds = service.getMyFeeds(userId);
+        return ResponseEntity.ok(myFeeds);
+    }
+
 
 
 }

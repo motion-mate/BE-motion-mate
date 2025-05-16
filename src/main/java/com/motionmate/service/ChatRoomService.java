@@ -11,13 +11,17 @@ import com.motionmate.dto.chat.ChatRoomUpdateDto;
 import com.motionmate.mapper.ChatRoomMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
@@ -113,12 +117,30 @@ public class ChatRoomService {
                 .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
 
         Optional<ChatRoomParticipant> existing = chatRoomParticipantRepository.findByChatRoomAndUser(room, user);
+
         if (existing.isPresent()) {
             existing.get().reconnect();
-        } else {
+            return;
+        }
+
+        try {
             chatRoomParticipantRepository.save(new ChatRoomParticipant(room, user));
+            chatMessageRepository.save(new ChatMessage(room, user, "입장했습니다.", ChatMessage.MessageType.ENTER));
+        } catch (DataIntegrityViolationException ex) {
+            log.debug("⚠️ 중복 참가 삽입 시도 감지됨 - 무시 처리", ex);
+            // 예외 후 세션 flush 시도 방지
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
+
+
+
+
+
+
+
+
+
 
     // 채팅방 탈퇴
     @Transactional
@@ -159,7 +181,7 @@ public class ChatRoomService {
 
     // 채팅방 나가기
     @Transactional
-    public void leaveRoom(Long roomId, String nickname) {
+    public void disconnectFromRoom(Long roomId, String nickname) {
         ChatRoom room = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
         User user = userProfileRepository.findUserByNickname(nickname)
@@ -167,8 +189,11 @@ public class ChatRoomService {
 
         ChatRoomParticipant participant = chatRoomParticipantRepository.findByChatRoomAndUser(room, user)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방 참가 정보가 없습니다."));
+
         participant.disconnect();
+        chatRoomParticipantRepository.save(participant); // 반드시 저장!
     }
+
 
     // 전체 멤버 조회
     @Transactional(readOnly = true)
