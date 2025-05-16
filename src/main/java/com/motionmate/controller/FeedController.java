@@ -47,7 +47,7 @@ public class FeedController {
 
 
     //피드 상세 조회
-    @GetMapping("feedsdetail/{feedId}")
+    @GetMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> getFeedDetail(
             @PathVariable Long feedId,
             @AuthenticationPrincipal @Nullable CustomOAuth2User user){
