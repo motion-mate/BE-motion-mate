@@ -12,6 +12,10 @@ public class FeedRequestDto {
 
     private String imageUrl;
 
+    private String bucketKey;
+
+    private String orgName;
+
     private String description;
 
     private FeedAccessType feedAccessType;

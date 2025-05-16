@@ -34,14 +34,24 @@ public class FeedService {
     private final FeedCommentRepository feedCommentRepository;
     private final FollowRepository followRepository;
 
-    // @Autowired
-//    private EntityManager entityManager;
+
 
     //피드 업로드
     public FeedResponseDto upload(FeedRequestDto request, Long userId) {
         User user = userRePository.findById(userId)
                 .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
-        Feed saved = repository.save(FeedMapper.toEntity(request, user));
+
+        Feed feed = FeedMapper.toEntity(request, user);
+
+        FeedImage image = FeedImage.builder()
+                .url(request.getImageUrl())
+                .bucketKey(request.getBucketKey())
+                .orgName(request.getOrgName())
+                .build();
+        feed.addImage(image);
+
+        Feed saved = repository.save(feed);
+
         return FeedMapper.fromEntity(saved);
     }
 
@@ -127,16 +137,11 @@ public class FeedService {
             throw new CustomException(HttpStatus.FORBIDDEN ,"수정 권한이 없습니다.");
         }
 
-        //글, 이미지, 접근권한 수정
-        feed.update(
-                request.getDescription(),
-                request.getImageUrl(),
-                request.getFeedAccessType()
-        );
 
 
-//        entityManager.flush();
-//        entityManager.refresh(feed);
+
+
+
 
        Feed updated = repository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "수정 후 피드를 다시 불러오지 못했습니다."));
