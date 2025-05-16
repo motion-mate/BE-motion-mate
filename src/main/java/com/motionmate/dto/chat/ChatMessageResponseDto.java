@@ -15,5 +15,6 @@ public class ChatMessageResponseDto {
     private String message;
     private LocalDateTime sentAt;
     private ChatMessage.MessageType type;
+    private Boolean connected;
 
 }
