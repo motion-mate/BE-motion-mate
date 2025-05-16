@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 public class GoodsRequestDto {
@@ -33,6 +35,9 @@ public class GoodsRequestDto {
     @NotBlank(message = "카테고리는 필수입니다.")
     private String category;
 
-    @NotBlank(message = "하위 카테고리는 필수입니다.") // ✅ 추가 필드
+    @NotBlank(message = "하위 카테고리는 필수입니다.")
     private String subCategory;
+
+    private List<String> colors;
+    private List<String> sizes;
 }

@@ -2,6 +2,7 @@ package com.motionmate.controller.goods;
 
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.order.OrderResponseDto;
+import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.goods.OrderService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,15 @@ public class OrderController {
 
     // ✅ 단일 상품 주문
     @PostMapping
-    public Long placeOrder(@AuthenticationPrincipal User user,
+    public Long placeOrder(@AuthenticationPrincipal CustomOAuth2User user,
                            @RequestParam Long goodsId,
                            @RequestParam @Min(1) int quantity) {
-        return orderService.placeOrder(user, goodsId, quantity);
+        return orderService.placeOrder(user.getUser(), goodsId, quantity);
     }
 
     // ✅ 주문 내역 조회 (GET 추가)
     @GetMapping
-    public List<OrderResponseDto> getOrders(@AuthenticationPrincipal User user) {
-        return orderService.getOrders(user);
+    public List<OrderResponseDto> getOrders(@AuthenticationPrincipal CustomOAuth2User user) {
+        return orderService.getOrders(user.getUser());
     }
 }
