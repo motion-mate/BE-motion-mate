@@ -26,6 +26,12 @@ public class ChatMessageService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
 
+        if (dto.getType() == ChatMessage.MessageType.ENTER) {
+            // ✅ 이미 방에 participant가 없는 경우에만 시스템 메시지 저장
+            boolean exists = chatRoomParticipantRepository.existsByChatRoomAndUser(chatRoom, sender);
+            if (!exists) return null; // 메시지 생략
+        }
+
         ChatMessage message = toEntity(chatRoom, sender, dto);
         return chatMessageRepository.save(message);
     }
