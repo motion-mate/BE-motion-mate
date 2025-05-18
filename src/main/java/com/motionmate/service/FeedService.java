@@ -11,6 +11,7 @@ import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.mapper.FeedMapper;
+import com.motionmate.utils.S3ServiceUtils;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ public class FeedService {
     private final FeedLikeRepository feedLikeRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final FollowRepository followRepository;
+    private final S3ServiceUtils s3ServiceUtils;
 
 
 
@@ -123,7 +125,7 @@ public class FeedService {
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
 
-        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount);
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, userId);
     }
 
     //피드 수정
@@ -137,20 +139,30 @@ public class FeedService {
             throw new CustomException(HttpStatus.FORBIDDEN ,"수정 권한이 없습니다.");
         }
 
+       //기존 이미지 삭제(S3, DB)
+       feed.getImages().stream().findFirst().ifPresent(oldImage -> {
+           String bucketKey = oldImage.getBucketKey();
+           if (bucketKey != null && !bucketKey.isEmpty()) {
+               s3ServiceUtils.deleteFile(bucketKey);
+           }
+           feed.getImages().remove(oldImage);
+       });
 
+       // 새 이미지 추가
+       FeedImage newImage = FeedImage.builder()
+               .url(request.getImageUrl())
+               .bucketKey(request.getBucketKey())
+               .orgName(request.getOrgName())
+               .build();
+       feed.addImage(newImage);
 
+       feed.update(request.getDescription(), request.getFeedAccessType());
 
+        boolean liked = feedLikeRepository.existsByFeedAndUser(feed, feed.getUser());
+        int likeCount = feedLikeRepository.countByFeed(feed);
+        int commentCount = feedCommentRepository.countByFeed(feed);
 
-
-
-       Feed updated = repository.findById(feedId)
-                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "수정 후 피드를 다시 불러오지 못했습니다."));
-
-        boolean liked = feedLikeRepository.existsByFeedAndUser(updated, updated.getUser());
-        int likeCount = feedLikeRepository.countByFeed(updated);
-        int commentCount = feedCommentRepository.countByFeed(updated);
-
-        return FeedMapper.fromEntityDetail(updated, liked, likeCount, commentCount);
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, userId);
     }
 
     //피드 삭제
@@ -162,6 +174,13 @@ public class FeedService {
         if(!feed.getUser().getId().equals(userId)){
             throw new CustomException(HttpStatus.FORBIDDEN,"삭제 권한이 없습니다.");
         }
+
+        feed.getImages().stream().findFirst().ifPresent(image -> {
+            String bucketKey = image.getBucketKey();
+            if (bucketKey != null &&  !bucketKey.isEmpty()) {
+                s3ServiceUtils.deleteFile(bucketKey);
+            }
+        });
         repository.delete(feed);
     }
 

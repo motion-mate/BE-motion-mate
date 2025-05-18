@@ -43,8 +43,9 @@ public class FeedMapper {
     }
 
     //entity -> FeedDetailResponseDto
-    public static FeedDetailResponseDto fromEntityDetail(Feed entity, boolean liked, int likeCount, int commentCount){
+    public static FeedDetailResponseDto fromEntityDetail(Feed entity, boolean liked, int likeCount, int commentCount, Long loginUserId){
         String imageUrl = entity.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
+        boolean isAuthor = entity.getUser().getId().equals(loginUserId);
 
         return FeedDetailResponseDto.builder()
                 .id(entity.getId())
@@ -58,6 +59,7 @@ public class FeedMapper {
                 .liked(liked)
                 .likeCount(likeCount)
                 .commentCount(commentCount)
+                .isAuthor(isAuthor)
                 .build();
 
     }

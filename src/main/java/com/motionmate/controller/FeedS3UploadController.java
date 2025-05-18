@@ -16,6 +16,7 @@ public class FeedS3UploadController {
 
     private final FeedS3Service feedS3Service;
 
+    //S3 이미지 업로드
     @PostMapping("/image-upload")
     public ResponseEntity<?> uploadFeedImage(@RequestParam MultipartFile file) {
         return feedS3Service.uploadTempFile(file);
