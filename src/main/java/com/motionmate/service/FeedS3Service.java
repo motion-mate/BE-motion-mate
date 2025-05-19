@@ -12,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class FeedS3Service {
     private final S3ServiceUtils s3Utils;
 
+    //S3 임시 경로에 파일을 업로드(미리보기용)
     public ResponseEntity<?> uploadTempFile(MultipartFile multipartFile){
-        S3FileResponse result = s3Utils.uploadToTemp(multipartFile, 102);
+        int userPk = 102;
+        S3FileResponse result = s3Utils.uploadToTemp(multipartFile, userPk);
         return ResponseEntity.ok(result);
     }
 }

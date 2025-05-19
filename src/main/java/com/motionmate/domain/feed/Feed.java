@@ -53,7 +53,6 @@ public class Feed {
     public void addImage(FeedImage image) {
         this.images.add(image);
         image.setFeed(this);
-
     }
 
 }

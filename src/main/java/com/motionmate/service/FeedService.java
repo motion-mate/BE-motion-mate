@@ -5,12 +5,16 @@ import com.motionmate.domain.follow.FollowRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfileRepository;
 import com.motionmate.domain.user.UserRepository;
+import com.motionmate.dto.exercise.S3FileRequest;
+import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
+import com.motionmate.mapper.ExerciseListMapper;
 import com.motionmate.mapper.FeedMapper;
+import com.motionmate.mapper.S3FileMapper;
 import com.motionmate.utils.S3ServiceUtils;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -37,22 +41,39 @@ public class FeedService {
     private final S3ServiceUtils s3ServiceUtils;
 
 
-
     //피드 업로드
     public FeedResponseDto upload(FeedRequestDto request, Long userId) {
         User user = userRePository.findById(userId)
                 .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
 
-        Feed feed = FeedMapper.toEntity(request, user);
+        int userPk = 102;
+
+        //temp -> upload 이동
+        S3FileRequest tempImage = request.getImageUrl();
+
+        S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
+
+        S3FileRequest newImage = S3FileMapper.toS3FileRequest(movedImage);
+
+        FeedRequestDto newRequest = FeedRequestDto.builder()
+                .imageUrl(newImage)
+                .description(request.getDescription())
+                .feedAccessType(request.getFeedAccessType())
+                .build();
+
+        Feed feed = FeedMapper.toEntity(newRequest, user);
 
         FeedImage image = FeedImage.builder()
-                .url(request.getImageUrl())
-                .bucketKey(request.getBucketKey())
-                .orgName(request.getOrgName())
+                .url(movedImage.url())
+                .bucketKey(movedImage.bucketKey())
+                .orgName(movedImage.orgName())
                 .build();
+
         feed.addImage(image);
 
         Feed saved = repository.save(feed);
+
+        s3ServiceUtils.deleteUserTempFiles(userPk);
 
         return FeedMapper.fromEntity(saved);
     }
@@ -140,21 +161,28 @@ public class FeedService {
         }
 
        //기존 이미지 삭제(S3, DB)
-       feed.getImages().stream().findFirst().ifPresent(oldImage -> {
-           String bucketKey = oldImage.getBucketKey();
-           if (bucketKey != null && !bucketKey.isEmpty()) {
-               s3ServiceUtils.deleteFile(bucketKey);
+       if (request.getImageUrl() != null ) {
+           FeedImage oldImage = feed.getImages().stream().findFirst().orElse(null);
+           if (oldImage != null) {
+               String bucketKey = oldImage.getBucketKey();
+               if (bucketKey != null && !bucketKey.isEmpty()) {
+                   s3ServiceUtils.deleteFile(bucketKey);
+               }
+               feed.getImages().remove(oldImage);
            }
-           feed.getImages().remove(oldImage);
-       });
 
-       // 새 이미지 추가
-       FeedImage newImage = FeedImage.builder()
-               .url(request.getImageUrl())
-               .bucketKey(request.getBucketKey())
-               .orgName(request.getOrgName())
-               .build();
-       feed.addImage(newImage);
+           S3FileRequest tempImage = request.getImageUrl();
+           S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userId.intValue());
+
+           // 새 이미지 추가
+           FeedImage newImage = FeedImage.builder()
+                   .url(movedImage.url())
+                   .bucketKey(movedImage.bucketKey())
+                   .orgName(movedImage.orgName())
+                   .build();
+
+           feed.addImage(newImage);
+       }
 
        feed.update(request.getDescription(), request.getFeedAccessType());
 
@@ -175,10 +203,10 @@ public class FeedService {
             throw new CustomException(HttpStatus.FORBIDDEN,"삭제 권한이 없습니다.");
         }
 
-        feed.getImages().stream().findFirst().ifPresent(image -> {
+        feed.getImages().forEach(image -> {
             String bucketKey = image.getBucketKey();
-            if (bucketKey != null &&  !bucketKey.isEmpty()) {
-                s3ServiceUtils.deleteFile(bucketKey);
+            if (bucketKey != null && !bucketKey.isEmpty()) {
+              s3ServiceUtils.deleteFile(bucketKey);
             }
         });
         repository.delete(feed);
