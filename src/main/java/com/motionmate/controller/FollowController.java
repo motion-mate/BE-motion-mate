@@ -21,7 +21,7 @@ public class FollowController {
 
     // 팔로우
     @PostMapping("/{toUserId}")
-    public ResponseEntity<Void> follow(
+    public ResponseEntity<String> follow(
             @PathVariable Long toUserId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         followService.follow(user.getUserId(), toUserId);
@@ -58,13 +58,13 @@ public class FollowController {
         return ResponseEntity.ok(isFollowing);
     }
 
-    // ✅ 내 팔로잉
+    // 내 팔로잉
     @GetMapping("/followings/me")
     public ResponseEntity<List<FollowResponseDto>> getMyFollowings(@AuthenticationPrincipal CustomOAuth2User user) {
         return ResponseEntity.ok(followService.getFollowings(user.getUserId()));
     }
 
-    // ✅ 내 팔로워
+    // 내 팔로워
     @GetMapping("/followers/me")
     public ResponseEntity<List<FollowResponseDto>> getMyFollowers(@AuthenticationPrincipal CustomOAuth2User user) {
         return ResponseEntity.ok(followService.getFollowers(user.getUserId()));

@@ -22,7 +22,7 @@ public class UserProfileMapper {
                 .build();
     }
 
-    // 단독 프로필 조회 DTO 변환
+    // 단독 프로필 조회 DTO 변환 
     public static UserProfileResponseDto toResponseDto(UserProfile profile) {
         return UserProfileResponseDto.builder()
                 .bio(profile.getBio())

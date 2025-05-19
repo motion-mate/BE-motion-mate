@@ -19,7 +19,7 @@ public class GoodsController {
 
     private final GoodsService goodsService;
 
-    // ✅ 상품 등록
+    // ✅ 상품 등록  
     @PostMapping
     public Long registerGoods(@RequestBody @Valid GoodsRequestDto dto) {
         return goodsService.registerGoods(dto);

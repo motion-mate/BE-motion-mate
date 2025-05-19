@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,10 +26,13 @@ public class FollowService {
     private final UserRepository userRepository;
 
     // 팔로우
-    // fromUserId : 팔로우 당하는 userId
-    // toUserId : 팔로우 하는 userId
+    // fromUserId : 팔로우 하는 userId
+    // toUserId : 팔로우 당하는 userId
     @Transactional
-    public void follow(Long fromUserId, Long toUserId) {
+    public ResponseEntity<String> follow(Long fromUserId, Long toUserId) {
+        if (fromUserId.equals(toUserId)) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "자기 자신을 팔로우할 수 없습니다.");
+        }
         // 이미 팔로우한 유저인지 검증
         if(followRepository.existsByFromUser_IdAndToUser_Id(fromUserId, toUserId)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 팔로우한 유저입니다.");
@@ -42,6 +46,7 @@ public class FollowService {
         Follow follow = FollowMapper.toEntity(null, fromUser, toUser);
         // 팔로우관계 저장
         followRepository.save(follow);
+        return ResponseEntity.ok("팔로우 성공");
     }
 
     // 언팔로우

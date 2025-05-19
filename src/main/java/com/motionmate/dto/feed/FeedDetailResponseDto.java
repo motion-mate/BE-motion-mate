@@ -17,6 +17,8 @@ public class FeedDetailResponseDto {
 
     private long id;
 
+    private Long userId;
+
     private String nickname;
 
     private String profileImageUrl;
@@ -39,4 +41,6 @@ public class FeedDetailResponseDto {
     private int likeCount;
 
     private int commentCount;
+
+    private boolean isFollowing;
 }
