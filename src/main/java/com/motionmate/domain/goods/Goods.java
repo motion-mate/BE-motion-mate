@@ -1,13 +1,9 @@
 package com.motionmate.domain.goods;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.Id;
-
 
 @Entity
 @Getter
@@ -21,15 +17,27 @@ public class Goods {
     private String name;
     private String description;
     private String imageUrl;
-    private Integer stock;
+
+    @Column(nullable = false)
+    private Integer stock = 0;
+
     private Integer price;
 
     private boolean isLimited;
     private String category;
     private String subCategory;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String colorsJson;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String sizesJson;
+
     public Goods(String name, String description, String imageUrl, Integer stock, Integer price,
-                 boolean isLimited, String category, String subCategory) {
+                 boolean isLimited, String category, String subCategory,
+                 String colorsJson, String sizesJson) {
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
@@ -37,7 +45,9 @@ public class Goods {
         this.price = price;
         this.isLimited = isLimited;
         this.category = category;
-        this.subCategory = subCategory; // ✅ 여기에 포함
+        this.subCategory = subCategory;
+        this.colorsJson = colorsJson;
+        this.sizesJson = sizesJson;
     }
 
     public void decreaseStock(int quantity) {

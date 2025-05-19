@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chat_room_id", "user_id"}))
 public class ChatRoomParticipant {
 
     @Id
@@ -20,20 +21,20 @@ public class ChatRoomParticipant {
     @ManyToOne
     private User user;
 
-    private boolean connected; // 접속 여부 확인
+    private boolean connected;  // 기본값 false
 
     public ChatRoomParticipant(ChatRoom chatRoom, User user) {
         this.chatRoom = chatRoom;
         this.user = user;
-        this.connected = true;
+        this.connected = true;  // 새로 입장할 땐 true
+    }
+
+    public void reconnect() {
+        this.connected = true;  // 재입장 시 true
     }
 
     public void disconnect() {
         this.connected = false;
     }
-
-    public void reconnect() {
-        this.connected = true;
-    }
-
 }
+

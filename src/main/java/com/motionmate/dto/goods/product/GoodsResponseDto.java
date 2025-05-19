@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 @Builder
@@ -17,8 +19,10 @@ public class GoodsResponseDto {
     private int stock;
     private boolean liked;
 
-    // ✅ 추가 필드
     private boolean isLimited;
     private String category;
     private String subCategory;
+
+    private List<String> colors;
+    private List<String> sizes;
 }

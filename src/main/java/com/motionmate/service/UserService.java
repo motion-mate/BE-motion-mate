@@ -36,6 +36,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    // 메인페이지 프로필 데이터
     @Transactional(readOnly = true)
     public MainPageUserProfileDto getMainPageUserProfile(Long userId) {
         User user = userRepository.findById(userId)

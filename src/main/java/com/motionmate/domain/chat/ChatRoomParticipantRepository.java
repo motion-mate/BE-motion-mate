@@ -22,6 +22,8 @@ public interface ChatRoomParticipantRepository extends JpaRepository<ChatRoomPar
 
     long countByChatRoom(ChatRoom chatRoom);
 
+    boolean existsByChatRoomAndUser(ChatRoom room, User user);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM ChatRoomParticipant p WHERE p.chatRoom.id = :chatRoomId")
