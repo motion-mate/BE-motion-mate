@@ -1,5 +1,6 @@
 package com.motionmate.domain.goods;
 
+import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,4 +27,7 @@ public class Inquiry {
     private String status;
 
     private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 }
