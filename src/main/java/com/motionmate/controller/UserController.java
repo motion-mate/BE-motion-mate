@@ -4,10 +4,7 @@ import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.dto.follow.FollowResponseDto;
 import com.motionmate.dto.goods.cart.CartItemResponseDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
-import com.motionmate.dto.user.MainPageUserProfileDto;
-import com.motionmate.dto.user.UserProfileDto;
-import com.motionmate.dto.user.UserProfileRegisterRequestDto;
-import com.motionmate.dto.user.UserProfileUpdateRequestDto;
+import com.motionmate.dto.user.*;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +53,11 @@ public class UserController {
     public void updateMyProfile(@AuthenticationPrincipal CustomOAuth2User user,
                                 @RequestBody UserProfileUpdateRequestDto dto) {
         userService.updateUserProfile(user.getUserId(), dto);
+    }
+
+    @GetMapping("users/me/summary")
+    public UserResponseDto getMySummary(@AuthenticationPrincipal CustomOAuth2User user) {
+        return userService.getMySummary(user.getUserId());
     }
 
 
