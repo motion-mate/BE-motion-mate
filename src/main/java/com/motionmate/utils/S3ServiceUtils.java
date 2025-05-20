@@ -86,6 +86,15 @@ public class S3ServiceUtils {
         }
     }
 
+    //삭제
+    public void deleteFile(String bucketKey) {
+        try{
+            s3Template.deleteObject(BUCKET_NAME, bucketKey);
+        } catch(Exception e) {
+            throw new RuntimeException("S3 파일 삭제 실패", e);
+        }
+    }
+
     public String uploadFile(MultipartFile file) {
         try {
             String bucketKey = createUniqueFileName(file.getOriginalFilename());
