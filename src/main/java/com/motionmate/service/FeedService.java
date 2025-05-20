@@ -160,7 +160,7 @@ public class FeedService {
         }
 
        //기존 이미지 삭제(S3, DB)
-       if (request.getImageUrl() != null ) {
+       if (request.getImageUrl() != null && request.getImageUrl().bucketKey() != null && !request.getImageUrl().bucketKey().isEmpty()) {
            FeedImage oldImage = feed.getImages().stream().findFirst().orElse(null);
            if (oldImage != null) {
                String bucketKey = oldImage.getBucketKey();
