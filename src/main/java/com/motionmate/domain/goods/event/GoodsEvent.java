@@ -1,6 +1,5 @@
 package com.motionmate.domain.goods.event;
 
-import com.motionmate.domain.goods.EventStatus;
 import com.motionmate.domain.goods.Goods;
 import jakarta.persistence.*;
 import lombok.*;

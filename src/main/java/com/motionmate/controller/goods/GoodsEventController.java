@@ -1,6 +1,6 @@
 package com.motionmate.controller.goods;
 
-import com.motionmate.domain.goods.EventStatus;
+import com.motionmate.domain.goods.event.EventStatus;
 import com.motionmate.domain.goods.event.GoodsEvent;
 import com.motionmate.dto.goods.event.GoodsEventRequestDto;
 import com.motionmate.dto.goods.event.GoodsEventResponseDto;
@@ -65,6 +65,7 @@ public class GoodsEventController {
         return ResponseEntity.ok().build();
     }
 
+    // ✅ 5. 재고 수량 확인
     @GetMapping("/{id}/remaining")
     public ResponseEntity<Integer> getRemainingStock(@PathVariable Long id) {
         int remaining = goodsEventService.getRemainingStock(id);

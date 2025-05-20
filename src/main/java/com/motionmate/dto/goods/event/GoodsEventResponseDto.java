@@ -1,6 +1,6 @@
 package com.motionmate.dto.goods.event;
 
-import com.motionmate.domain.goods.EventStatus;
+import com.motionmate.domain.goods.event.EventStatus;
 import lombok.Builder;
 import lombok.Getter;
 
