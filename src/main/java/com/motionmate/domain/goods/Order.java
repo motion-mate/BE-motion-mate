@@ -26,7 +26,6 @@ public class Order {
 
     private String orderNumber;
 
-<<<<<<< HEAD
     @Enumerated(EnumType.STRING) // ✅ Enum은 문자열로 저장
     private OrderStatus status;
 
@@ -34,14 +33,6 @@ public class Order {
 
     private String trackingNumber;
 
-=======
-    private LocalDateTime orderedAt;
-
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
-
-    private String trackingNumber;
->>>>>>> 37bf0df6c36ca39daeaa6c15258b39fec675af8e
     private String courier;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,14 +57,8 @@ public class Order {
      * 총 주문 금액 계산
      */
     public int getTotalAmount() {
-<<<<<<< HEAD
-        return orderItems.stream()
-                .mapToInt(OrderItem::getTotalPrice)
-                .sum();
-=======
         return orderItems != null
                 ? orderItems.stream().mapToInt(OrderItem::getTotalPrice).sum()
                 : 0;
->>>>>>> 37bf0df6c36ca39daeaa6c15258b39fec675af8e
     }
 }

@@ -21,11 +21,7 @@ public class OrderMapper {
         return Order.builder()
                 .user(user)
                 .orderedAt(LocalDateTime.now())
-<<<<<<< HEAD
                 .status(Order.OrderStatus.READY) // enum 타입 사용
-=======
-                .status(Order.OrderStatus.READY) // enum 사용
->>>>>>> 37bf0df6c36ca39daeaa6c15258b39fec675af8e
                 .orderNumber(UUID.randomUUID().toString())
                 .build();
     }
