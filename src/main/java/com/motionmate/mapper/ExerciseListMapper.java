@@ -1,5 +1,6 @@
 package com.motionmate.mapper;
 
+import com.motionmate.domain.exercise.ExerciseCompleted;
 import com.motionmate.domain.exercise.ExerciseImage;
 import com.motionmate.domain.exercise.ExerciseList;
 import com.motionmate.domain.exercise.ExerciseSchedule;
@@ -79,4 +80,29 @@ public class ExerciseListMapper {
                 schedule.getTime()
         );
     }
+    public static ExerciseCompleted toExerciseCompletedRequest(ExerciseCompletedRequest dto, User user){
+        return ExerciseCompleted.builder()
+                .date(dto.getDate())
+                .exerciseName(dto.getExerciseName())
+                .exerciseCategory(dto.getExerciseCategory())
+                .setNumber(dto.getSetNumber())
+                .kg(dto.getKg())
+                .reps(dto.getReps())
+                .time(dto.getTime())
+                .completed(dto.isCompleted())
+                .user(user)
+                .build();
+    }
+    public static ExerciseCompletedResponse fromExerciseCompletedResponse(ExerciseCompleted entity){
+        return new ExerciseCompletedResponse(
+                entity.getDate(),
+                entity.getExerciseCategory(),
+                entity.getExerciseName(),
+                entity.getSetNumber(),
+                entity.getKg(),
+                entity.getReps(),
+                entity.getTime()
+        );
+    }
+
 }
