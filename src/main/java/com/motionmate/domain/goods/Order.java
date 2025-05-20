@@ -8,6 +8,7 @@ import jakarta.persistence.Id; // ✅ @Id import
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table; // ✅ @Table import
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,6 +35,7 @@ public class Order {
     private LocalDateTime orderedAt;    // 주문 시각
 
     // 주문 생성자 (user, goods, quantity 필수)
+    @Builder
     public Order(User user, Goods goods, Integer quantity) {
         this.user = user;
         this.goods = goods;
