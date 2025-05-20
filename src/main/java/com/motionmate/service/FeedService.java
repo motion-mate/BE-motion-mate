@@ -3,13 +3,19 @@ package com.motionmate.service;
 import com.motionmate.domain.feed.*;
 import com.motionmate.domain.follow.FollowRepository;
 import com.motionmate.domain.user.User;
+import com.motionmate.domain.user.UserProfileRepository;
 import com.motionmate.domain.user.UserRepository;
+import com.motionmate.dto.exercise.S3FileRequest;
+import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
+import com.motionmate.mapper.ExerciseListMapper;
 import com.motionmate.mapper.FeedMapper;
+import com.motionmate.mapper.S3FileMapper;
+import com.motionmate.utils.S3ServiceUtils;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +34,52 @@ import java.util.Objects;
 public class FeedService {
     private final FeedRepository repository;
     private final UserRepository userRePository;
+    private final UserProfileRepository userProfileRepository;
     private final FeedLikeRepository feedLikeRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final FollowRepository followRepository;
+    private final S3ServiceUtils s3ServiceUtils;
 
-    // @Autowired
-//    private EntityManager entityManager;
+    int userPk = 102;
 
     //피드 업로드
     public FeedResponseDto upload(FeedRequestDto request, Long userId) {
         User user = userRePository.findById(userId)
                 .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
-        Feed saved = repository.save(FeedMapper.toEntity(request, user));
+
+        //temp -> upload 이동
+        S3FileRequest tempImage = request.getImageUrl();
+
+        S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
+
+        S3FileRequest newImage = S3FileMapper.toS3FileRequest(movedImage);
+
+        FeedRequestDto newRequest = FeedRequestDto.builder()
+                .imageUrl(newImage)
+                .description(request.getDescription())
+                .feedAccessType(request.getFeedAccessType())
+                .build();
+
+        Feed feed = FeedMapper.toEntity(newRequest, user);
+
+        FeedImage image = FeedImage.builder()
+                .url(movedImage.url())
+                .bucketKey(movedImage.bucketKey())
+                .orgName(movedImage.orgName())
+                .build();
+
+        feed.addImage(image);
+
+        Feed saved = repository.save(feed);
+
+        s3ServiceUtils.deleteUserTempFiles(userPk);
+
         return FeedMapper.fromEntity(saved);
     }
 
     //전체 피드 조회
-    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, Long userId) {
+    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, String nickname, Long userId) {
+      boolean isLoggedIn =  (nickname != null) && userProfileRepository.existsByNickname(nickname);
       User user =  (userId != null) ? userRePository.findById(userId).orElse(null) : null;
 
       Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
@@ -63,8 +98,8 @@ public class FeedService {
                   // 전체 공개 피드는 누구나 볼 수 있음
                  if (accessType == FeedAccessType.PUBLIC) return true;
 
-                  // FOLLOWERS 피드인데 비로그인인 경우는 볼 수 없음
-                 if (accessType == FeedAccessType.FOLLOWERS && userId == null) return false;
+                  // 비회원은 퍼블릭만 조회 가능
+                 if (!isLoggedIn) return false;
 
                   // 자신의 피드는 항상 볼 수 있음
                  if (Objects.equals(feed.getUser().getId(), userId)) return true;
@@ -77,7 +112,9 @@ public class FeedService {
               })
               .map(feed -> {
           boolean liked = (user != null) && feedLikeRepository.existsByFeedAndUser(feed, user);
-          return FeedMapper.fromEntity(feed, liked);
+          int likeCount = feedLikeRepository.countByFeed(feed);
+          int commentCount = feedCommentRepository.countByFeed(feed);
+          return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
       })
               .toList();
     }
@@ -108,7 +145,7 @@ public class FeedService {
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
 
-        return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, userId);
     }
 
     //피드 수정
@@ -122,25 +159,37 @@ public class FeedService {
             throw new CustomException(HttpStatus.FORBIDDEN ,"수정 권한이 없습니다.");
         }
 
-        //글, 이미지, 접근권한 수정
-        feed.update(
-                request.getDescription(),
-                request.getImageUrl(),
-                request.getFeedAccessType()
-        );
+       //기존 이미지 삭제(S3, DB)
+       if (request.getImageUrl() != null && request.getImageUrl().bucketKey() != null && !request.getImageUrl().bucketKey().isEmpty()) {
+           FeedImage oldImage = feed.getImages().stream().findFirst().orElse(null);
+           if (oldImage != null) {
+               String bucketKey = oldImage.getBucketKey();
+               if (bucketKey != null && !bucketKey.isEmpty()) {
+                   s3ServiceUtils.deleteFile(bucketKey);
+               }
+               feed.getImages().remove(oldImage);
+           }
 
+           S3FileRequest tempImage = request.getImageUrl();
+           S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
 
-//        entityManager.flush();
-//        entityManager.refresh(feed);
+           // 새 이미지 추가
+           FeedImage newImage = FeedImage.builder()
+                   .url(movedImage.url())
+                   .bucketKey(movedImage.bucketKey())
+                   .orgName(movedImage.orgName())
+                   .build();
 
-       Feed updated = repository.findById(feedId)
-                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "수정 후 피드를 다시 불러오지 못했습니다."));
+           feed.addImage(newImage);
+       }
 
-        boolean liked = feedLikeRepository.existsByFeedAndUser(updated, updated.getUser());
-        int likeCount = feedLikeRepository.countByFeed(updated);
-        int commentCount = feedCommentRepository.countByFeed(updated);
+       feed.update(request.getDescription(), request.getFeedAccessType());
 
-        return FeedMapper.fromEntity(updated, liked, likeCount, commentCount);
+        boolean liked = feedLikeRepository.existsByFeedAndUser(feed, feed.getUser());
+        int likeCount = feedLikeRepository.countByFeed(feed);
+        int commentCount = feedCommentRepository.countByFeed(feed);
+
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, userId);
     }
 
     //피드 삭제
@@ -152,6 +201,13 @@ public class FeedService {
         if(!feed.getUser().getId().equals(userId)){
             throw new CustomException(HttpStatus.FORBIDDEN,"삭제 권한이 없습니다.");
         }
+
+        feed.getImages().forEach(image -> {
+            String bucketKey = image.getBucketKey();
+            if (bucketKey != null && !bucketKey.isEmpty()) {
+              s3ServiceUtils.deleteFile(bucketKey);
+            }
+        });
         repository.delete(feed);
     }
 
@@ -162,6 +218,29 @@ public class FeedService {
         List<FeedLike> likeFeeds = feedLikeRepository.findByUser(user);
 
         return likeFeeds.stream()
-                .map(feedLike -> FeedMapper.fromEntity(feedLike.getFeed(), true)).toList();
+                .map(feedLike -> {
+                    Feed feed = feedLike.getFeed();
+                    int likeCount = feedLikeRepository.countByFeed(feed);
+                    int commentCount = feedCommentRepository.countByFeed(feed);
+                    return FeedMapper.fromEntity(feed, true, likeCount, commentCount);
+                })
+                .toList();
     }
+
+    //본인 피드 조회
+    public List<FeedResponseDto> getMyFeeds(Long userId) {
+     User user = userRePository.findById(userId)
+             .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
+     List<Feed> myFeeds = repository.findByUserIdOrderByIdDesc(userId);
+
+     return myFeeds.stream()
+             .map(feed -> {
+                 int likeCount = feedLikeRepository.countByFeed(feed);
+                 int commentCount = feedCommentRepository.countByFeed(feed);
+                 boolean liked = feedLikeRepository.existsByFeedAndUser(feed, user);
+                 return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
+             })
+             .toList();
+    }
+
 }

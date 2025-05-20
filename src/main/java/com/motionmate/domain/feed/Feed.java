@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,7 +22,7 @@ public class Feed {
 
     @ManyToOne
     private User user;
-    private String imageUrl;
+
     private String description;
 
     @CreationTimestamp
@@ -33,18 +35,30 @@ public class Feed {
     @Enumerated(EnumType.STRING)
     private FeedAccessType feedAccessType;
 
+    @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FeedLike> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FeedComment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FeedImage> images = new ArrayList<>();
+
     @Builder
-    public Feed(User user, String imageUrl, String description, FeedAccessType feedAccessType) {
+    public Feed(User user, String description, FeedAccessType feedAccessType) {
         this.user = user;
-        this.imageUrl = imageUrl;
         this.description = description;
         this.feedAccessType = feedAccessType;
     }
 
-    public void update(String description, String imageUrl, FeedAccessType feedAccessType) {
+    public void update(String description, FeedAccessType feedAccessType) {
         this.description = description;
-        this.imageUrl = imageUrl;
         this.feedAccessType = feedAccessType;
+    }
+
+    public void addImage(FeedImage image) {
+        this.images.add(image);
+        image.setFeed(this);
     }
 
 }

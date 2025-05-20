@@ -19,9 +19,9 @@ public class GoodsLikeController {
 
     // ✅ 상품 찜 추가
     @PostMapping("/{goodsId}")
-    public void likeGoods(@AuthenticationPrincipal User user,
+    public void likeGoods(@AuthenticationPrincipal CustomOAuth2User user,
                           @PathVariable Long goodsId) {
-        goodsLikeService.likeGoods(user, goodsId);
+        goodsLikeService.likeGoods(user.getUser(), goodsId);
     }
 
     // ✅ 찜 취소

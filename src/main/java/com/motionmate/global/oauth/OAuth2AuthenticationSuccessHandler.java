@@ -34,21 +34,20 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         // ✅ JWT 토큰 생성
         String token = jwtTokenProvider.generateToken(userId);
 
-        // ✅ 닉네임 등록 여부 확인
+// ✅ 닉네임 등록 여부 확인
         boolean isRegistered = userService.isProfileRegistered(userId);
 
-        // ✅ 리다이렉트 URL 분기
+// ✅ 리다이렉트 URL 분기
         String redirectUrl;
         if (isRegistered) {
-            redirectUrl = "http://localhost:3000/social/success?userId=" + userId + "&refresh=true";
+            redirectUrl = "http://localhost:3000/social/success?userId=" + userId + "&loginSuccess=true";
         } else {
-            redirectUrl = "http://localhost:3000/profile/register?userId=" + userId + "&refresh=true";
+            redirectUrl = "http://localhost:3000/profile/register?userId=" + userId + "&loginSuccess=true";
         }
-
 
         log.info("🔀 리다이렉트 URL: {}", redirectUrl); // ✅ 로그 추가
 
-        // 개발환경(localhost)이라면 임시로 Secure, SameSite 조정
+// 개발환경(localhost)이라면 임시로 Secure, SameSite 조정
         String tokenCookie = String.format(
                 "token=%s; Max-Age=%d; Path=/", // ↓ Secure, HttpOnly, SameSite 제거
                 token,
@@ -59,7 +58,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 userId,
                 60 * 60 * 24
         );
-
 
         response.setHeader("Set-Cookie", tokenCookie);
         response.addHeader("Set-Cookie", userIdCookie);
