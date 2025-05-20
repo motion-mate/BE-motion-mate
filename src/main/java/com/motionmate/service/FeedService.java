@@ -40,13 +40,12 @@ public class FeedService {
     private final FollowRepository followRepository;
     private final S3ServiceUtils s3ServiceUtils;
 
+    int userPk = 102;
 
     //피드 업로드
     public FeedResponseDto upload(FeedRequestDto request, Long userId) {
         User user = userRePository.findById(userId)
                 .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
-
-        int userPk = 102;
 
         //temp -> upload 이동
         S3FileRequest tempImage = request.getImageUrl();
@@ -172,7 +171,7 @@ public class FeedService {
            }
 
            S3FileRequest tempImage = request.getImageUrl();
-           S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userId.intValue());
+           S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
 
            // 새 이미지 추가
            FeedImage newImage = FeedImage.builder()

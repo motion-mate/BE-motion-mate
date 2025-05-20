@@ -36,6 +36,12 @@ public class Feed {
     private FeedAccessType feedAccessType;
 
     @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FeedLike> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FeedComment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "feed", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FeedImage> images = new ArrayList<>();
 
     @Builder
