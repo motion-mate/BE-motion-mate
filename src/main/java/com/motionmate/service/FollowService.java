@@ -82,7 +82,7 @@ public class FollowService {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."));
         User toUser = userRepository.findById(toUserId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."));
-
+    
         // 팔로우 관계가 존재하는지 확인
         boolean isFollowing = followRepository.existsByFromUser_IdAndToUser_Id(fromUserId, toUserId);
 

@@ -42,5 +42,8 @@ public class FeedDetailResponseDto {
 
     private int commentCount;
 
+    //피드 작성자 확인용
+    private boolean isAuthor;
+
     private boolean isFollowing;
 }

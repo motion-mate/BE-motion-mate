@@ -1,11 +1,14 @@
 package com.motionmate.controller.goods;
 
+import com.motionmate.domain.goods.Inquiry;
+import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.inquiry.InquiryRequestDto;
 import com.motionmate.dto.goods.inquiry.InquiryResponseDto;
 import com.motionmate.mapper.goods.InquiryMapper;
 import com.motionmate.service.goods.InquiryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,15 +25,16 @@ public class InquiryController {
 
     // 문의 등록
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody @Valid InquiryRequestDto dto) {
-        service.save(InquiryMapper.toEntity(dto));
+    public ResponseEntity<Void> create(@AuthenticationPrincipal User user, @RequestBody @Valid InquiryRequestDto dto) {
+        Inquiry inquiry = InquiryMapper.toEntity(dto, user);
+        service.save(inquiry);
         return ResponseEntity.ok().build();
     }
 
     // 문의 목록 조회
-    @GetMapping
-    public List<InquiryResponseDto> getAll() {
-        return service.findAll().stream()
+    @GetMapping("/user")
+    public List<InquiryResponseDto> getUserInquiries(@AuthenticationPrincipal User user) {
+        return service.findByUser(user).stream()
                 .map(InquiryMapper::toResponseListDto)
                 .toList();
     }

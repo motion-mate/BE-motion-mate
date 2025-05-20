@@ -32,7 +32,7 @@ public class FeedController {
             @AuthenticationPrincipal CustomOAuth2User user) {
         FeedResponseDto response = service.upload(request, user.getUserId());
         return ResponseEntity.ok(response);
-        }
+    }
 
     //전체 피드 조회
     @GetMapping
@@ -41,7 +41,7 @@ public class FeedController {
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomOAuth2User user) {
         Long userId = (user != null) ? user.getUserId() : null;
-        String nickname = (user != null) ? user.getUser().getProfile().getNickname(): null;
+        String nickname = (user != null) ? user.getUser().getProfile().getNickname() : null;
         return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, nickname, userId));
     }
 
@@ -50,7 +50,7 @@ public class FeedController {
     @GetMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> getFeedDetail(
             @PathVariable Long feedId,
-            @AuthenticationPrincipal @Nullable CustomOAuth2User user){
+            @AuthenticationPrincipal @Nullable CustomOAuth2User user) {
         Long userId = (user != null) ? user.getUserId() : null;
         return ResponseEntity.ok(service.getFeedDetail(feedId, userId));
     }
@@ -78,8 +78,8 @@ public class FeedController {
     @GetMapping("/liked")
     public ResponseEntity<List<FeedResponseDto>> getFeedsLikedByUser(
             @AuthenticationPrincipal CustomOAuth2User user) {
-       List<FeedResponseDto> likedFeeds = service.getFeedsLikedByUser(user.getUserId());
-       return ResponseEntity.ok(likedFeeds);
+        List<FeedResponseDto> likedFeeds = service.getFeedsLikedByUser(user.getUserId());
+        return ResponseEntity.ok(likedFeeds);
     }
 
     //본인 피드 조회
@@ -90,7 +90,6 @@ public class FeedController {
         List<FeedResponseDto> myFeeds = service.getMyFeeds(userId);
         return ResponseEntity.ok(myFeeds);
     }
-
 
 
 }

@@ -6,6 +6,7 @@ import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.chat.ChatMessageRequestDto;
 import com.motionmate.dto.chat.ChatMessageResponseDto;
 import com.motionmate.mapper.ChatMessageMapper;
+import com.motionmate.mongo.ChatMessageMongoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,8 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomParticipantRepository chatRoomParticipantRepository;
+    private final ChatMessageMongoService chatMessageMongoService; // ✅ 추가
+
 
     public ChatMessage saveMessage(Long roomId, ChatMessageRequestDto dto, User sender) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
@@ -32,8 +35,11 @@ public class ChatMessageService {
             if (!exists) return null; // 메시지 생략
         }
 
-        ChatMessage message = toEntity(chatRoom, sender, dto);
-        return chatMessageRepository.save(message);
+        ChatMessage message = ChatMessageMapper.toEntity(chatRoom, sender, dto);
+        ChatMessage saved = chatMessageRepository.save(message);
+
+        chatMessageMongoService.saveToMongo(saved); // ✅ MongoDB에도 저장
+        return saved;
     }
 
     public ChatMessage saveEnterMessage(ChatRoom room, User user) {
@@ -45,7 +51,10 @@ public class ChatMessageService {
             chatRoomParticipantRepository.save(new ChatRoomParticipant(room, user));
 
             ChatMessage message = new ChatMessage(room, user, "입장했습니다.", ChatMessage.MessageType.ENTER);
-            return chatMessageRepository.save(message);
+
+            ChatMessage saved = chatMessageRepository.save(message);
+            chatMessageMongoService.saveToMongo(saved); // ✅ Mongo에도 저장
+            return saved;
         }
 
         // 이미 참가자인 경우
