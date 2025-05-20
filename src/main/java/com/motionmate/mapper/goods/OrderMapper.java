@@ -4,30 +4,28 @@ import com.motionmate.domain.goods.Goods;
 import com.motionmate.domain.goods.Order;
 import com.motionmate.domain.goods.OrderItem;
 import com.motionmate.domain.user.User;
-import com.motionmate.dto.goods.order.OrderRequestDto;
-import com.motionmate.dto.goods.order.OrderResponseDto;
-import com.motionmate.dto.goods.order.OrderRequestDto.OrderItemRequest;
-
+import com.motionmate.dto.goods.order.OrderItemRequestDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class OrderMapper {
 
-    // ✅ Order 엔티티 생성
     public Order toOrderEntity(User user) {
         return Order.builder()
                 .user(user)
                 .orderedAt(LocalDateTime.now())
+                .status("ORDERED")
+                .orderNumber(UUID.randomUUID().toString())
                 .build();
     }
 
-    // ✅ OrderItem 리스트 생성
-    public List<OrderItem> toOrderItemEntityList(List<OrderItemRequest> requestItems, List<Goods> goodsList) {
+    public List<OrderItem> toOrderItemEntityList(List<OrderItemRequestDto> requestItems, List<Goods> goodsList) {
         return requestItems.stream().map(req -> {
             Goods matchedGoods = goodsList.stream()
                     .filter(g -> g.getId().equals(req.getGoodsId()))
@@ -42,7 +40,6 @@ public class OrderMapper {
         }).collect(Collectors.toList());
     }
 
-    // ✅ 응답 DTO 변환
     public OrderResponseDto toResponseDto(Order order) {
         return OrderResponseDto.builder()
                 .orderId(order.getId())
@@ -54,8 +51,8 @@ public class OrderMapper {
                                 .quantity(item.getQuantity())
                                 .unitPrice(item.getUnitPrice())
                                 .totalPrice(item.getTotalPrice())
-                                .build()
-                        ).collect(Collectors.toList()))
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

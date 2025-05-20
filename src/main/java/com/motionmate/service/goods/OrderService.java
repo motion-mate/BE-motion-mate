@@ -6,8 +6,8 @@ import com.motionmate.domain.goods.OrderItem;
 import com.motionmate.domain.goods.OrderRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.order.OrderRequestDto;
-import com.motionmate.dto.goods.order.OrderRequestDto.OrderItemRequest;
 import com.motionmate.dto.goods.order.OrderResponseDto;
+import com.motionmate.dto.goods.order.OrderItemRequestDto;
 import com.motionmate.mapper.goods.OrderMapper;
 import com.motionmate.domain.goods.GoodsRepository;
 
@@ -32,7 +32,7 @@ public class OrderService {
     public OrderResponseDto createOrder(OrderRequestDto requestDto, User user) {
         // 1. 상품 ID 목록 추출
         List<Long> goodsIds = requestDto.getItems().stream()
-                .map(OrderItemRequest::getGoodsId)
+                .map(OrderItemRequestDto::getGoodsId)
                 .toList();
 
         // 2. 상품 목록 조회
