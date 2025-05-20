@@ -1,6 +1,6 @@
 package com.motionmate.dto.goods.event;
 
-import com.motionmate.domain.goods.EventStatus;
+import com.motionmate.domain.goods.event.EventStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;

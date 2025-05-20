@@ -1,6 +1,6 @@
     package com.motionmate.service.goods;
 
-    import com.motionmate.domain.goods.EventStatus;
+    import com.motionmate.domain.goods.event.EventStatus;
     import com.motionmate.domain.goods.Goods;
     import com.motionmate.domain.goods.Order;
     import com.motionmate.domain.goods.OrderRepository;
@@ -15,7 +15,6 @@
     import org.springframework.stereotype.Service;
     import org.springframework.transaction.annotation.Transactional;
 
-    import java.time.LocalDateTime;
     import java.util.List;
 
     @Service
