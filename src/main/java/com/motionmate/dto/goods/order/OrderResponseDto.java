@@ -8,17 +8,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 public class OrderResponseDto {
-
     private Long orderId;
     private LocalDateTime orderedAt;
+    private String status;
     private List<OrderItemDto> items;
 
+    public int getTotalAmount() {
+        return items.stream().mapToInt(OrderItemDto::getTotalPrice).sum();
+    }
+
+    public String getFirstProductName() {
+        return items != null && !items.isEmpty() ? items.get(0).getGoodsName() : "";
+    }
+
     @Getter
-    @AllArgsConstructor
     @Builder
+    @AllArgsConstructor
     public static class OrderItemDto {
         private Long goodsId;
         private String goodsName;

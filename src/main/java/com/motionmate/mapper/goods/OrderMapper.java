@@ -4,6 +4,7 @@ import com.motionmate.domain.goods.Goods;
 import com.motionmate.domain.goods.Order;
 import com.motionmate.domain.goods.OrderItem;
 import com.motionmate.domain.user.User;
+import com.motionmate.dto.goods.order.OrderRequestDto;
 import com.motionmate.dto.goods.order.OrderItemRequestDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,7 @@ public class OrderMapper {
         return OrderResponseDto.builder()
                 .orderId(order.getId())
                 .orderedAt(order.getOrderedAt())
+                .status(order.getStatus())
                 .items(order.getOrderItems().stream()
                         .map(item -> OrderResponseDto.OrderItemDto.builder()
                                 .goodsId(item.getGoods().getId())
