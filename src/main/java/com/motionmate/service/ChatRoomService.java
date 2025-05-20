@@ -133,15 +133,6 @@ public class ChatRoomService {
         }
     }
 
-
-
-
-
-
-
-
-
-
     // 채팅방 탈퇴
     @Transactional
     public void exitRoom(Long roomId, String nickname) {
