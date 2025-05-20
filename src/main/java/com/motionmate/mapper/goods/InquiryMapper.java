@@ -5,6 +5,7 @@ import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.inquiry.InquiryRequestDto;
 import com.motionmate.dto.goods.inquiry.InquiryResponseDto;
 
+
 import java.time.LocalDateTime;
 
 public class InquiryMapper {
@@ -14,7 +15,7 @@ public class InquiryMapper {
                 .title(dto.getTitle())
                 .category(dto.getCategory())
                 .content(dto.getContent())
-                .status(Inquiry.InquiryStatus.Before)
+                .status(Inquiry.InquiryStatus.BEFORE) // ✅ 정확하게 매칭
                 .createdAt(LocalDateTime.now())
                 .user(user)
                 .build();

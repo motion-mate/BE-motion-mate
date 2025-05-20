@@ -15,5 +15,6 @@ public class InquiryResponseDto {
     private String category;
     private String date;
     private Inquiry.InquiryStatus status;
-    private String content; // 목록에서는 null 가능
+    private String statusLabel; // ✅ 한글 상태 설명
+    private String content;     // 목록에서는 null 가능
 }

@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface CartItemRepository extends JpaRepository<CartItem, Long> {
+public interface
+CartItemRepository extends JpaRepository<CartItem, Long> {
 
+    List<CartItem> findByUser(User user);
     // 특정 유저의 장바구니 목록
     List<CartItem> findAllByUser(User user);
 

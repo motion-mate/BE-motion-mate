@@ -13,9 +13,19 @@ import java.time.LocalDateTime;
 @Builder
 public class Inquiry {
 
-    // 문의 내역의 답변 완료 여부
     public enum InquiryStatus {
-        Before, Complete
+        BEFORE("미답변"),
+        COMPLETE("답변 완료");
+
+        private final String label;
+
+        InquiryStatus(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 
     @Id
@@ -37,3 +47,4 @@ public class Inquiry {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 }
+
