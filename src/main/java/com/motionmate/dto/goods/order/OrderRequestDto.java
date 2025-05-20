@@ -1,15 +1,16 @@
 package com.motionmate.dto.goods.order;
 
-import com.motionmate.domain.goods.Order;
-import lombok.Builder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class OrderRequestDto {
 
-    private String goodsName;
-    private Integer price;
-    private Order.OrderStatus status;
-
+    @NotNull(message = "주문 상품 목록은 필수입니다.")
+    private List<@Valid OrderItemRequestDto> items;
 }
