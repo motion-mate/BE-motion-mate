@@ -103,7 +103,6 @@ public class ChatRoomController {
         return ResponseEntity.ok().build();
     }
 
-
     // 채팅방 멤버 조회
     @GetMapping("/{roomId}/members")
     public ResponseEntity<List<ChatRoomMemberDto>> getRoomMembers(@PathVariable Long roomId) {

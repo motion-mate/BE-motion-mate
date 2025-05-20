@@ -1,6 +1,7 @@
 package com.motionmate.mapper.goods;
 
 import com.motionmate.domain.goods.Inquiry;
+import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.inquiry.InquiryRequestDto;
 import com.motionmate.dto.goods.inquiry.InquiryResponseDto;
 
@@ -8,13 +9,14 @@ import java.time.LocalDateTime;
 
 public class InquiryMapper {
 
-    public static Inquiry toEntity(InquiryRequestDto dto) {
+    public static Inquiry toEntity(InquiryRequestDto dto, User user) {
         return Inquiry.builder()
                 .title(dto.getTitle())
                 .category(dto.getCategory())
                 .content(dto.getContent())
                 .status("미답변")
                 .createdAt(LocalDateTime.now())
+                .user(user)
                 .build();
     }
 

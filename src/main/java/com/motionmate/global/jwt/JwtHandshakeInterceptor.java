@@ -1,5 +1,6 @@
 package com.motionmate.global.jwt;
 
+import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserRepository;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -27,11 +28,11 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                                    WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) {
 
-        String token = extractTokenFromRequest(request);
-        System.out.println("webSocket 연결 시 받은 토큰: " + token);
+        String token = extractQueryParam(request, "token");
+        String roomId = extractQueryParam(request, "roomId");
 
-        if (token == null) {
-            System.out.println("❌ WebSocket 연결 실패: 토큰 없음");
+        if (token == null || roomId == null) {
+            System.out.println("❌ WebSocket 연결 실패: 토큰 또는 roomId 누락");
             return false;
         }
 
@@ -42,14 +43,14 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
         Long userId = jwtTokenProvider.getUserIdFromToken(token);
         return userRepository.findById(userId).map(user -> {
-            attributes.put("user", user); // 유저 전체 객체 저장
-            System.out.println("WebSocket 연결 성공: " + user.getProfile().getNickname());
+            attributes.put("user", user);       // 유저 전체 객체 저장
+            attributes.put("roomId", roomId);   // roomId도 저장
+            System.out.println("✅ WebSocket 연결 성공: " + user.getProfile().getNickname() + ", Room ID: " + roomId);
             return true;
         }).orElseGet(() -> {
-            System.out.println("WebSocket 연결 실패: 사용자 없음");
+            System.out.println("❌ WebSocket 연결 실패: 사용자 없음");
             return false;
         });
-
     }
 
     @Override
@@ -57,15 +58,13 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                                ServerHttpResponse response,
                                WebSocketHandler wsHandler,
                                Exception exception) {
-
+        // 생략 가능
     }
 
-    private String extractTokenFromRequest(ServerHttpRequest request) {
+    private String extractQueryParam(ServerHttpRequest request, String param) {
         return UriComponentsBuilder.fromUri(request.getURI())
                 .build()
                 .getQueryParams()
-                .getFirst("token");
+                .getFirst(param);
     }
-
-
 }

@@ -101,6 +101,19 @@ public class UserService {
         return UserProfileMapper.toUserProfileDto(user, profile);
     }
 
+    @Transactional
+    public UserResponseDto getMySummary(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getOauthNickname())
+                .profileImageUrl(user.getProfile().getProfileImageUrl())
+                .build();
+    }
+
     // 다른 유저 프로필 조회
     @Transactional(readOnly = true)
     public UserProfileDto getUserProfile(Long userId) {
