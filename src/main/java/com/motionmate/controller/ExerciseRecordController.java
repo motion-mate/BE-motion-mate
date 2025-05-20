@@ -70,4 +70,5 @@ public class ExerciseRecordController {
     // GET /{id}
     // PUT /{id}
     // DELETE /{id}
+    //regitser
 }
