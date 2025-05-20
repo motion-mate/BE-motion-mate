@@ -17,15 +17,23 @@ import java.util.List;
 @Table(name = "orders")
 public class Order {
 
+    public enum OrderStatus {
+        READY, GOING, FINISH
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String orderNumber;
 
-    private String status;
-
     private LocalDateTime orderedAt;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    private String trackingNumber;
+    private String courier;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -49,8 +57,8 @@ public class Order {
      * 총 주문 금액 계산
      */
     public int getTotalAmount() {
-        return orderItems.stream()
-                .mapToInt(OrderItem::getTotalPrice)
-                .sum();
+        return orderItems != null
+                ? orderItems.stream().mapToInt(OrderItem::getTotalPrice).sum()
+                : 0;
     }
 }

@@ -13,6 +13,11 @@ import java.time.LocalDateTime;
 @Builder
 public class Inquiry {
 
+    // 문의 내역의 답변 완료 여부
+    public enum InquiryStatus {
+        Before, Complete
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +29,7 @@ public class Inquiry {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private String status;
+    private InquiryStatus status;
 
     private LocalDateTime createdAt;
 

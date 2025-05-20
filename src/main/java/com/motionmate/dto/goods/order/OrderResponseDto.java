@@ -1,5 +1,6 @@
 package com.motionmate.dto.goods.order;
 
+import com.motionmate.domain.goods.Order;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,15 +14,21 @@ import java.util.List;
 public class OrderResponseDto {
     private Long orderId;
     private LocalDateTime orderedAt;
-    private String status;
+    private Order.OrderStatus status;
+    private String trackingNumber;
+    private String courier;
     private List<OrderItemDto> items;
 
     public int getTotalAmount() {
-        return items.stream().mapToInt(OrderItemDto::getTotalPrice).sum();
+        return items != null
+                ? items.stream().mapToInt(OrderItemDto::getTotalPrice).sum()
+                : 0;
     }
 
     public String getFirstProductName() {
-        return items != null && !items.isEmpty() ? items.get(0).getGoodsName() : "";
+        return items != null && !items.isEmpty()
+                ? items.get(0).getGoodsName()
+                : "";
     }
 
     @Getter

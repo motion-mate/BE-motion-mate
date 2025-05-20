@@ -21,7 +21,7 @@ public class OrderMapper {
         return Order.builder()
                 .user(user)
                 .orderedAt(LocalDateTime.now())
-                .status("ORDERED")
+                .status(Order.OrderStatus.READY) // enum 사용
                 .orderNumber(UUID.randomUUID().toString())
                 .build();
     }
@@ -46,6 +46,8 @@ public class OrderMapper {
                 .orderId(order.getId())
                 .orderedAt(order.getOrderedAt())
                 .status(order.getStatus())
+                .trackingNumber(order.getTrackingNumber())
+                .courier(order.getCourier())
                 .items(order.getOrderItems().stream()
                         .map(item -> OrderResponseDto.OrderItemDto.builder()
                                 .goodsId(item.getGoods().getId())
