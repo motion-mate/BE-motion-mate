@@ -34,10 +34,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         // ✅ JWT 토큰 생성
         String token = jwtTokenProvider.generateToken(userId);
 
-        // ✅ 닉네임 등록 여부 확인
+// ✅ 닉네임 등록 여부 확인
         boolean isRegistered = userService.isProfileRegistered(userId);
 
-        // ✅ 리다이렉트 URL 분기
+// ✅ 리다이렉트 URL 분기
         String redirectUrl;
         if (isRegistered) {
             redirectUrl = "http://localhost:3000/social/success?userId=" + userId + "&loginSuccess=true";
@@ -45,25 +45,23 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             redirectUrl = "http://localhost:3000/profile/register?userId=" + userId + "&loginSuccess=true";
         }
 
+        log.info("🔀 리다이렉트 URL: {}", redirectUrl); // ✅ 로그 추가
 
-        // ✅ HttpOnly, Secure 쿠키로 설정 (AccessToken + userId)
-        Cookie tokenCookie = new Cookie("token", token);
-        tokenCookie.setHttpOnly(true); // JS 접근 차단
-        tokenCookie.setSecure(false);  // localhost 개발 환경이면 false (배포 시 true)
-        tokenCookie.setPath("/");
-        tokenCookie.setMaxAge(60 * 60); // 1시간
+// 개발환경(localhost)이라면 임시로 Secure, SameSite 조정
+        String tokenCookie = String.format(
+                "token=%s; Max-Age=%d; Path=/", // ↓ Secure, HttpOnly, SameSite 제거
+                token,
+                60 * 60 * 24
+        );
+        String userIdCookie = String.format(
+                "userId=%d; Max-Age=%d; Path=/",
+                userId,
+                60 * 60 * 24
+        );
 
-        Cookie userIdCookie = new Cookie("userId", userId.toString());
-        userIdCookie.setHttpOnly(true);
-        userIdCookie.setSecure(false);
-        userIdCookie.setPath("/");
-        userIdCookie.setMaxAge(60 * 60);
+        response.setHeader("Set-Cookie", tokenCookie);
+        response.addHeader("Set-Cookie", userIdCookie);
 
-        // ✅ 쿠키 추가
-        response.addCookie(tokenCookie);
-        response.addCookie(userIdCookie);
-
-        log.info("🔀 리다이렉트 URL: {}", redirectUrl);
         response.sendRedirect(redirectUrl);
     }
 }
