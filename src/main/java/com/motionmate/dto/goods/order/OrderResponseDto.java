@@ -16,4 +16,6 @@ public class OrderResponseDto {
     private Integer totalPrice; // 총가격
     private LocalDateTime orderedAt;
     private Order.OrderStatus status;
+    private String trackingNumber;
+    private String courier;
 }

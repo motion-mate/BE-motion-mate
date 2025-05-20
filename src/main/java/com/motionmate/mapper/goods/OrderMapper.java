@@ -1,6 +1,7 @@
 package com.motionmate.mapper.goods;
 
 import com.motionmate.domain.goods.Order;
+import com.motionmate.dto.goods.order.OrderRequestDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
 
 public class OrderMapper {
@@ -14,7 +15,9 @@ public class OrderMapper {
                 .quantity(quantity)
                 .totalPrice(price * quantity) // ✅ 총 가격 계산
                 .orderedAt(order.getOrderedAt())
-                .status(order.status)
+                .status(order.getStatus())
+                .trackingNumber(order.getTrackingNumber())
+                .courier(order.getCourier())
                 .build();
     }
 

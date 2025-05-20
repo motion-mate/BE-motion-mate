@@ -35,7 +35,13 @@ public class Order {
 
     // 배송 상태
     @Enumerated(EnumType.STRING)
-    public OrderStatus status;
+    private OrderStatus status;
+
+    // 송장번호
+    private String trackingNumber;
+
+    // 택배사 이름 or 코드
+    private String courier;
 
     // 주문 생성자 (user, goods, quantity 필수)
     @Builder
