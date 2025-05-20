@@ -1,5 +1,6 @@
 package com.motionmate.dto.goods.order;
 
+import com.motionmate.domain.goods.Order;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,4 +15,5 @@ public class OrderResponseDto {
     private Integer price;
     private Integer totalPrice; // 총가격
     private LocalDateTime orderedAt;
+    private Order.OrderStatus status;
 }

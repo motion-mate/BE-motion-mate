@@ -14,6 +14,7 @@ public class OrderMapper {
                 .quantity(quantity)
                 .totalPrice(price * quantity) // ✅ 총 가격 계산
                 .orderedAt(order.getOrderedAt())
+                .status(order.status)
                 .build();
     }
 
