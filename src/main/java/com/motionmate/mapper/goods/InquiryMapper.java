@@ -14,7 +14,7 @@ public class InquiryMapper {
                 .title(dto.getTitle())
                 .category(dto.getCategory())
                 .content(dto.getContent())
-                .status("미답변")
+                .status(Inquiry.InquiryStatus.Before)
                 .createdAt(LocalDateTime.now())
                 .user(user)
                 .build();

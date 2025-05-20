@@ -29,6 +29,7 @@ public class Inquiry {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Enumerated(EnumType.STRING)
     private InquiryStatus status;
 
     private LocalDateTime createdAt;
