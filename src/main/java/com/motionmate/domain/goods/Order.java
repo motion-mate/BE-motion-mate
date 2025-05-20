@@ -1,12 +1,7 @@
 package com.motionmate.domain.goods;
 
 import com.motionmate.domain.user.User; // ✅ User 클래스 import
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id; // ✅ @Id import
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table; // ✅ @Table import
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본 생성자 (외부 new 방지)
 @Table(name = "orders") // 테이블명 명시 (예약어 order 피하기 위함)
 public class Order {
+
+    public enum OrderStatus {
+        READY, GOING, FINISH
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증가 PK
@@ -33,6 +32,16 @@ public class Order {
 //    private Integer price;
     private Integer quantity;           // 주문 수량
     private LocalDateTime orderedAt;    // 주문 시각
+
+    // 배송 상태
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    // 송장번호
+    private String trackingNumber;
+
+    // 택배사 이름 or 코드
+    private String courier;
 
     // 주문 생성자 (user, goods, quantity 필수)
     @Builder
