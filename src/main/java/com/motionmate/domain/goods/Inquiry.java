@@ -13,6 +13,21 @@ import java.time.LocalDateTime;
 @Builder
 public class Inquiry {
 
+    public enum InquiryStatus {
+        BEFORE("미답변"),
+        COMPLETE("답변 완료");
+
+        private final String label;
+
+        InquiryStatus(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,10 +39,12 @@ public class Inquiry {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private InquiryStatus status;
 
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 }
+

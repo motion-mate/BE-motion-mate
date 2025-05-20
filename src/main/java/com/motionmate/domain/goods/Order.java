@@ -10,12 +10,15 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Table(name = "orders")
 public class Order {
+
+    public enum OrderStatus {
+        READY, GOING, FINISH
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +26,14 @@ public class Order {
 
     private String orderNumber;
 
-    private String status;
+    @Enumerated(EnumType.STRING) // ✅ Enum은 문자열로 저장
+    private OrderStatus status;
 
     private LocalDateTime orderedAt;
+
+    private String trackingNumber;
+
+    private String courier;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -82,7 +82,7 @@ public class GoodsEventService {
         Order order = Order.builder()
                 .user(user)
                 .orderedAt(LocalDateTime.now())
-                .status("ORDERED")
+                .status(Order.OrderStatus.READY)
                 .orderNumber("EVENT-" + System.currentTimeMillis())
                 .build();
 
