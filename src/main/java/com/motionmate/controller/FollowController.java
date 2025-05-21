@@ -1,16 +1,22 @@
 package com.motionmate.controller;
 
+import com.motionmate.domain.user.User;
+import com.motionmate.domain.user.UserRepository;
+import com.motionmate.dto.follow.FollowCountResponse;
 import com.motionmate.dto.follow.FollowResponseDto;
 import com.motionmate.dto.follow.IsFollowingDto;
+import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.FollowService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/follows")
@@ -18,10 +24,11 @@ import java.util.List;
 public class FollowController {
 
     private final FollowService followService;
+    private final UserRepository userRepository;
 
     // 팔로우
     @PostMapping("/{toUserId}")
-    public ResponseEntity<Void> follow(
+    public ResponseEntity<String> follow(
             @PathVariable Long toUserId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         followService.follow(user.getUserId(), toUserId);
@@ -58,15 +65,21 @@ public class FollowController {
         return ResponseEntity.ok(isFollowing);
     }
 
-    // ✅ 내 팔로잉
+    // 내 팔로잉
     @GetMapping("/followings/me")
     public ResponseEntity<List<FollowResponseDto>> getMyFollowings(@AuthenticationPrincipal CustomOAuth2User user) {
         return ResponseEntity.ok(followService.getFollowings(user.getUserId()));
     }
 
-    // ✅ 내 팔로워
+    // 내 팔로워
     @GetMapping("/followers/me")
     public ResponseEntity<List<FollowResponseDto>> getMyFollowers(@AuthenticationPrincipal CustomOAuth2User user) {
         return ResponseEntity.ok(followService.getFollowers(user.getUserId()));
+    }
+
+    @GetMapping("/counts/{userId}")
+    public ResponseEntity<FollowCountResponse> getFollowCounts(@PathVariable Long userId) {
+        FollowCountResponse response = followService.getFollowCounts(userId);
+        return ResponseEntity.ok(response);
     }
 }

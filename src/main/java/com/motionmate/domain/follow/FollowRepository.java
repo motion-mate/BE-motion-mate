@@ -22,4 +22,6 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
     @Query("SELECT f FROM Follow f JOIN FETCH f.fromUser WHERE f.toUser.id = :userId")
     List<Follow> findAllByToUser_IdWithUser(@Param("userId") Long userId);
+
+    boolean existsByFromUserAndToUser(User user, User user1);
 }

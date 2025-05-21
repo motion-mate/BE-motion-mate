@@ -1,6 +1,7 @@
 package com.motionmate.service;
 
 import com.motionmate.domain.feed.*;
+import com.motionmate.domain.follow.Follow;
 import com.motionmate.domain.follow.FollowRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfileRepository;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +40,7 @@ public class FeedService {
     private final FeedLikeRepository feedLikeRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final FollowRepository followRepository;
+    private final FollowService followService;
     private final S3ServiceUtils s3ServiceUtils;
 
     int userPk = 102;
@@ -121,11 +124,16 @@ public class FeedService {
                  return false;
               })
               .map(feed -> {
-          boolean liked = (user != null) && feedLikeRepository.existsByFeedAndUser(feed, user);
-          int likeCount = feedLikeRepository.countByFeed(feed);
-          int commentCount = feedCommentRepository.countByFeed(feed);
-          return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
-      })
+                  boolean liked = (user != null) && feedLikeRepository.existsByFeedAndUser(feed, user);
+                  int likeCount = feedLikeRepository.countByFeed(feed);
+                  int commentCount = feedCommentRepository.countByFeed(feed);
+
+                  boolean isFollowing = false;
+                  if(user != null && !Objects.equals(user.getId(), feed.getUser().getId())) {
+                      isFollowing = followService.isFollowing(user.getId(), feed.getUser().getId()).isFollowing();
+                  }
+                  return FeedMapper.fromEntity(feed, liked, likeCount, commentCount, isFollowing);
+              })
               .toList();
     }
 
@@ -155,7 +163,12 @@ public class FeedService {
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
 
-        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, userId);
+        boolean isFollowing = false;
+        if(user != null && !Objects.equals(user.getId(), feed.getUser().getId())) {
+            isFollowing = followService.isFollowing(user.getId(), feed.getUser().getId()).isFollowing();
+        }
+
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, isFollowing, userId);
     }
 
     //피드 수정
@@ -199,7 +212,8 @@ public class FeedService {
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
 
-        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, userId);
+        boolean isFollowing = false;
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, isFollowing, userId);
     }
 
     //피드 삭제
@@ -232,7 +246,8 @@ public class FeedService {
                     Feed feed = feedLike.getFeed();
                     int likeCount = feedLikeRepository.countByFeed(feed);
                     int commentCount = feedCommentRepository.countByFeed(feed);
-                    return FeedMapper.fromEntity(feed, true, likeCount, commentCount);
+                    boolean isFollowing = followRepository.existsByFromUserAndToUser(user, feed.getUser());
+                    return FeedMapper.fromEntity(feed, true, likeCount, commentCount, isFollowing);
                 })
                 .toList();
     }
@@ -248,7 +263,7 @@ public class FeedService {
                  int likeCount = feedLikeRepository.countByFeed(feed);
                  int commentCount = feedCommentRepository.countByFeed(feed);
                  boolean liked = feedLikeRepository.existsByFeedAndUser(feed, user);
-                 return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
+                 return FeedMapper.fromEntityLikeMyFeed(feed, liked, likeCount, commentCount);
              })
              .toList();
     }

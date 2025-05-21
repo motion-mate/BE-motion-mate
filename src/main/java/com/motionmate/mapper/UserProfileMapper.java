@@ -17,12 +17,10 @@ public class UserProfileMapper {
                 .nickname(user.getProfile().getNickname())
                 .bio(user.getProfile().getBio())
                 .profileImageUrl(user.getProfile().getProfileImageUrl())
-                .followerCount(user.getProfile().getFollowerCount())
-                .followingCount(user.getProfile().getFollowingCount())
                 .build();
     }
 
-    // 단독 프로필 조회 DTO 변환
+    // 단독 프로필 조회 DTO 변환 
     public static UserProfileResponseDto toResponseDto(UserProfile profile) {
         return UserProfileResponseDto.builder()
                 .bio(profile.getBio())
@@ -51,10 +49,10 @@ public class UserProfileMapper {
 
     // 요청 DTO → 기존 엔티티에 업데이트
     public static void updateFromDto(UserProfile profile, UserProfileUpdateRequestDto dto) {
-        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl(), dto.getFollowerCount(), dto.getFollowingCount());
+        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl());
     }
 
     public static void updateFromDto(UserProfile profile, UserProfileRegisterRequestDto dto) {
-        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl(), dto.getFollowerCount(), dto.getFollowingCount());
+        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl());
     }
 }
