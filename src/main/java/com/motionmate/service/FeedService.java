@@ -40,6 +40,7 @@ public class FeedService {
     private final FeedLikeRepository feedLikeRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final FollowRepository followRepository;
+    private final FollowService followService;
     private final S3ServiceUtils s3ServiceUtils;
 
     int userPk = 102;
@@ -157,8 +158,7 @@ public class FeedService {
             isFollowing = followService.isFollowing(user.getId(), feed.getUser().getId()).isFollowing();
         }
 
-        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, isFollowing);
-        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, userId);
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, isFollowing, userId);
     }
 
     //피드 수정
@@ -202,9 +202,8 @@ public class FeedService {
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
 
-        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, userId);
         boolean isFollowing = false;
-        return FeedMapper.fromEntityDetail(updated, liked, likeCount, commentCount, isFollowing);
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, isFollowing, userId);
     }
 
     //피드 삭제
@@ -237,7 +236,8 @@ public class FeedService {
                     Feed feed = feedLike.getFeed();
                     int likeCount = feedLikeRepository.countByFeed(feed);
                     int commentCount = feedCommentRepository.countByFeed(feed);
-                    return FeedMapper.fromEntityLikeMyFeed(feed, true, likeCount, commentCount);
+                    boolean isFollowing = followRepository.existsByFromUserAndToUser(user, feed.getUser());
+                    return FeedMapper.fromEntity(feed, true, likeCount, commentCount, isFollowing);
                 })
                 .toList();
     }
@@ -253,7 +253,7 @@ public class FeedService {
                  int likeCount = feedLikeRepository.countByFeed(feed);
                  int commentCount = feedCommentRepository.countByFeed(feed);
                  boolean liked = feedLikeRepository.existsByFeedAndUser(feed, user);
-                 return FeedMapper.fromEntity(feed, liked, likeCount, commentCount);
+                 return FeedMapper.fromEntityLikeMyFeed(feed, liked, likeCount, commentCount);
              })
              .toList();
     }

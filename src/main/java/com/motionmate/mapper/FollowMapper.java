@@ -2,6 +2,7 @@ package com.motionmate.mapper;
 
 import com.motionmate.domain.follow.Follow;
 import com.motionmate.domain.user.User;
+import com.motionmate.dto.follow.FollowCountResponse;
 import com.motionmate.dto.follow.FollowRequestDto;
 import com.motionmate.dto.follow.FollowResponseDto;
 import com.motionmate.dto.follow.IsFollowingDto;
@@ -32,6 +33,4 @@ public class FollowMapper {
                 .isFollowing(isFollowing)
                 .build();
     }
-
-
 }

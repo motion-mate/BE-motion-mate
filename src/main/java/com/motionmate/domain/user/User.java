@@ -33,6 +33,12 @@ public class User {
 
     private String provider; // google, kakao, naver 등
 
+    @Column(name = "following_count")
+    private int followingCount = 0;
+
+    @Column(name = "follower_count")
+    private int followerCount = 0;
+
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id") // 또는 name 생략 가능
     private UserProfile profile;
@@ -58,4 +64,21 @@ public class User {
     public void connectProfile(UserProfile profile) {
         this.profile = profile;
     }
+
+    public void incrementFollowingCount() {
+        this.followingCount++;
+    }
+
+    public void decrementFollowingCount() {
+        if(this.followingCount > 0) this.followingCount--;
+    }
+
+    public void incrementFollowerCount() {
+        this.followerCount++;
+    }
+
+    public void decrementFollowerCount() {
+        if(this.followerCount > 0) this.followerCount--;
+    }
 }
+
