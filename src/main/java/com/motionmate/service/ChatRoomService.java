@@ -125,7 +125,7 @@ public class ChatRoomService {
 
         try {
             chatRoomParticipantRepository.save(new ChatRoomParticipant(room, user));
-            chatMessageRepository.save(new ChatMessage(room, user, "입장했습니다.", ChatMessage.MessageType.ENTER));
+            // chatMessageRepository.save(new ChatMessage(room, user, "입장했습니다.", ChatMessage.MessageType.ENTER));
         } catch (DataIntegrityViolationException ex) {
             log.debug("⚠️ 중복 참가 삽입 시도 감지됨 - 무시 처리", ex);
             // 예외 후 세션 flush 시도 방지
