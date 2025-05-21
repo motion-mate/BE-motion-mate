@@ -47,7 +47,7 @@ public class FeedCommentService {
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
 
-        List<FeedComment> comments = feedCommentRepository.findByFeed(feed);
+        List<FeedComment> comments = feedCommentRepository.findByFeedOrderByCreatedAtDesc(feed);
 
         return comments.stream()
                 .map(comment -> {
