@@ -1,6 +1,5 @@
 package com.motionmate.domain.goods.event;
 
-import com.motionmate.domain.goods.Goods;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,7 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 
 @Entity
 @Getter
@@ -19,21 +17,19 @@ public class GoodsEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-    private String description;
-    private String imageUrl;
+    private String title;               // 이벤트명
+    private String description;        // 이벤트 설명
+    private String imageUrl;           // 이벤트 배너 이미지
+
+    private String goodsName;          // 이벤트용 굿즈 이름
+    private String goodsImageUrl;      // 이벤트용 굿즈 이미지
+    private int eventStock;            // 이벤트 재고
 
     private LocalDate startDate;
     private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
     private EventStatus status;
-
-    @ManyToOne
-    private Goods goods;
-
-    private int stock; // 선착순 수량
-
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -44,20 +40,27 @@ public class GoodsEvent {
 
     @Builder
     public GoodsEvent(String title, String description, String imageUrl,
-                      LocalDate startDate, LocalDate endDate, EventStatus status, int stock) {
+                      String goodsName, String goodsImageUrl, int eventStock,
+                      LocalDate startDate, LocalDate endDate, EventStatus status) {
         this.title = title;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.goodsName = goodsName;
+        this.goodsImageUrl = goodsImageUrl;
+        this.eventStock = eventStock;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
-        this.stock = stock;
     }
 
     public void updateStatus(EventStatus status) {
         this.status = status;
     }
+
+    public void decreaseStock(int quantity) {
+        if (this.eventStock < quantity) {
+            throw new IllegalArgumentException("이벤트 재고 부족");
+        }
+        this.eventStock -= quantity;
+    }
 }
-
-
-
