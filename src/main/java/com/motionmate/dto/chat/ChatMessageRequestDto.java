@@ -12,4 +12,5 @@ public class ChatMessageRequestDto {
     private Long chatRoomId; // 채팅방 ID
     private String message; // 메시지 내용
     private ChatMessage.MessageType type;
+    private String senderNickname;
 }
