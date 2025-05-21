@@ -50,29 +50,39 @@ public class FeedService {
         //temp -> upload 이동
         S3FileRequest tempImage = request.getImageUrl();
 
-        S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
+        Feed feed;
 
-        S3FileRequest newImage = S3FileMapper.toS3FileRequest(movedImage);
+        if (tempImage != null) {
+            S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
 
-        FeedRequestDto newRequest = FeedRequestDto.builder()
-                .imageUrl(newImage)
-                .description(request.getDescription())
-                .feedAccessType(request.getFeedAccessType())
-                .build();
+            S3FileRequest newImage = S3FileMapper.toS3FileRequest(movedImage);
 
-        Feed feed = FeedMapper.toEntity(newRequest, user);
+            FeedRequestDto newRequest = FeedRequestDto.builder()
+                    .imageUrl(newImage)
+                    .description(request.getDescription())
+                    .feedAccessType(request.getFeedAccessType())
+                    .build();
 
-        FeedImage image = FeedImage.builder()
-                .url(movedImage.url())
-                .bucketKey(movedImage.bucketKey())
-                .orgName(movedImage.orgName())
-                .build();
+            feed = FeedMapper.toEntity(newRequest, user);
 
-        feed.addImage(image);
+            FeedImage image = FeedImage.builder()
+                    .url(movedImage.url())
+                    .bucketKey(movedImage.bucketKey())
+                    .orgName(movedImage.orgName())
+                    .build();
+
+            feed.addImage(image);
+
+            s3ServiceUtils.deleteUserTempFiles(userPk);
+        } else {
+            feed = Feed.builder()
+                    .user(user)
+                    .description(request.getDescription())
+                    .feedAccessType(request.getFeedAccessType())
+                    .build();
+        }
 
         Feed saved = repository.save(feed);
-
-        s3ServiceUtils.deleteUserTempFiles(userPk);
 
         return FeedMapper.fromEntity(saved);
     }
