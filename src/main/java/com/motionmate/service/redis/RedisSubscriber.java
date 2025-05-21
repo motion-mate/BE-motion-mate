@@ -6,7 +6,6 @@ import com.motionmate.domain.chat.ChatRoom;
 import com.motionmate.domain.chat.ChatRoomRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfileRepository;
-import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.chat.ChatMessageRequestDto;
 import com.motionmate.dto.chat.ChatMessageResponseDto;
 import com.motionmate.global.exception.ChatMessageNotFoundException;
@@ -43,8 +42,7 @@ public class RedisSubscriber implements MessageListener {
 
             log.info("📩 RedisSubscriber 수신: {}", publishMessage);
 
-            // 2. JSON 문자열인지 확인하고 이스케이프된 경우 처리
-            // 메시지가 이중으로 감싸져 있으면 디코딩
+            // 2. JSON 문자열이 이중 이스케이프된 경우 복구
             if (publishMessage.startsWith("\"") && publishMessage.endsWith("\"")) {
                 publishMessage = publishMessage.substring(1, publishMessage.length() - 1)
                         .replace("\\\"", "\"")
@@ -54,6 +52,13 @@ public class RedisSubscriber implements MessageListener {
             // 3. 역직렬화
             ChatMessageRequestDto roomMessage = objectMapper.readValue(publishMessage, ChatMessageRequestDto.class);
 
+            // 4. STOMP로 프론트에 전송 (모든 타입: ENTER, QUIT, TALK)
+            messagingTemplate.convertAndSend(
+                    "/sub/chat/room/" + roomMessage.getChatRoomId(),
+                    roomMessage
+            );
+
+            // 5. TALK 타입만 DB 및 Redis 저장
             if (roomMessage.getType().equals(ChatMessage.MessageType.TALK)) {
                 ChatRoom chatRoom = chatRoomRepository.findById(roomMessage.getChatRoomId())
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
@@ -66,9 +71,12 @@ public class RedisSubscriber implements MessageListener {
                 );
 
                 ChatMessageResponseDto response = ChatMessageMapper.toDto(savedMessage);
-                messagingTemplate.convertAndSend("/sub/chat/room/" + roomMessage.getChatRoomId(), response);
 
-                redisTemplate.opsForList().rightPush("CHAT_MESSAGES:" + roomMessage.getChatRoomId(), publishMessage);
+                // Redis 채팅 메시지 리스트에 저장
+                redisTemplate.opsForList().rightPush(
+                        "CHAT_MESSAGES:" + roomMessage.getChatRoomId(),
+                        publishMessage
+                );
             }
 
         } catch (Exception e) {
