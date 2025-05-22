@@ -105,4 +105,13 @@ public class ReviewService {
         return reviewRepository.calculateAverageRating(goods);
     }
 
+    /**
+     * 로그인한 유저가 작성한 리뷰조회를 DTO 변환
+     */
+    public List<ReviewResponseDto> getReviewsByUser(User user){
+        return reviewRepository.findAllByUser(user).stream()
+                .map(ReviewMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+    
 }
