@@ -2,6 +2,7 @@ package com.motionmate.service;
 
 import com.motionmate.domain.follow.Follow;
 import com.motionmate.domain.follow.FollowRepository;
+import com.motionmate.domain.notification.Notification;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.follow.FollowCountResponse;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.motionmate.dto.notification.NotificationRequestDto;
+
 
 import java.util.List;
 
@@ -27,6 +30,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     // 팔로우
     // fromUserId : 팔로우 하는 userId
@@ -54,6 +58,14 @@ public class FollowService {
 
         userRepository.save(fromUser);
         userRepository.save(toUser);
+
+        notificationService.createNotification (
+                NotificationRequestDto.builder()
+                    .userId(toUser.getId())
+                    .type(Notification.NotificationType.FOLLOW)
+                    .content(fromUser.getProfile().getNickname() + "님이 팔로우했습니다.")
+                    .build()
+        );
 
         return ResponseEntity.ok("팔로우 성공");
     }

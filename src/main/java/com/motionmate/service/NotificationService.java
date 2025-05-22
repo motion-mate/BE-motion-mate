@@ -8,6 +8,7 @@ import com.motionmate.dto.notification.NotificationRequestDto;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.mapper.NotificationMapper;
+import com.motionmate.service.websocket.NotificationSocketSender;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationSocketSender notificationSocketSender;
     private final UserRepository userRepository;
 
     // 알림 생성
@@ -28,7 +30,14 @@ public class NotificationService {
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."));
         Notification notification = NotificationMapper.toEntity(requestDto, user);
-        return notificationRepository.save(notification);
+        Notification savedNotification = notificationRepository.save(notification);
+
+        notificationSocketSender.sendNotification(
+                user.getId(),
+                NotificationMapper.toDto(savedNotification)
+        );
+
+        return savedNotification;
     }
 
     // 특정 유저 알림 전체 조회
@@ -43,9 +52,13 @@ public class NotificationService {
 
 
     // 알림 읽음처리
-    public Notification markNotificationAsRead(Long notificationId) {
+    public Notification markNotificationAsRead(Long notificationId, Long userId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 알림입니다."));
+
+        if(!notification.getUser().getId().equals(userId)) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "본인의 알림만 읽음처리 할 수 있습니다.");
+        }
         notification.markAsRead();
         notificationRepository.save(notification);
         return notification;
@@ -59,7 +72,7 @@ public class NotificationService {
             throw new CustomException(HttpStatus.NOT_FOUND, "읽지 않은 알림이 없습니다.");
         }
         for (Notification notification : unreadNotifications) {
-            notification.markAsReadAll();
+            notification.markAsRead();
         }
     }
 
@@ -75,7 +88,7 @@ public class NotificationService {
         List<Notification> deleteAllNotifications = notificationRepository.findByUserId(userId);
 
         if(deleteAllNotifications.isEmpty()) {
-            throw new CustomException(HttpStatus.NO_CONTENT, "삭제할 알림이 없습니다.");
+            throw new CustomException(HttpStatus.NOT_FOUND, "삭제할 알림이 없습니다.");
         }
         for (Notification notificationDelete : deleteAllNotifications) {
             notificationRepository.delete(notificationDelete);

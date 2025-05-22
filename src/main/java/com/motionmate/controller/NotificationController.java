@@ -4,6 +4,7 @@ import com.motionmate.domain.notification.Notification;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.notification.NotificationRequestDto;
 import com.motionmate.dto.notification.NotificationResponseDto;
+import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.mapper.NotificationMapper;
 import com.motionmate.service.NotificationService;
@@ -38,6 +39,14 @@ public class NotificationController {
     public ResponseEntity<List<NotificationResponseDto>> getNotifications(
             @AuthenticationPrincipal CustomOAuth2User oauthUser,
             @PathVariable Long userId) {
+
+        // CustomOAuth2User에서 로그인한 사용자의 userId를 추출
+        // 파라미터의 userId와 로그인 한 userId가 다르면 403 권한없음 예외처리
+        Long loginUserId = oauthUser.getUser().getId();
+        if(!loginUserId.equals(userId)) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+
         List<Notification> notifications = notificationService.getNotificationByUser(userId);
         List<NotificationResponseDto> responseDto = notifications.stream()
                 .map(NotificationMapper::toDto)
@@ -48,9 +57,13 @@ public class NotificationController {
 
     // 알림 읽음 처리 API (PATCH 요청)
     @PatchMapping("/read/{notificationId}")
-    public ResponseEntity<NotificationResponseDto> markAsRead(@PathVariable Long notificationId) {
+    public ResponseEntity<NotificationResponseDto> markAsRead(
+            @PathVariable Long notificationId,
+            @AuthenticationPrincipal CustomOAuth2User oauthUser
+    ) {
+        Long userId = oauthUser.getUser().getId();
         // NotificationService 에서 알림을 읽음으로 처리
-        Notification updated = notificationService.markNotificationAsRead(notificationId);
+        Notification updated = notificationService.markNotificationAsRead(notificationId, userId);
         // 업데이트된 알림을 NotificationResponseDto 로 변환 후 응답
         NotificationResponseDto responseDto = NotificationMapper.toDto(updated);
 
