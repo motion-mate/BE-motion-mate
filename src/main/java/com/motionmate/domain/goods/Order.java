@@ -61,4 +61,13 @@ public class Order {
                 ? orderItems.stream().mapToInt(OrderItem::getTotalPrice).sum()
                 : 0;
     }
+
+    public void updateStatus(OrderStatus newStatus) {
+        this.status = newStatus;
+    }
+
+    public void updateTracking(String trackingNumber, String courier) {
+        this.trackingNumber = trackingNumber;
+        this.courier = courier;
+    }
 }

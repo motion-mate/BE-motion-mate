@@ -30,7 +30,7 @@ public class GoodsRequestDto {
     private Integer stock;
 
     @NotNull(message = "한정 여부는 필수입니다.")
-    private Boolean isLimited;
+    private Boolean limited;
 
     @NotBlank(message = "카테고리는 필수입니다.")
     private String category;

@@ -40,4 +40,17 @@ public class GoodsService {
         boolean liked = goodsLikeRepository.existsByUserAndGoods(user, goods);
         return GoodsMapper.toDto(goods, liked);
     }
+
+
+    @Transactional
+    public void updateGoods(Long id, GoodsRequestDto dto) {
+        Goods goods = goodsRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        goods.update(dto.getName(), dto.getDescription(), dto.getPrice(), dto.getStock());
+    }
+
+    @Transactional
+    public void deleteGoods(Long id) {
+        goodsRepository.deleteById(id);
+    }
 }

@@ -7,6 +7,7 @@ import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.goods.GoodsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,4 +38,20 @@ public class GoodsController {
                                            @AuthenticationPrincipal CustomOAuth2User user) {
         return goodsService.getGoodsDetail(id, user.getUser());
     }
+
+    // ✅ 상품 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateGoods(@PathVariable Long id,
+                                            @RequestBody @Valid GoodsRequestDto dto) {
+        goodsService.updateGoods(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    // ✅ 상품 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteGoods(@PathVariable Long id) {
+        goodsService.deleteGoods(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
