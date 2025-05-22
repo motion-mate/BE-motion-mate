@@ -133,15 +133,6 @@ public class ChatRoomService {
         }
     }
 
-
-
-
-
-
-
-
-
-
     // 채팅방 탈퇴
     @Transactional
     public void exitRoom(Long roomId, String nickname) {
@@ -177,7 +168,6 @@ public class ChatRoomService {
         // ✅ 일반 탈퇴 로직
         chatRoomParticipantRepository.delete(participant);
     }
-
 
     // 채팅방 나가기
     @Transactional
