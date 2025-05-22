@@ -55,6 +55,7 @@ public class FeedService {
 
         Feed feed;
 
+        //
         if (tempImage != null) {
             S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
 
