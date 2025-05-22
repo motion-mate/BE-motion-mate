@@ -12,7 +12,7 @@ public class NotificationMapper {
         return NotificationResponseDto.builder()
                 .id(notification.getId())
                 .userId(notification.getUser().getId())
-                .type(notification.getType())
+                .type(notification.getType().name())
                 .content(notification.getContent())
                 .isRead(notification.isRead())
                 .createdAt(notification.getCreatedAt())
