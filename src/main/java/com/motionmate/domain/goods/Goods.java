@@ -10,9 +10,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Goods {
 
+    public enum GoodsStatus {
+        FOR_SALE, SOLD_OUT, HIDDEN
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GoodsStatus status = GoodsStatus.FOR_SALE;
 
     private String name;
     private String description;
@@ -26,6 +34,8 @@ public class Goods {
     private boolean isLimited;
     private String category;
     private String subCategory;
+    @Column(nullable = false)
+    private boolean hidden = false;
 
     @Lob
     @Column(columnDefinition = "TEXT")
@@ -48,6 +58,7 @@ public class Goods {
         this.subCategory = subCategory;
         this.colorsJson = colorsJson;
         this.sizesJson = sizesJson;
+        this.status = stock == 0 ? GoodsStatus.SOLD_OUT : GoodsStatus.FOR_SALE; // ✅ 자동 상태 설정
     }
 
     public void decreaseStock(int quantity) {
@@ -55,5 +66,26 @@ public class Goods {
             throw new IllegalArgumentException("재고 부족");
         }
         this.stock -= quantity;
+    }
+
+    public void update(String name, String description, int price, int stock) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stock = stock;
+        this.status = stock == 0 ? GoodsStatus.SOLD_OUT : GoodsStatus.FOR_SALE; // ✅ 상태 동기화
+
+    }
+
+//    public boolean isHidden() {
+//        return hidden;
+//    }
+
+    public void hide() {
+        this.hidden = true;
+    }
+
+    public void unhide() {
+        this.hidden = false;
     }
 }

@@ -4,7 +4,12 @@ import com.motionmate.domain.goods.*;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.order.OrderRequestDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
+import com.motionmate.dto.goods.order.OrderStatusUpdateDto;
+import com.motionmate.dto.goods.order.TrackingUpdateDto;
+import com.motionmate.dto.goods.product.GoodsRequestDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
+import com.motionmate.service.goods.GoodsService;
+import com.motionmate.service.goods.OrderService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.motionmate.mapper.goods.OrderMapper;
 import jakarta.validation.Valid;
@@ -22,6 +27,7 @@ public class OrderController {
     private final OrderRepository orderRepository;
     private final GoodsRepository goodsRepository;
     private final OrderMapper orderMapper;
+    private final OrderService orderService;
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(
@@ -53,4 +59,25 @@ public class OrderController {
                 .map(orderMapper::toResponseDto)
                 .toList();
     }
+
+
+
+
+
+    // ✅ 주문 상태 변경 (관리자 전용)
+    @PatchMapping("/{orderId}/status")
+    public ResponseEntity<Void> updateOrderStatus(@PathVariable Long orderId,
+                                                  @RequestBody OrderStatusUpdateDto dto) {
+        orderService.updateStatus(orderId, dto.getStatus());
+        return ResponseEntity.ok().build();
+    }
+
+    // ✅ 송장번호/택배사 입력 (관리자 전용)
+    @PatchMapping("/{orderId}/tracking")
+    public ResponseEntity<Void> updateTracking(@PathVariable Long orderId,
+                                               @RequestBody TrackingUpdateDto dto) {
+        orderService.updateTrackingInfo(orderId, dto.getTrackingNumber(), dto.getCourier());
+        return ResponseEntity.ok().build();
+    }
+
 }
