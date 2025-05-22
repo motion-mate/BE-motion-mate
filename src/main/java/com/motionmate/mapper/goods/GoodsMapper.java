@@ -8,6 +8,17 @@ import com.motionmate.utils.JsonUtil;
 public class GoodsMapper {
 
     public static GoodsResponseDto toDto(Goods goods, boolean liked) {
+
+        String status;
+        if (goods.isHidden()) {
+            status = "HIDDEN";
+        } else if (goods.getStock() != null && goods.getStock() == 0) {
+            status = "SOLD_OUT";
+        } else {
+            status = "FOR_SALE";
+        }
+
+
         return GoodsResponseDto.builder()
                 .id(goods.getId())
                 .name(goods.getName())
@@ -20,6 +31,7 @@ public class GoodsMapper {
                 .category(goods.getCategory())
                 .subCategory(goods.getSubCategory())
                 .colors(JsonUtil.fromJsonArray(goods.getColorsJson()))
+                .status(status)
                 .sizes(JsonUtil.fromJsonArray(goods.getSizesJson()))
                 .build();
     }
@@ -31,7 +43,7 @@ public class GoodsMapper {
                 dto.getImageUrl(),
                 dto.getStock(),
                 dto.getPrice(),
-                dto.getIsLimited(),
+                dto.getLimited(),
                 dto.getCategory(),
                 dto.getSubCategory(),
                 JsonUtil.toJsonArray(dto.getColors()),

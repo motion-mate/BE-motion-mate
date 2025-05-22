@@ -1,8 +1,6 @@
 package com.motionmate.controller;
 
-import com.motionmate.domain.chat.ChatMessage;
-import com.motionmate.domain.chat.ChatRoom;
-import com.motionmate.domain.chat.ChatRoomRepository;
+import com.motionmate.domain.chat.*;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.chat.ChatMessageRequestDto;
 import com.motionmate.service.ChatMessageService;
@@ -15,16 +13,17 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ChatMessageController {
 
-    private final SimpMessagingTemplate template;
     private final ChatMessageService chatMessageService;
     private final ChatRoomRepository chatRoomRepository;
     private final RedisPublisher redisPublisher;
+    private final ChatRoomParticipantRepository chatRoomParticipantRepository;
 
     @MessageMapping("/chat/{roomId}")
     public void sendMessage(@DestinationVariable Long roomId,
@@ -47,6 +46,21 @@ public class ChatMessageController {
             // 입장 메시지만 즉시 저장 (선택사항)
             ChatRoom room = chatRoomRepository.findById(roomId)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+
+            Optional<ChatRoomParticipant> participantOpt =
+                    chatRoomParticipantRepository.findByChatRoomAndUser(room, user);
+
+            if (participantOpt.isEmpty()) {
+                log.warn("❗ ChatRoomParticipant 조회 실패: user={}, room={}", user.getId(), room.getId());
+            } else {
+                ChatRoomParticipant participant = participantOpt.get();
+                log.info("✅ ChatRoomParticipant 조회 성공: user={}, connected={}, room={}",
+                        user.getId(), participant.isConnected(), room.getId());
+
+                participant.reconnect(); // connected = true
+                chatRoomParticipantRepository.save(participant);
+            }
+
             chatMessageService.saveEnterMessage(room, user);
         }
 

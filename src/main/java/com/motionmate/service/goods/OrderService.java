@@ -63,4 +63,18 @@ public class OrderService {
                 .map(orderMapper::toResponseDto)
                 .toList();
     }
+
+    @Transactional
+    public void updateStatus(Long orderId, Order.OrderStatus status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
+        order.updateStatus(status); // setter 없으면 직접 필드 수정
+    }
+
+    @Transactional
+    public void updateTrackingInfo(Long orderId, String trackingNumber, String courier) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
+        order.updateTracking(trackingNumber, courier);
+    }
 }

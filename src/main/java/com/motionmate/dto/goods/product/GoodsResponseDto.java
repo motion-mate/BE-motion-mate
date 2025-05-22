@@ -22,6 +22,8 @@ public class GoodsResponseDto {
     private boolean isLimited;
     private String category;
     private String subCategory;
+    private String status; // "FOR_SALE", "SOLD_OUT", "HIDDEN"
+
 
     private List<String> colors;
     private List<String> sizes;
