@@ -182,29 +182,39 @@ public class FeedService {
             throw new CustomException(HttpStatus.FORBIDDEN ,"수정 권한이 없습니다.");
         }
 
-       //기존 이미지 삭제(S3, DB)
-       if (request.getImageUrl() != null && request.getImageUrl().bucketKey() != null && !request.getImageUrl().bucketKey().isEmpty()) {
-           FeedImage oldImage = feed.getImages().stream().findFirst().orElse(null);
-           if (oldImage != null) {
-               String bucketKey = oldImage.getBucketKey();
-               if (bucketKey != null && !bucketKey.isEmpty()) {
-                   s3ServiceUtils.deleteFile(bucketKey);
-               }
-               feed.getImages().remove(oldImage);
-           }
+        FeedImage oldImage = feed.getImages().stream().findFirst().orElse(null);
 
-           S3FileRequest tempImage = request.getImageUrl();
-           S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
+        //기존 이미지 삭제(S3, DB)
+        if (request.getImageUrl() == null) {
+            if (oldImage != null) {
+                String bucketKey = oldImage.getBucketKey();
+                if (bucketKey != null && !bucketKey.isEmpty()) {
+                    s3ServiceUtils.deleteFile(bucketKey);
+                }
+                feed.getImages().remove(oldImage);
+            }
+        }
+        else if (request.getImageUrl().bucketKey() != null && !request.getImageUrl().bucketKey().isEmpty()) {
+            if (oldImage != null) {
+                String bucketKey = oldImage.getBucketKey();
+                if (bucketKey != null && !bucketKey.isEmpty()) {
+                    s3ServiceUtils.deleteFile(bucketKey);
+                }
+                feed.getImages().remove(oldImage);
+            }
 
-           // 새 이미지 추가
-           FeedImage newImage = FeedImage.builder()
-                   .url(movedImage.url())
-                   .bucketKey(movedImage.bucketKey())
-                   .orgName(movedImage.orgName())
-                   .build();
+            S3FileRequest tempImage = request.getImageUrl();
+            S3FileResponse movedImage = s3ServiceUtils.moveFromTempToUpload(tempImage, userPk);
 
-           feed.addImage(newImage);
-       }
+            // 새 이미지 추가
+            FeedImage newImage = FeedImage.builder()
+                    .url(movedImage.url())
+                    .bucketKey(movedImage.bucketKey())
+                    .orgName(movedImage.orgName())
+                    .build();
+
+            feed.addImage(newImage);
+        }
 
        feed.update(request.getDescription(), request.getFeedAccessType());
 
