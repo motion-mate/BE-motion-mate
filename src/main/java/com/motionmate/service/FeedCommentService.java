@@ -4,11 +4,13 @@ import com.motionmate.domain.feed.Feed;
 import com.motionmate.domain.feed.FeedComment;
 import com.motionmate.domain.feed.FeedCommentRepository;
 import com.motionmate.domain.feed.FeedRepository;
+import com.motionmate.domain.notification.Notification;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.feed.FeedCommentRequestDto;
 import com.motionmate.dto.feed.FeedCommentResponseDto;
 import com.motionmate.dto.feed.FeedCommentUpdateDto;
+import com.motionmate.dto.notification.NotificationRequestDto;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.mapper.FeedCommentMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class FeedCommentService {
     private final FeedRepository feedRepository;
     private final UserRepository userRepository;
     private final FeedCommentRepository feedCommentRepository;
+    private final NotificationService notificationService;
 
     //댓글 등록
     public FeedCommentResponseDto createComment(Long feedId, Long userId, FeedCommentRequestDto dto) {
@@ -39,6 +42,16 @@ public class FeedCommentService {
               .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다"));
 
       FeedComment saved = feedCommentRepository.save(FeedCommentMapper.toEntity(dto, user, feed));
+
+      if(!feed.getUser().getId().equals(userId)) {
+          notificationService.createNotification (
+                  NotificationRequestDto.builder()
+                          .userId(feed.getUser().getId())
+                          .type(Notification.NotificationType.COMMENT)
+                          .content(user.getProfile().getNickname() + "님이 회원님의 게시글에 댓글을 남겼습니다.")
+                          .build()
+          );
+      }
       return FeedCommentMapper.fromEntity(saved);
     }
 

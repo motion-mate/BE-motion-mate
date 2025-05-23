@@ -1,4 +1,4 @@
 package com.motionmate.dto.exercise;
 
-public class ExerciseRecordRequestDto {
+public class  ExerciseRecordRequestDto {
 }
