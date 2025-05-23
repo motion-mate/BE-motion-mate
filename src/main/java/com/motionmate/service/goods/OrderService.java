@@ -1,5 +1,6 @@
 package com.motionmate.service.goods;
 
+import com.motionmate.domain.delivery.Delivery;
 import com.motionmate.domain.goods.Goods;
 import com.motionmate.domain.goods.Order;
 import com.motionmate.domain.goods.OrderItem;
@@ -8,6 +9,7 @@ import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.order.OrderRequestDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
 import com.motionmate.dto.goods.order.OrderItemRequestDto;
+import com.motionmate.mapper.delivery.DeliveryMapper;
 import com.motionmate.mapper.goods.OrderMapper;
 import com.motionmate.domain.goods.GoodsRepository;
 
@@ -38,14 +40,16 @@ public class OrderService {
         // 2. 상품 목록 조회
         List<Goods> goodsList = goodsRepository.findAllById(goodsIds);
 
-        // 3. Order 객체 생성
+        // 3. 주문 객체 생성
         Order order = orderMapper.toOrderEntity(user);
 
-        // 4. OrderItem 리스트 생성
+        // 4. 주문상품 생성
         List<OrderItem> orderItems = orderMapper.toOrderItemEntityList(requestDto.getItems(), goodsList);
-
-        // 5. 연관관계 설정
         order.applyOrderItems(orderItems);
+
+        // ✅ 5. 배송 정보 생성 및 연결
+        Delivery delivery = DeliveryMapper.toEntity(requestDto.getDelivery()); // delivery 필드 추가돼야 함
+        order.applyDelivery(delivery);
 
         // 6. 저장
         orderRepository.save(order);
@@ -71,10 +75,5 @@ public class OrderService {
         order.updateStatus(status); // setter 없으면 직접 필드 수정
     }
 
-    @Transactional
-    public void updateTrackingInfo(Long orderId, String trackingNumber, String courier) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
-        order.updateTracking(trackingNumber, courier);
-    }
+
 }
