@@ -30,7 +30,6 @@ public class OrderItem {
     @JoinColumn(name = "goods_id")
     private Goods goods;
 
-    private String goodsName;
 
     /**
      * 단건 총액 계산
