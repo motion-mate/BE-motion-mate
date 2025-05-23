@@ -1,4 +1,4 @@
-package com.motionmate.domain.goods.event;
+package com.motionmate.domain.event;
 
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GoodsEventParticipation {
+public class EventParticipation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,14 +22,14 @@ public class GoodsEventParticipation {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private GoodsEvent goodsEvent;
+    private Event event;
 
     private LocalDateTime participatedAt;
 
     @Builder
-    public GoodsEventParticipation(User user, GoodsEvent goodsEvent) {
+    public EventParticipation(User user, Event event) {
         this.user = user;
-        this.goodsEvent = goodsEvent;
+        this.event = event;
         this.participatedAt = LocalDateTime.now();
     }
 }
