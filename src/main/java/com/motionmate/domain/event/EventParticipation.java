@@ -1,5 +1,6 @@
 package com.motionmate.domain.event;
 
+import com.motionmate.domain.delivery.Delivery;
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,6 +24,10 @@ public class EventParticipation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Event event;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "delivery_id")
+    private Delivery delivery;
 
     private LocalDateTime participatedAt;
 

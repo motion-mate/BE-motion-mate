@@ -1,14 +1,17 @@
 package com.motionmate.mapper.goods;
 
+import com.motionmate.domain.delivery.Delivery;
 import com.motionmate.domain.goods.Goods;
 import com.motionmate.domain.goods.Order;
 import com.motionmate.domain.goods.OrderItem;
 import com.motionmate.domain.goods.ReviewRepository;
 import com.motionmate.domain.user.User;
+import com.motionmate.dto.delivery.DeliveryResponseDto;
 import com.motionmate.dto.goods.order.OrderItemRequestDto;
 import com.motionmate.dto.goods.order.OrderItemResponseDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
 
+import com.motionmate.mapper.delivery.DeliveryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +26,6 @@ public class OrderMapper {
 
     private final ReviewRepository reviewRepository;
 
-    // 주문 엔티티 생성
     public Order toOrderEntity(User user) {
         return Order.builder()
                 .user(user)
@@ -33,7 +35,6 @@ public class OrderMapper {
                 .build();
     }
 
-    // OrderItem 리스트 생성
     public List<OrderItem> toOrderItemEntityList(List<OrderItemRequestDto> requestItems, List<Goods> goodsList) {
         return requestItems.stream().map(req -> {
             Goods matchedGoods = goodsList.stream()
@@ -49,16 +50,21 @@ public class OrderMapper {
         }).collect(Collectors.toList());
     }
 
-    // 주문 응답 DTO 변환
     public OrderResponseDto toResponseDto(Order order) {
         User user = order.getUser();
+        Delivery delivery = order.getDelivery();
+
+            DeliveryResponseDto deliveryDto = delivery != null ? DeliveryResponseDto.builder()
+                .recipientName(delivery.getRecipientName())
+                .phoneNumber(delivery.getPhoneNumber())
+                .address(delivery.getAddress())
+                .zipcode(delivery.getZipcode())
+                .build() : null;
 
         return OrderResponseDto.builder()
                 .orderId(order.getId())
                 .orderedAt(order.getOrderedAt())
                 .status(order.getStatus())
-                .trackingNumber(order.getTrackingNumber())
-                .courier(order.getCourier())
                 .items(order.getOrderItems().stream()
                         .map(item -> OrderItemResponseDto.builder()
                                 .goodsId(item.getGoods().getId())
@@ -70,6 +76,7 @@ public class OrderMapper {
                                 .hasReview(reviewRepository.existsByUserAndGoods(user, item.getGoods()))
                                 .build())
                         .collect(Collectors.toList()))
+                .delivery(deliveryDto)
                 .build();
     }
 }

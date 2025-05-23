@@ -1,6 +1,7 @@
 package com.motionmate.dto.goods.order;
 
 import com.motionmate.domain.goods.Order;
+import com.motionmate.dto.delivery.DeliveryResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,9 +17,9 @@ public class OrderResponseDto {
     private Long orderId;
     private LocalDateTime orderedAt;
     private Order.OrderStatus status;
-    private String trackingNumber;
-    private String courier;
     private List<OrderItemResponseDto> items;
+    private DeliveryResponseDto delivery; // ✅ 추가
+
 
     // ✅ 유틸 메서드: 총 금액 계산
     public int getTotalAmount() {
