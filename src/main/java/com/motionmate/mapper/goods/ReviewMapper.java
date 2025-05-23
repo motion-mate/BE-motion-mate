@@ -27,6 +27,7 @@ public class ReviewMapper {
                 .content(review.getContent())
                 .rating(review.getRating())
                 .username(review.getUser().getOauthNickname())
+                .goodsName(review.getGoods().getName())
                 .createdAt(review.getCreatedAt())
                 .build();
     }

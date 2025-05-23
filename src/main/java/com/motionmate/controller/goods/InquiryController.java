@@ -44,4 +44,11 @@ public class InquiryController {
     public InquiryResponseDto getById(@PathVariable Long id) {
         return InquiryMapper.toResponseDetailDto(service.findById(id));
     }
+
+    // 문의 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInquiry(@PathVariable Long id, @AuthenticationPrincipal User user){
+        service.deleteInquiry(id, user);
+        return ResponseEntity.noContent().build();
+    }
 }

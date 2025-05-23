@@ -10,6 +10,7 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsByUserAndGoods(User user, Goods goods);
     List<Review> findAllByGoods(Goods goods);
+    List<Review> findAllByUser(User user);
 
     // 평균 평점 계산 쿼리
     @Query("SELECT COALESCE(AVG(r.rating),0) FROM Review r WHERE r.goods = :goods")
