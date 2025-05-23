@@ -4,8 +4,10 @@ import com.motionmate.domain.feed.Feed;
 import com.motionmate.domain.feed.FeedLike;
 import com.motionmate.domain.feed.FeedLikeRepository;
 import com.motionmate.domain.feed.FeedRepository;
+import com.motionmate.domain.notification.Notification;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserRepository;
+import com.motionmate.dto.notification.NotificationRequestDto;
 import com.motionmate.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ public class FeedLikeService {
     private final FeedRepository feedRepository;
     private final FeedLikeRepository likeRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     //좋아요 토글(추가, 삭제)
     public boolean toggleLike(Long feedId, Long userId){
@@ -39,6 +42,16 @@ public class FeedLikeService {
         } else {
             FeedLike newLike = new FeedLike(user, feed);
             likeRepository.save(newLike);
+
+            if(!feed.getUser().getId().equals(userId)) {
+                notificationService.createNotification(
+                        NotificationRequestDto.builder()
+                                .userId(feed.getUser().getId())
+                                .type(Notification.NotificationType.LIKE)
+                                .content(user.getProfile().getNickname() + "님이 회원님의 게시글을 좋아합니다.")
+                                .build()
+                );
+            }
             return  true;
         }
     }
