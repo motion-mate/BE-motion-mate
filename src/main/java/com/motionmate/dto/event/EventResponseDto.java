@@ -17,5 +17,5 @@ public class EventResponseDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean active;
-    private Integer remainingStock;
+    private Integer stock;
 }

@@ -31,6 +31,7 @@ public class EventService {
     }
 
     // ✅ 2. 이벤트 참여
+    @Transactional
     public void participate(User user, Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "이벤트 없음"));
@@ -39,13 +40,19 @@ public class EventService {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이벤트 비활성화됨");
         }
 
-        if (event.getType() == Event.EventType.GIVEAWAY) {
-            event.decreaseStock();
+        // ✅ 공통으로 재고 확인
+        if (event.getStock() <= 0) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "이벤트 재고가 소진되었습니다.");
         }
 
+        // ✅ 타입 구분 없이 재고 차감
+        event.decreaseStock();
+
+        // ✅ 참여 저장
         participationRepository.save(new EventParticipation(user, event));
 
-        if (event.getType() == Event.EventType.GIVEAWAY && event.getStock() == 0) {
+        // ✅ 재고 0 되면 자동 종료 처리
+        if (event.getStock() == 0) {
             event.deactivate();
         }
     }

@@ -28,7 +28,7 @@ public class EventMapper {
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .active(event.isActive())
-                .remainingStock(event.getStock())
+                .stock(event.getStock())
                 .build();
     }
 }
