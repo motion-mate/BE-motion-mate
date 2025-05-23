@@ -29,7 +29,7 @@ public class GoodsController {
     // ✅ 전체 상품 목록 조회
     @GetMapping
     public List<GoodsResponseDto> getAllGoods(@AuthenticationPrincipal CustomOAuth2User user) {
-        return goodsService.getGoodsList(user.getUser());
+        return goodsService.getGoodsList((user != null) ? user.getUser() : null);
     }
 
     // ✅ 특정 상품 상세 조회
