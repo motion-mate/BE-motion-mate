@@ -9,11 +9,13 @@ import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.order.OrderRequestDto;
 import com.motionmate.dto.goods.order.OrderResponseDto;
 import com.motionmate.dto.goods.order.OrderItemRequestDto;
+import com.motionmate.global.exception.CustomException;
 import com.motionmate.mapper.delivery.DeliveryMapper;
 import com.motionmate.mapper.goods.OrderMapper;
 import com.motionmate.domain.goods.GoodsRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,5 +77,16 @@ public class OrderService {
         order.updateStatus(status); // setter 없으면 직접 필드 수정
     }
 
+    @Transactional(readOnly = true)
+    public OrderResponseDto getOrderById(Long orderId, User user) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND,"해당 주문을 찾을 수 없습니다."));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new CustomException(HttpStatus.FORBIDDEN,"해당 주문에 접근할 수 없습니다.");
+        }
+
+        return orderMapper.toResponseDto(order);
+    }
 
 }

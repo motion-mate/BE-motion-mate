@@ -62,6 +62,14 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
+    // ✅ 주문 상세 조회 (프론트에서 /api/orders/{id}로 요청)
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id,
+                                                         @AuthenticationPrincipal CustomOAuth2User userPrincipal) {
+        User user = userPrincipal.getUser();
+        return ResponseEntity.ok(orderService.getOrderById(id, user));
+    }
+
 
 
 }
