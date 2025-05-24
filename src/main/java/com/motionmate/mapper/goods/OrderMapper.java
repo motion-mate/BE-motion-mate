@@ -59,6 +59,8 @@ public class OrderMapper {
                 .phoneNumber(delivery.getPhoneNumber())
                 .address(delivery.getAddress())
                 .zipcode(delivery.getZipcode())
+                    .courier(delivery.getCourier())               // ✅ 추가
+                    .trackingNumber(delivery.getTrackingNumber()) // ✅ 추가
                 .build() : null;
 
         return OrderResponseDto.builder()
