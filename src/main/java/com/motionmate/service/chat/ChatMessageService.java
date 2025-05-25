@@ -5,6 +5,7 @@ import com.motionmate.domain.user.User;
 import com.motionmate.dto.chat.ChatMessageRequestDto;
 import com.motionmate.dto.chat.ChatMessageResponseDto;
 import com.motionmate.mapper.chat.ChatMessageMapper;
+import com.motionmate.mongo.ChatMessageDocument;
 import com.motionmate.mongo.ChatMessageMongoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -72,14 +73,12 @@ public class ChatMessageService {
 
 
     public List<ChatMessageResponseDto> getMessages(Long roomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+        List<ChatMessageDocument> docs = chatMessageMongoService.getMessagesByRoomId(roomId);
 
-        List<ChatMessage> messages = chatMessageRepository.findByChatRoomOrderBySentAtAsc(chatRoom);
-
-        return messages.stream()
-                .map(ChatMessageMapper::toDto)
+        return docs.stream()
+                .map(ChatMessageMapper::fromDocument)
                 .toList();
     }
+
 
 }
