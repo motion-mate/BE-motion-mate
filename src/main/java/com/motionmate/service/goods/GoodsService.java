@@ -28,7 +28,7 @@ public class GoodsService {
 
     @Transactional(readOnly = true)
     public List<GoodsResponseDto> getGoodsList(User user) {
-        return goodsRepository.findAll().stream()
+        return goodsRepository.findAllByHiddenFalse().stream()
                 .map(goods -> GoodsMapper.toDto(goods, goodsLikeRepository.existsByUserAndGoods(user, goods)))
                 .toList();
     }
