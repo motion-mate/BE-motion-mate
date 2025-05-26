@@ -36,20 +36,10 @@ public class OrderController {
 
         User user = userPrincipal.getUser();
 
-        List<Goods> goodsList = goodsRepository.findAllById(
-                requestDto.getItems().stream()
-                        .map(item -> item.getGoodsId())
-                        .toList()
-        );
-
-        Order order = orderMapper.toOrderEntity(user);
-        List<OrderItem> orderItems = orderMapper.toOrderItemEntityList(requestDto.getItems(), goodsList);
-        order.applyOrderItems(orderItems);
-
-        orderRepository.save(order);
-
-        return ResponseEntity.ok(orderMapper.toResponseDto(order));
+        // ✅ 핵심: 이거 하나면 충분
+        return ResponseEntity.ok(orderService.createOrder(requestDto, user));
     }
+
 
     @GetMapping
     public List<OrderResponseDto> getOrders(@AuthenticationPrincipal CustomOAuth2User userPrincipal) {
@@ -72,12 +62,14 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    // ✅ 송장번호/택배사 입력 (관리자 전용)
-    @PatchMapping("/{orderId}/tracking")
-    public ResponseEntity<Void> updateTracking(@PathVariable Long orderId,
-                                               @RequestBody TrackingUpdateDto dto) {
-        orderService.updateTrackingInfo(orderId, dto.getTrackingNumber(), dto.getCourier());
-        return ResponseEntity.ok().build();
+    // ✅ 주문 상세 조회 (프론트에서 /api/orders/{id}로 요청)
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id,
+                                                         @AuthenticationPrincipal CustomOAuth2User userPrincipal) {
+        User user = userPrincipal.getUser();
+        return ResponseEntity.ok(orderService.getOrderById(id, user));
     }
+
+
 
 }

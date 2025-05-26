@@ -1,8 +1,10 @@
 package com.motionmate.domain.notification;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.ConnectionBuilder;
 import java.time.LocalDateTime;
@@ -25,6 +27,8 @@ public class Notification {
     private NotificationType type;
     private String content;
     private boolean isRead = false;
+
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     public enum NotificationType {

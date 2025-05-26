@@ -1,7 +1,6 @@
 package com.motionmate.service.websocket;
 
 import com.motionmate.dto.notification.NotificationResponseDto;
-import com.motionmate.mapper.NotificationMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
