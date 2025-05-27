@@ -27,4 +27,6 @@ public class GoodsResponseDto {
 
     private List<String> colors;
     private List<String> sizes;
+
+
 }

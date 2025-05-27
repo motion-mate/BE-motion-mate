@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class GoodsService {
 
     private final GoodsRepository goodsRepository;
     private final GoodsLikeRepository goodsLikeRepository;
+
 
     public Long registerGoods(GoodsRequestDto dto) {
         Goods goods = GoodsMapper.toEntity(dto);
@@ -52,5 +54,10 @@ public class GoodsService {
     @Transactional
     public void deleteGoods(Long id) {
         goodsRepository.deleteById(id);
+    }
+
+    public List<GoodsResponseDto> getRecommendedGoods(){
+        List<Goods> goodsList = goodsRepository.findTop3ByOrderByCreatedAtDesc();
+        return GoodsMapper.toDtoList(goodsList);
     }
 }

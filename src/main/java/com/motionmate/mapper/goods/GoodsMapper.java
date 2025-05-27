@@ -5,6 +5,8 @@ import com.motionmate.dto.goods.product.GoodsRequestDto;
 import com.motionmate.dto.goods.product.GoodsResponseDto;
 import com.motionmate.utils.JsonUtil;
 
+import java.util.List;
+
 public class GoodsMapper {
 
     public static GoodsResponseDto toDto(Goods goods, boolean liked) {
@@ -49,5 +51,11 @@ public class GoodsMapper {
                 JsonUtil.toJsonArray(dto.getColors()),
                 JsonUtil.toJsonArray(dto.getSizes())
         );
+    }
+
+    public static List<GoodsResponseDto> toDtoList(List<Goods> goodsList){
+        return goodsList.stream()
+                .map(goods -> toDto(goods, false))
+                .toList();
     }
 }
