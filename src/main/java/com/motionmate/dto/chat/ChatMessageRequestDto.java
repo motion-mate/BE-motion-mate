@@ -4,7 +4,9 @@ import com.motionmate.domain.chat.ChatMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
+@ToString
 @Getter
 @Setter // WebSocket을 사용할 때 JSON이 값을 바인딩 할 때 필요
 @NoArgsConstructor
