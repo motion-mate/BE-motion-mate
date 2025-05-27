@@ -60,4 +60,5 @@ public class GoodsController {
         return goodsService.getRecommendedGoods();
     }
 
+
 }

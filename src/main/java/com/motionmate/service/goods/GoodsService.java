@@ -22,6 +22,7 @@ public class GoodsService {
     private final GoodsRepository goodsRepository;
     private final GoodsLikeRepository goodsLikeRepository;
 
+
     public Long registerGoods(GoodsRequestDto dto) {
         Goods goods = GoodsMapper.toEntity(dto);
         return goodsRepository.save(goods).getId();
@@ -56,9 +57,7 @@ public class GoodsService {
     }
 
     public List<GoodsResponseDto> getRecommendedGoods(){
-        List<Goods> goods = goodsRepository.findTop3ByOrderByCreatedAtDesc();
-        return goods.stream()
-                .map(GoodsResponseDto::from)
-                .collect(Collectors.toList());
+        List<Goods> goodsList = goodsRepository.findTop3ByOrderByCreatedAtDesc();
+        return GoodsMapper.toDtoList(goodsList);
     }
 }
