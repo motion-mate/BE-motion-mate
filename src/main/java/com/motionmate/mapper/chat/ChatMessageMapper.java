@@ -5,6 +5,7 @@ import com.motionmate.domain.chat.ChatRoom;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.chat.ChatMessageRequestDto;
 import com.motionmate.dto.chat.ChatMessageResponseDto;
+import com.motionmate.mongo.ChatMessageDocument;
 
 import java.time.LocalDateTime;
 
@@ -54,5 +55,13 @@ public class ChatMessageMapper {
                 .build();
     }
 
+    public static ChatMessageResponseDto fromDocument(ChatMessageDocument doc) {
+        return ChatMessageResponseDto.builder()
+                .senderNickname(doc.getSenderNickname())
+                .message(doc.getMessage())
+                .sentAt(doc.getSentAt())
+                .type(ChatMessage.MessageType.valueOf(doc.getType()))
+                .build();
+    }
 
 }

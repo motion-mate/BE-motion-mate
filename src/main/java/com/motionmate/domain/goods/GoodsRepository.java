@@ -6,5 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface GoodsRepository extends JpaRepository<Goods, Long> {
+    List<Goods> findAllByHiddenFalse();
+
     List<Goods> findTop3ByOrderByCreatedAtDesc();
 }
