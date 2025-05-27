@@ -7,6 +7,7 @@ import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.product.GoodsRequestDto;
 import com.motionmate.dto.goods.product.GoodsResponseDto;
 import com.motionmate.mapper.goods.GoodsMapper;
+import com.motionmate.service.redis.LimitedGoodsRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +22,20 @@ public class GoodsService {
 
     private final GoodsRepository goodsRepository;
     private final GoodsLikeRepository goodsLikeRepository;
+    private final LimitedGoodsRedisService limitedGoodsRedisService;
 
 
+
+    @Transactional
     public Long registerGoods(GoodsRequestDto dto) {
         Goods goods = GoodsMapper.toEntity(dto);
-        return goodsRepository.save(goods).getId();
+        Goods saved = goodsRepository.save(goods);
+
+        if (saved.isLimited()) {
+            limitedGoodsRedisService.setInitialStock(saved.getId(), saved.getStock());
+        }
+
+        return saved.getId();
     }
 
     @Transactional(readOnly = true)
