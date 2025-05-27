@@ -54,4 +54,10 @@ public class GoodsController {
         return ResponseEntity.noContent().build();
     }
 
+    // 추천 상품
+    @GetMapping("/recommend")
+    public List<GoodsResponseDto> getRecommendedGoods(){
+        return goodsService.getRecommendedGoods();
+    }
+
 }

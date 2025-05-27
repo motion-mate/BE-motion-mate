@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +53,12 @@ public class GoodsService {
     @Transactional
     public void deleteGoods(Long id) {
         goodsRepository.deleteById(id);
+    }
+
+    public List<GoodsResponseDto> getRecommendedGoods(){
+        List<Goods> goods = goodsRepository.findTop3ByOrderByCreatedAtDesc();
+        return goods.stream()
+                .map(GoodsResponseDto::from)
+                .collect(Collectors.toList());
     }
 }
