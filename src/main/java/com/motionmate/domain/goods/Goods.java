@@ -41,6 +41,9 @@ public class Goods {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Version // ✅ 낙관적 락 버전 필드 추가
+    private Long version;
+
     @Column(nullable = false)
     private boolean hidden = false;
 
@@ -82,6 +85,10 @@ public class Goods {
         this.stock = stock;
         this.status = stock == 0 ? GoodsStatus.SOLD_OUT : GoodsStatus.FOR_SALE; // ✅ 상태 동기화
 
+    }
+
+    public void markSoldOut() {
+        this.status = GoodsStatus.SOLD_OUT;
     }
 
 //    public boolean isHidden() {
