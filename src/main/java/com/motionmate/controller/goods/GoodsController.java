@@ -47,11 +47,24 @@ public class GoodsController {
         return ResponseEntity.ok().build();
     }
 
-    // ✅ 상품 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGoods(@PathVariable Long id) {
-        goodsService.deleteGoods(id);
-        return ResponseEntity.noContent().build();
+    // ✅ 상품 숨김 처리 (Soft Delete)
+    @PatchMapping("/{id}/hide")
+    public ResponseEntity<Void> hideGoods(@PathVariable Long id) {
+        goodsService.deleteGoods(id); // 내부에서는 goods.hide() 호출
+        return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/{id}/unhide")
+    public ResponseEntity<Void> unhideGoods(@PathVariable Long id) {
+        goodsService.unhideGoods(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // 추천 상품
+    @GetMapping("/recommend")
+    public List<GoodsResponseDto> getRecommendedGoods(){
+        return goodsService.getRecommendedGoods();
+    }
+
 
 }
