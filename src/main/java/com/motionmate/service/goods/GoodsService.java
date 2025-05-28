@@ -41,7 +41,7 @@ public class GoodsService {
     @Transactional(readOnly = true)
     public List<GoodsResponseDto> getGoodsList(User user) {
         return goodsRepository.findAllByHiddenFalse().stream()
-                .map(goods -> GoodsMapper.toDto(goods, goodsLikeRepository.existsByUserAndGoods(user, goods)))
+                .map(goods -> GoodsMapper.toDto(goods, goodsLikeRepository.existsByUserAndGoods(user, goods), limitedGoodsRedisService))
                 .toList();
     }
 
@@ -50,7 +50,7 @@ public class GoodsService {
         Goods goods = goodsRepository.findById(goodsId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
         boolean liked = goodsLikeRepository.existsByUserAndGoods(user, goods);
-        return GoodsMapper.toDto(goods, liked);
+        return GoodsMapper.toDto(goods, liked, limitedGoodsRedisService);
     }
 
 
@@ -63,11 +63,20 @@ public class GoodsService {
 
     @Transactional
     public void deleteGoods(Long id) {
-        goodsRepository.deleteById(id);
+        Goods goods = goodsRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        goods.hide(); // ❗ 실제 삭제하지 않고 숨김 처리
+    }
+
+    @Transactional
+    public void unhideGoods(Long id) {
+        Goods goods = goodsRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        goods.unhide();
     }
 
     public List<GoodsResponseDto> getRecommendedGoods(){
         List<Goods> goodsList = goodsRepository.findTop3ByOrderByCreatedAtDesc();
-        return GoodsMapper.toDtoList(goodsList);
+        return GoodsMapper.toDtoList(goodsList, limitedGoodsRedisService);
     }
 }

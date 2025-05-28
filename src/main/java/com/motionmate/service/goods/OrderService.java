@@ -61,14 +61,16 @@ public class OrderService {
                 if (!success) {
                     throw new CustomException(HttpStatus.CONFLICT, "한정 상품 '" + goods.getName() + "'의 재고가 부족합니다.");
                 }
-                // ✅ 재고가 0이면 상태를 SOLD_OUT으로 변경
                 int remain = limitedGoodsRedisService.getStock(goods.getId());
                 if (remain == 0) {
-                    goods.markSoldOut();
+                    goods.markSoldOut(); // Redis 기준 SOLD_OUT 처리
                 }
             } else {
                 try {
                     goods.decreaseStock(quantity);
+                    if (goods.getStock() == 0) {
+                        goods.markSoldOut(); // ✅ 일반 상품도 SOLD_OUT 처리 추가
+                    }
                 } catch (Exception e) {
                     throw new CustomException(HttpStatus.CONFLICT, "상품 '" + goods.getName() + "'의 재고가 부족합니다.");
                 }
