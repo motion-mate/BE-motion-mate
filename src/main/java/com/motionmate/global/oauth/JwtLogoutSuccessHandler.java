@@ -1,6 +1,7 @@
 package com.motionmate.global.oauth;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
@@ -11,16 +12,26 @@ import java.io.IOException;
 public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
 
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-            throws IOException, ServletException {
+    public void onLogoutSuccess(HttpServletRequest request,
+                                HttpServletResponse response,
+                                Authentication authentication) throws IOException {
 
-        String tokenCookie = "token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict";
+        Cookie tokenCookie = new Cookie("token", null);
+        tokenCookie.setHttpOnly(true);
+        tokenCookie.setSecure(false); // 🔥 배포 시 true
+        tokenCookie.setPath("/");
+        tokenCookie.setMaxAge(0);
+        tokenCookie.setDomain("localhost"); // 🔥 이거 반드시 추가
+        response.addCookie(tokenCookie);
 
-        String userIdCookie = "userId=; Max-Age=0; Path=/; Secure; SameSite=Strict";
+        Cookie userIdCookie = new Cookie("userId", null);
+        userIdCookie.setSecure(false);
+        userIdCookie.setPath("/");
+        userIdCookie.setMaxAge(0);
+        userIdCookie.setDomain("localhost"); // 🔥 이것도!
+        response.addCookie(userIdCookie);
 
-        response.setHeader("Set-Cookie", tokenCookie);
-        response.addHeader("Set-Cookie", userIdCookie);
-
+        // ✅ 리다이렉트
         response.sendRedirect("http://localhost:3000/main");
     }
 }

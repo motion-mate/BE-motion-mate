@@ -8,11 +8,12 @@ import com.motionmate.dto.user.UserResponseDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -27,7 +28,7 @@ public class UserController {
     }
 
     // 최초 닉네임 등록 (회원가입 이후 첫 프로필 설정)
-    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
+//    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
     @PatchMapping("/profile/register")
     public void registerProfile(@AuthenticationPrincipal CustomOAuth2User user,
                                 @RequestBody UserProfileRegisterRequestDto dto) {
@@ -38,6 +39,10 @@ public class UserController {
     // 내 정보 조회
     @GetMapping("/users/me")
     public UserProfileDto getMyInfo(@AuthenticationPrincipal CustomOAuth2User user) {
+        if (user == null) {
+            log.error("❌ 인증된 사용자 없음 (SecurityContext에 없음)");
+            throw new RuntimeException("로그인이 필요한 요청입니다.");
+        }
         return userService.getMyInfo(user.getUserId());
     }
 
@@ -59,45 +64,17 @@ public class UserController {
         return userService.getMySummary(user.getUserId());
     }
 
+    @GetMapping("/mainprofile/me")
+    public ResponseEntity<MainPageUserProfileDto> getMyMainProfile(@AuthenticationPrincipal CustomOAuth2User user) {
+        Long userId = user.getUserId();
+        MainPageUserProfileDto userProfile = userService.getMainPageUserProfile(userId);
+        return ResponseEntity.ok(userProfile);
+    }
 
-
-//    // 내 피드
-//    @GetMapping("/mypage/my-feeds")
-//    public List<FeedResponseDto> getMyFeeds(@AuthenticationPrincipal CustomOAuth2User user) {
-//        return userService.getMyFeeds(user.getUserId());
-//    }
-//
-//    @GetMapping("/mypage/my-records")
-//    public List<ExerciseRecordDto> getMyRecords(@AuthenticationPrincipal CustomOAuth2User user) {
-//        return userService.getMyRecords(user.getUserId());
-//    }
-//
-
-//    // 내 주문 목록
-//    @GetMapping("/mypage/my-orders")
-//    public List<OrderResponseDto> getMyOrders(@AuthenticationPrincipal CustomOAuth2User user) {
-//        return userService.getMyOrders(user.getUserId());
-//    }
-//
-//
-//
-//    // 내가 팔로우하고 있는 사람들 (팔로잉)
-//    @GetMapping("/mypage/my-following")
-//    public List<FollowResponseDto> getMyFollowing(@AuthenticationPrincipal CustomOAuth2User user) {
-//        return userService.getMyFollowing(user.getUserId());
-//    }
-//
-//    // 나를 팔로우하는 사람들 (팔로워)
-//    @GetMapping("/mypage/my-followers")
-//    public List<FollowResponseDto> getMyFollowers(@AuthenticationPrincipal CustomOAuth2User user) {
-//        return userService.getMyFollowers(user.getUserId());
-//    }
-//
-//    // 나의 장바구니
-//    @GetMapping("/mypage/my-cart")
-//    public List<CartItemResponseDto> getMyCartItems(@AuthenticationPrincipal CustomOAuth2User user) {
-//        return userService.getMyCartItems(user.getUserId());
-//    }
+    @GetMapping("/profile/me")
+    public UserProfileDto getMyProfile(@AuthenticationPrincipal CustomOAuth2User user) {
+        return userService.getUserProfile(user.getUserId());
+    }
 
 
 }

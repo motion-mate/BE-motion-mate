@@ -47,7 +47,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
 // 개발환경(localhost)이라면 임시로 Secure, SameSite 조정
         String tokenCookie = String.format(
-                "token=%s; Max-Age=%d; Path=/", // ↓ Secure, HttpOnly, SameSite 제거
+                "token=%s; Max-Age=%d; Path=/; HttpOnly; Secure; SameSite=Strict",
                 token,
                 60 * 60 * 24
         );
