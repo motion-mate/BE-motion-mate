@@ -15,4 +15,4 @@ public class NotificationSocketSender {
         String destination = "/sub/notification/" + toUserId;
         messagingTemplate.convertAndSend(destination, notificationDto);
     }
-}
+}   
