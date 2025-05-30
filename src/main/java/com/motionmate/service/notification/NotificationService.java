@@ -63,15 +63,12 @@ public class NotificationService {
         return notification;
     }
 
-    // 알림 전체 읽음처리
+    // 전체 알림 읽음 처리
     public void markNotificationAsReadAll(Long userId) {
-        List<Notification> unreadNotifications = notificationRepository.findByUserIdAndIsRead(userId, false);
+        int updatedCount = notificationRepository.markAllAsReadByUserId(userId);
 
-        if (unreadNotifications.isEmpty()) {
+        if (updatedCount == 0) {
             throw new CustomException(HttpStatus.NOT_FOUND, "읽지 않은 알림이 없습니다.");
-        }
-        for (Notification notification : unreadNotifications) {
-            notification.markAsRead();
         }
     }
 
@@ -84,13 +81,11 @@ public class NotificationService {
     }
 
     public void deleteAllNotification(Long userId) {
-        List<Notification> deleteAllNotifications = notificationRepository.findByUserId(userId);
+        int deletedCount = notificationRepository.deleteAllByUserId(userId);
 
-        if(deleteAllNotifications.isEmpty()) {
+        if (deletedCount == 0) {
             throw new CustomException(HttpStatus.NOT_FOUND, "삭제할 알림이 없습니다.");
         }
-        for (Notification notificationDelete : deleteAllNotifications) {
-            notificationRepository.delete(notificationDelete);
-        }
     }
+
 }

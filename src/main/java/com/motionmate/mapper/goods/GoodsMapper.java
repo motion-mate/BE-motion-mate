@@ -52,6 +52,7 @@ public class GoodsMapper {
                 dto.getName(),
                 dto.getDescription(),
                 dto.getImageUrl(),
+                dto.getBucketKey(),
                 dto.getStock(),
                 dto.getPrice(),
                 dto.getLimited(),
