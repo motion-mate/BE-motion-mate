@@ -21,5 +21,6 @@ public interface ExerciseScheduleRepository extends JpaRepository<ExerciseSchedu
     int findMaxSetNumber(@Param("userId") Long userId,
                          @Param("date") String date,
                          @Param("exerciseId") Long exerciseId);
+    boolean existsByUserIdAndDate(Long userId, String date);
 
 }
