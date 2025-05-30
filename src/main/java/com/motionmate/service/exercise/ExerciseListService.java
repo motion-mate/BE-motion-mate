@@ -7,6 +7,7 @@ import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.exercise.*;
 import com.motionmate.mapper.exercise.ExerciseListMapper;
 import com.motionmate.utils.S3ServiceUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
