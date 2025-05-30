@@ -2,7 +2,6 @@ package com.motionmate.mapper.follow;
 
 import com.motionmate.domain.follow.Follow;
 import com.motionmate.domain.user.User;
-import com.motionmate.dto.follow.FollowRequestDto;
 import com.motionmate.dto.follow.FollowResponseDto;
 import com.motionmate.dto.follow.IsFollowingDto;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,7 @@ public class FollowMapper {
     }
 
     // FollowRequestDto -> Follow
-    public static Follow toEntity(FollowRequestDto dto, User fromUser, User toUser) {
+    public static Follow toEntity(User fromUser, User toUser) {
         return Follow.builder()
                 .fromUser(fromUser)
                 .toUser(toUser)
