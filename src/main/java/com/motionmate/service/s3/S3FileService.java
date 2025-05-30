@@ -16,4 +16,7 @@ public class S3FileService {
         S3FileResponse result = s3Utils.uploadToTemp(multipartFile, 101);
         return ResponseEntity.ok(result);
     }
+    public void deleteFile(String bucketKey) {
+        s3Utils.deleteFile(bucketKey);
+    }
 }
