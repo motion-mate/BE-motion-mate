@@ -1,6 +1,8 @@
 package com.motionmate.domain.feed;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -10,5 +12,8 @@ public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> 
     int countByFeed(Feed feed);
     List<FeedComment> findByFeedOrderByCreatedAtDesc(Feed feed);
     List<FeedComment> findTop10ByFeedOrderByCreatedAtDesc(Feed feed);
+
+    @Query("SELECT fc.feed.id, COUNT(fc) FROM FeedComment fc WHERE fc.feed.id IN :feedIds GROUP BY fc.feed.id")
+    List<Object[]> countByFeedIds (@Param("feedIds") List<Long> feedIds);
 
 }
