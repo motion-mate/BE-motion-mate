@@ -29,12 +29,14 @@ public class ChatRoomParticipant {
         this.connected = true;  // 새로 입장할 땐 true
     }
 
-    public void reconnect() {
+    public ChatRoomParticipant reconnect() {
         this.connected = true;  // 재입장 시 true
+        return this;
     }
 
-    public void disconnect() {
+    public ChatRoomParticipant disconnect() {
         this.connected = false;
+        return this;
     }
 }
 
