@@ -28,6 +28,8 @@ public class Goods {
     private String name;
     private String description;
     private String imageUrl;
+    @Column(nullable = false)
+    private String bucketKey;
 
     @Column(nullable = false)
     private Integer stock = 0;
@@ -55,12 +57,13 @@ public class Goods {
     @Column(columnDefinition = "TEXT")
     private String sizesJson;
 
-    public Goods(String name, String description, String imageUrl, Integer stock, Integer price,
+    public Goods(String name, String description, String imageUrl,String bucketKey, Integer stock, Integer price,
                  boolean isLimited, String category, String subCategory,
                  String colorsJson, String sizesJson) {
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.bucketKey = bucketKey;
         this.stock = stock;
         this.price = price;
         this.isLimited = isLimited;

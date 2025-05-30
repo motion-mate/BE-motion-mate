@@ -8,6 +8,7 @@ import com.motionmate.dto.goods.product.GoodsRequestDto;
 import com.motionmate.dto.goods.product.GoodsResponseDto;
 import com.motionmate.mapper.goods.GoodsMapper;
 import com.motionmate.service.redis.LimitedGoodsRedisService;
+import com.motionmate.service.s3.S3FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,7 @@ public class GoodsService {
     private final GoodsRepository goodsRepository;
     private final GoodsLikeRepository goodsLikeRepository;
     private final LimitedGoodsRedisService limitedGoodsRedisService;
-
+    // private final S3FileService s3FileService;
 
 
     @Transactional
@@ -65,6 +66,7 @@ public class GoodsService {
     public void deleteGoods(Long id) {
         Goods goods = goodsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        // s3FileService.deleteFile(goods.getBucketKey());
         goods.hide(); // ❗ 실제 삭제하지 않고 숨김 처리
     }
 

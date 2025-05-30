@@ -57,7 +57,6 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom")
     Set<ChatRoomParticipant> chatRoomParticipants=new HashSet<>();
 
-
     public ChatRoom update(ChatRoomUpdateDto dto) {
         this.title=dto.getTitle();
         this.exerciseType=dto.getExerciseType();
