@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "LEFT JOIN FETCH f2.toUser " +
             "WHERE u.id = :id")
     Optional<User> findWithProfileAndFollowById(@Param("id") Long id);
+
+    Optional<User> findByProfile_nickname(String senderNickname);
 }

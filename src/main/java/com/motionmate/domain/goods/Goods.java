@@ -28,6 +28,8 @@ public class Goods {
     private String name;
     private String description;
     private String imageUrl;
+    @Column(nullable = false)
+    private String bucketKey;
 
     @Column(nullable = false)
     private Integer stock = 0;
@@ -41,6 +43,9 @@ public class Goods {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Version // ✅ 낙관적 락 버전 필드 추가
+    private Long version;
+
     @Column(nullable = false)
     private boolean hidden = false;
 
@@ -52,12 +57,13 @@ public class Goods {
     @Column(columnDefinition = "TEXT")
     private String sizesJson;
 
-    public Goods(String name, String description, String imageUrl, Integer stock, Integer price,
+    public Goods(String name, String description, String imageUrl,String bucketKey, Integer stock, Integer price,
                  boolean isLimited, String category, String subCategory,
                  String colorsJson, String sizesJson) {
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.bucketKey = bucketKey;
         this.stock = stock;
         this.price = price;
         this.isLimited = isLimited;
@@ -82,6 +88,10 @@ public class Goods {
         this.stock = stock;
         this.status = stock == 0 ? GoodsStatus.SOLD_OUT : GoodsStatus.FOR_SALE; // ✅ 상태 동기화
 
+    }
+
+    public void markSoldOut() {
+        this.status = GoodsStatus.SOLD_OUT;
     }
 
 //    public boolean isHidden() {
