@@ -26,9 +26,9 @@ public class ChatConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/sub")
-                .setTaskScheduler(webSocketHeartbeatScheduler()) // ⚠ 이름 변경된 Bean 사용
-                .setHeartbeatValue(new long[]{10000, 10000});
+        registry.enableSimpleBroker("/sub");
+//                .setTaskScheduler(webSocketHeartbeatScheduler()) // ⚠ 이름 변경된 Bean 사용
+//                .setHeartbeatValue(new long[]{10000, 10000});
         registry.setApplicationDestinationPrefixes("/pub");
     }
 

@@ -1,6 +1,7 @@
 package com.motionmate.domain.chat;
 
 import com.motionmate.domain.user.User;
+import com.motionmate.dto.chat.ChatRoomUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -52,46 +53,24 @@ public class ChatRoom {
     @ManyToOne
     private User creator; // 방의 생성자
 
-    //@OneToMany(mappedBy = "chatRoom")
-    //Set<ChatRoomParticipant> shatRoomParticipants=new HashSet<>();
+    @Builder.Default
+    @OneToMany(mappedBy = "chatRoom")
+    Set<ChatRoomParticipant> chatRoomParticipants=new HashSet<>();
 
+
+    public ChatRoom update(ChatRoomUpdateDto dto) {
+        this.title=dto.getTitle();
+        this.exerciseType=dto.getExerciseType();
+        this.address=dto.getAddress();
+        this.latitude=dto.getLatitude();
+        this.longitude=dto.getLongitude();
+        this.promiseDate=dto.getPromiseDate();
+        this.promiseTime=dto.getPromiseTime();
+        this.roadAddress=dto.getRoadAddress();
+        return this;
+    }
     // 방장 위임
     public void setCreator(User user) { this.creator = user; }
-
-    // 채팅방 제목 수정
-    public void updateTitle(String title) {
-        this.title = title;
-    }
-
-    // 운동 종류 수정
-    public void updateExerciseType(ExerciseType exerciseType) {
-        this.exerciseType = exerciseType;
-    }
-
-    // 주소 수정
-    public void updateAddress(String address) {
-        this.address = address;
-    }
-
-    // 좌표 수정
-    public void updateLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public void updateLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    // 운동 날짜/시간 수정
-    public void updatePromiseDate(LocalDate promiseDate) {
-        this.promiseDate = promiseDate;
-        this.promiseAt = LocalDateTime.of(promiseDate, this.promiseTime);
-    }
-
-    public void updatePromiseTime(LocalTime promiseTime) {
-        this.promiseTime = promiseTime;
-        this.promiseAt = LocalDateTime.of(this.promiseDate, promiseTime);
-    }
 
     // 최종 생성자 (develop 브랜치 기준)
     public ChatRoom(String title, ExerciseType exerciseType, String roadAddress, String address,
