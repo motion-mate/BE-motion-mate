@@ -2,8 +2,11 @@ package com.motionmate.global.jwt;
 
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -22,16 +25,35 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         this.userRepository = userRepository;
     }
 
+    private String getTokenFromCookie(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookieName.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean beforeHandshake(ServerHttpRequest request,
                                    ServerHttpResponse response,
                                    WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) {
 
-        String token = extractQueryParam(request, "token");
-        String roomId = extractQueryParam(request, "roomId");
+        ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+        HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
+        //String token = extractQueryParam(request, "token");
+        //String roomId = extractQueryParam(request, "roomId");
+        String cookieName="token";
+        String token=getTokenFromCookie(httpServletRequest, cookieName);
 
-        if (token == null || roomId == null) {
+
+
+        System.out.println("token:"+token);
+        if (token == null) {
             System.out.println("❌ WebSocket 연결 실패: 토큰 또는 roomId 누락");
             return false;
         }
@@ -44,8 +66,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         Long userId = jwtTokenProvider.getUserIdFromToken(token);
         return userRepository.findById(userId).map(user -> {
             attributes.put("user", user);       // 유저 전체 객체 저장
-            attributes.put("roomId", roomId);   // roomId도 저장
-            System.out.println("✅ WebSocket 연결 성공: " + user.getProfile().getNickname() + ", Room ID: " + roomId);
+            //attributes.put("roomId", roomId);   // roomId도 저장
+            System.out.println("✅ WebSocket 연결 성공: " + user.getProfile().getNickname() );
             return true;
         }).orElseGet(() -> {
             System.out.println("❌ WebSocket 연결 실패: 사용자 없음");

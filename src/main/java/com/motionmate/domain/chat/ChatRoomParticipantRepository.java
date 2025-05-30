@@ -31,4 +31,7 @@ public interface ChatRoomParticipantRepository extends JpaRepository<ChatRoomPar
 
     List<ChatRoomParticipant> findByUser(User user);
 
+    Optional<ChatRoomParticipant> findByChatRoom_idAndUser(Long roomId, User user);
+
+    Optional<ChatRoomParticipant> findByChatRoom_idAndUser_profile_nickname(Long roomId, String nickname);
 }

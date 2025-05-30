@@ -16,5 +16,6 @@ public class ChatRoomUpdateDto {
     private Double longitude;
     private LocalDate promiseDate;
     private LocalTime promiseTime;
+    private String roadAddress;
 
 }

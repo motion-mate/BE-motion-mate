@@ -49,7 +49,7 @@ public class RedisSubscriber implements MessageListener {
 
             // 3. 역직렬화
             ChatMessageRequestDto roomMessage = objectMapper.readValue(publishMessage, ChatMessageRequestDto.class);
-
+            System.out.println("<<메세지>>"+roomMessage);
             // 4. 분기 처리
             if (roomMessage.getType() == ChatMessage.MessageType.TALK) {
                 ChatRoom chatRoom = chatRoomRepository.findById(roomMessage.getChatRoomId())
@@ -73,7 +73,17 @@ public class RedisSubscriber implements MessageListener {
                         "CHAT_MESSAGES:" + roomMessage.getChatRoomId(),
                         objectMapper.writeValueAsString(response)
                 );
-            } else {
+            }else if(roomMessage.getType() == ChatMessage.MessageType.ENTER) {
+                // STOMP 전송
+                messagingTemplate.convertAndSend(
+                        "/sub/chat/room/" + roomMessage.getChatRoomId(),
+                        ChatMessageResponseDto.builder()
+                                .message(roomMessage.getMessage())
+                                .type(roomMessage.getType())
+                                .senderNickname(roomMessage.getSenderNickname())
+                                .build()
+                );
+            }else {
                 ChatRoom chatRoom = chatRoomRepository.findById(roomMessage.getChatRoomId())
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
 

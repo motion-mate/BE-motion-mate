@@ -51,7 +51,7 @@ public class FollowService {
         User toUser = userRepository.findById(toUserId)
                         .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."));
         // 팔로우하는 userId와, 팔로우당하는 usrId를 파라미터로 받아서 팔로우관계 객체생성
-        Follow follow = FollowMapper.toEntity(null, fromUser, toUser);
+        Follow follow = FollowMapper.toEntity(fromUser, toUser);
         followRepository.save(follow);
 
         fromUser.incrementFollowingCount();

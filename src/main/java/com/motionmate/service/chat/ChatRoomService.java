@@ -97,6 +97,7 @@ public class ChatRoomService {
     @Transactional
     public ChatRoomResponseDto updateChatRoom(Long roomId, String nickname, ChatRoomUpdateDto dto) {
         ChatRoom room = chatRoomRepository.findById(roomId)
+                .map(entity->entity.update(dto))
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
 
         if (!room.getCreator().getProfile().getNickname().equals(nickname)) {
@@ -110,6 +111,7 @@ public class ChatRoomService {
     // 채팅방 입장
     @Transactional
     public void enterRoom(Long roomId, String nickname) {
+        System.out.println(">>>>: 손님입장");
         ChatRoom room = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
         User user = userProfileRepository.findUserByNickname(nickname)
@@ -143,7 +145,7 @@ public class ChatRoomService {
         ChatRoomParticipant participant = chatRoomParticipantRepository.findByChatRoomAndUser(room, user)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방 참가 정보가 없습니다."));
 
-        // ✅ 현재 유저가 방장일 경우 → 방장 위임 시도
+        // 현재 유저가 방장일 경우 → 방장 위임 시도
         if (room.getCreator().getId().equals(user.getId())) {
             // 자신 제외하고 남은 참가자 중 한 명을 새로운 방장으로 설정
             List<ChatRoomParticipant> otherParticipants =
@@ -152,35 +154,33 @@ public class ChatRoomService {
                             .toList();
 
             if (otherParticipants.isEmpty()) {
-                // ✅ 참가자 없으면 방 삭제
+                // 참가자 없으면 방 삭제
                 chatMessageRepository.deleteByChatRoomId(roomId);
                 chatRoomParticipantRepository.delete(participant);
                 chatRoomRepository.delete(room);
                 return;
             } else {
-                // ✅ 방장 위임
+                // 방장 위임
                 User newCreator = otherParticipants.get(0).getUser();
                 room.setCreator(newCreator); // 엔티티에 setter가 있어야 함
             }
         }
 
-        // ✅ 일반 탈퇴 로직
+        // 일반 탈퇴 로직
         chatRoomParticipantRepository.delete(participant);
     }
 
     // 채팅방 나가기
     @Transactional
     public void disconnectFromRoom(Long roomId, String nickname) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
-        User user = userProfileRepository.findUserByNickname(nickname)
-                .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
-
-        ChatRoomParticipant participant = chatRoomParticipantRepository.findByChatRoomAndUser(room, user)
+        //ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
+        //User user = userProfileRepository.findUserByNickname(nickname).orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
+        System.out.println(">>>채팅방나가기? disconnectFromRoom?");
+        chatRoomParticipantRepository.findByChatRoom_idAndUser_profile_nickname(roomId, nickname)
+                .map(ChatRoomParticipant::disconnect)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방 참가 정보가 없습니다."));
 
-        participant.disconnect();
-        chatRoomParticipantRepository.save(participant); // 반드시 저장!
+        //chatRoomParticipantRepository.save(participant); // 반드시 저장!
     }
 
 
