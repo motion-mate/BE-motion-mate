@@ -2,6 +2,7 @@ package com.motionmate.service.chat;
 
 import com.motionmate.domain.chat.*;
 import com.motionmate.domain.user.User;
+import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.chat.ChatMessageRequestDto;
 import com.motionmate.dto.chat.ChatMessageResponseDto;
 import com.motionmate.mapper.chat.ChatMessageMapper;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
+    private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomParticipantRepository chatRoomParticipantRepository;
     private final ChatMessageMongoService chatMessageMongoService; // ✅ 추가
@@ -30,7 +32,7 @@ public class ChatMessageService {
         if (dto.getType() == ChatMessage.MessageType.ENTER) {
             // ✅ 이미 방에 participant가 없는 경우에만 시스템 메시지 저장
             boolean exists = chatRoomParticipantRepository.existsByChatRoomAndUser(chatRoom, sender);
-            if (!exists) return null; // 메시지 생략
+            if (exists) return null; // 멤버에 존재하면 메시지 생략
         }
 
         ChatMessage message = ChatMessageMapper.toEntity(chatRoom, sender, dto);
@@ -81,4 +83,14 @@ public class ChatMessageService {
     }
 
 
+    public void save(Long roomId, ChatMessageRequestDto request) {
+        System.out.println(">>>"+request);
+        System.out.println("roomId:>>>"+roomId);
+        chatMessageRepository.save(ChatMessage.builder()
+                        .message(request.getMessage())
+                        .type(ChatMessage.MessageType.TALK)
+                        .chatRoom(ChatRoom.builder().id(roomId).build())
+                        .sender(userRepository.findByProfile_nickname(request.getSenderNickname()).orElseThrow())
+                .build());
+    }
 }

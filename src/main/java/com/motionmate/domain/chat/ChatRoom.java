@@ -2,17 +2,19 @@ package com.motionmate.domain.chat;
 
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class ChatRoom {
 
     public enum ExerciseType {
@@ -49,6 +51,9 @@ public class ChatRoom {
 
     @ManyToOne
     private User creator; // 방의 생성자
+
+    //@OneToMany(mappedBy = "chatRoom")
+    //Set<ChatRoomParticipant> shatRoomParticipants=new HashSet<>();
 
     // 방장 위임
     public void setCreator(User user) { this.creator = user; }

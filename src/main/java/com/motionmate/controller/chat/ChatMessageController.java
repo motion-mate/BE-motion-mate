@@ -10,12 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class ChatMessageController {
 
@@ -60,12 +61,18 @@ public class ChatMessageController {
                 chatRoomParticipantRepository.save(participant);
             }
 
-            chatMessageService.saveEnterMessage(room, user);
+            // chatMessageService.saveEnterMessage(room, user);
         }
 
         // TALK 등 일반 메시지는 저장하지 않고 Redis로만 전송
         log.info("📤 RedisPublisher.publish() 호출됨: {}", dto);
         redisPublisher.publish(dto);
+    }
+
+    @PostMapping("/api/chatrooms/{roomId}/messages")
+    public void sendTalkMessage(@PathVariable("roomId") Long roomId, @RequestBody ChatMessageRequestDto request) {
+        //System.out.println("request>>>>:"+request);
+        chatMessageService.save(roomId,request);
     }
 
     @MessageExceptionHandler
