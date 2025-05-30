@@ -1,5 +1,6 @@
 package com.motionmate.dto.notification;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,5 +17,6 @@ public class NotificationResponseDto {
     private String type;
     private String content;
     private boolean isRead;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 }

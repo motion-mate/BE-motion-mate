@@ -17,6 +17,8 @@ public class FeedDetailResponseDto {
 
     private long id;
 
+    private Long userId;
+
     private String nickname;
 
     private String profileImageUrl;
@@ -42,4 +44,6 @@ public class FeedDetailResponseDto {
 
     //피드 작성자 확인용
     private boolean isAuthor;
+
+    private boolean isFollowing;
 }

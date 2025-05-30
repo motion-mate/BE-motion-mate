@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 @Builder
@@ -17,4 +19,6 @@ public class InquiryResponseDto {
     private Inquiry.InquiryStatus status;
     private String statusLabel; // ✅ 한글 상태 설명
     private String content;     // 목록에서는 null 가능
+    private String answer;
+    private LocalDateTime answeredAt;
 }

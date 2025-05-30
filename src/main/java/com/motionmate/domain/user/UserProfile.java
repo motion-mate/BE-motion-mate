@@ -22,29 +22,22 @@ public class UserProfile {
     private String goal;
     private LocalDate birthDate;
 
-    private int followerCount;
-    private int followingCount;
-
     @Builder
-    public UserProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl, int followerCount, int followingCount) {
+    public UserProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl) {
         this.nickname = nickname;
         this.bio = bio;
         this.goal = goal;
         this.birthDate = birthDate;
         this.profileImageUrl = profileImageUrl;
-        this.followerCount = followerCount;
-        this.followingCount = followingCount;
     }
 
 
-    public void updateProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl, int followerCount, int followingCount) {
+    public void updateProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl) {
         this.nickname = nickname;
         this.bio = bio;
         this.goal = goal;
         this.birthDate = birthDate;
         this.profileImageUrl = profileImageUrl;
-        this.followerCount = followerCount;
-        this.followingCount = followingCount;
     }
 
 //    public void updateNickname(String nickname) {
@@ -61,8 +54,6 @@ public class UserProfile {
                 .goal(null)
                 .birthDate(null)
                 .profileImageUrl(null)
-                .followerCount(0)
-                .followingCount(0)
                 .build();
     }
 

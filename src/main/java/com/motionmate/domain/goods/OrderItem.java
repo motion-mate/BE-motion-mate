@@ -16,6 +16,8 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+
     private int quantity;
 
     private int unitPrice;
@@ -27,6 +29,7 @@ public class OrderItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goods_id")
     private Goods goods;
+
 
     /**
      * 단건 총액 계산

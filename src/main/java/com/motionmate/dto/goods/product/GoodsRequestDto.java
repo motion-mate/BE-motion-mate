@@ -3,6 +3,8 @@ package com.motionmate.dto.goods.product;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class GoodsRequestDto {
 
     @NotBlank(message = "상품 이름은 필수입니다.")
@@ -21,6 +24,8 @@ public class GoodsRequestDto {
     @NotBlank(message = "이미지 URL은 필수입니다.")
     private String imageUrl;
 
+    private String bucketKey;
+
     @NotNull(message = "가격은 필수입니다.")
     @Min(value = 0, message = "가격은 0 이상이어야 합니다.")
     private Integer price;
@@ -30,7 +35,7 @@ public class GoodsRequestDto {
     private Integer stock;
 
     @NotNull(message = "한정 여부는 필수입니다.")
-    private Boolean isLimited;
+    private Boolean limited;
 
     @NotBlank(message = "카테고리는 필수입니다.")
     private String category;

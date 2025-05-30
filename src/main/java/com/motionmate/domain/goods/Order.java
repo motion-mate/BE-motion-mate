@@ -1,5 +1,6 @@
 package com.motionmate.domain.goods;
 
+import com.motionmate.domain.delivery.Delivery;
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,13 +32,14 @@ public class Order {
 
     private LocalDateTime orderedAt;
 
-    private String trackingNumber;
-
-    private String courier;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "delivery_id")
+    private Delivery delivery;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
@@ -61,4 +63,14 @@ public class Order {
                 ? orderItems.stream().mapToInt(OrderItem::getTotalPrice).sum()
                 : 0;
     }
+
+    public void updateStatus(OrderStatus newStatus) {
+        this.status = newStatus;
+    }
+
+    public void applyDelivery(Delivery delivery) {
+        this.delivery = delivery; // 단방향이면 이 한 줄만 필요
+    }
+
+
 }

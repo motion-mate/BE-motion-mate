@@ -1,8 +1,10 @@
 package com.motionmate.domain.notification;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.ConnectionBuilder;
 import java.time.LocalDateTime;
@@ -21,12 +23,19 @@ public class Notification {
     @JoinColumn(name="user_id")
     private User user;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
     private String content;
-    private boolean isRead;
+    private boolean isRead = false;
+
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public Notification(User user, String type, String content) {
+    public enum NotificationType {
+        FOLLOW, COMMENT, LIKE, SYSTEM
+    }
+
+    public Notification(User user, NotificationType type, String content) {
         this.user = user;
         this.type = type;
         this.content = content;
@@ -38,7 +47,7 @@ public class Notification {
         this.isRead = true;
     }
 
-    public void markAsReadAll() {
-        this.isRead = true;
-    }
+//    public void markAsReadAll() {
+//        this.isRead = true;
+//    }
 }

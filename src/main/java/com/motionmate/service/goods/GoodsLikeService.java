@@ -5,6 +5,7 @@ import com.motionmate.domain.goods.*;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.product.GoodsResponseDto;
 import com.motionmate.mapper.goods.GoodsMapper;
+import com.motionmate.service.redis.LimitedGoodsRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,8 @@ public class GoodsLikeService {
 
     private final GoodsLikeRepository goodsLikeRepository;
     private final GoodsRepository goodsRepository;
+    private final LimitedGoodsRedisService limitedGoodsRedisService;
+
 
     public void likeGoods(User user, Long goodsId) {
         Goods goods = goodsRepository.findById(goodsId)
@@ -44,7 +47,7 @@ public class GoodsLikeService {
     @Transactional(readOnly = true)
     public List<GoodsResponseDto> getMyLikedGoods(User user) {
         return goodsLikeRepository.findAllByUser(user).stream()
-                .map(like -> GoodsMapper.toDto(like.getGoods(), true))
+                .map(like -> GoodsMapper.toDto(like.getGoods(), true, limitedGoodsRedisService))
                 .toList();
     }
 }
