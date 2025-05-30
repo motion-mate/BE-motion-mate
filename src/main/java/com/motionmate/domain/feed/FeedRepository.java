@@ -3,7 +3,6 @@ package com.motionmate.domain.feed;
 import com.motionmate.domain.user.User;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

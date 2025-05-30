@@ -22,9 +22,10 @@ public class FeedMapper {
     //entity -> FeedResponseDto
     public static FeedResponseDto fromEntity(Feed entity, boolean liked, int likeCount, int commentCount, boolean isFollowing){
         String imageUrl = entity.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
+
         User user = entity.getUser();
-        UserProfile profile = user.getProfile();
         Long userId = user.getId();
+        UserProfile profile = user.getProfile();
         String nickName = profile.getNickname();
         String profileImageUrl = profile.getProfileImageUrl();
 
