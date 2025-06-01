@@ -35,9 +35,9 @@ public class FeedController {
             @RequestParam(required = false) Long lastFeedId,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomOAuth2User user) {
+
         Long userId = (user != null) ? user.getUserId() : null;
-        String nickname = (user != null) ? user.getUser().getProfile().getNickname() : null;
-        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, nickname, userId));
+        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, userId));
     }
 
 
@@ -67,14 +67,6 @@ public class FeedController {
             @AuthenticationPrincipal CustomOAuth2User user) {
         service.delete(feedId, user.getUserId());
         return ResponseEntity.noContent().build();
-    }
-
-    //좋아요 누른 피드 조회
-    @GetMapping("/liked")
-    public ResponseEntity<List<FeedResponseDto>> getFeedsLikedByUser(
-            @AuthenticationPrincipal CustomOAuth2User user) {
-        List<FeedResponseDto> likedFeeds = service.getFeedsLikedByUser(user.getUserId());
-        return ResponseEntity.ok(likedFeeds);
     }
 
     //본인 피드 조회
