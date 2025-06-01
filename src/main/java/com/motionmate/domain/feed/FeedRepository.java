@@ -30,6 +30,10 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
             "WHERE f.id IN :ids")
     List<Feed> findFeedsWithUserAndProfile(@Param("ids") List<Long> ids);
 
+    //삭제 권한 검증용 (작성자 ID만 추출)
+    @Query("SELECT f.user.id FROM Feed f WHERE f.id = :id")
+    Long findWriterIdByFeedId(@Param("id") Long id);
+
 
 
 

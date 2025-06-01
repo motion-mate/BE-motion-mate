@@ -42,9 +42,7 @@ public class FeedService {
     int userPk = 102;
 
     //피드 업로드
-    public FeedResponseDto upload(FeedRequestDto request, Long userId) {
-        User user = userRePository.findById(userId)
-                .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
+    public FeedResponseDto upload(FeedRequestDto request, User user) {
 
         S3FileRequest imageInfo = request.getImageUrl();
 
@@ -81,9 +79,9 @@ public class FeedService {
 
     //전체 피드 조회
     @Transactional(readOnly = true)
-    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, User loginUser) {
+    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, User user) {
         // 로그인 여부 체크
-        boolean isLoggedIn = (loginUser != null);
+        boolean isLoggedIn = (user != null);
 
         // 커서 기반 페이징: 가장 마지막 피드 ID를 기준으로 최신 순 정렬 후 상위 size개 조회
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
@@ -102,7 +100,7 @@ public class FeedService {
 
         // 로그인한 유저가 좋아요 누른 피드 ID 리스트 조회 (N+1 방지)
         Set<Long> likedFeedIds = isLoggedIn
-                ? new HashSet<>(feedLikeRepository.findLikedFeedIdByUserId(loginUser.getId()))
+                ? new HashSet<>(feedLikeRepository.findLikedFeedIdByUserId(user.getId()))
                 : Collections.emptySet();
 
         // 피드별 좋아요 수를 Group By로 한 번에 조회
@@ -132,11 +130,11 @@ public class FeedService {
                     if (!isLoggedIn) return false;
 
                     // 내가 작성한 피드라면 항상 볼 수 있음
-                    if (Objects.equals(feed.getUser().getId(), loginUser.getId())) return true;
+                    if (Objects.equals(feed.getUser().getId(), user.getId())) return true;
 
                     // FOLLOWERS 전용
                     return accessType != FeedAccessType.FOLLOWERS ||
-                            followRepository.existsByFromUser_IdAndToUser_Id(loginUser.getId(), feed.getUser().getId());
+                            followRepository.existsByFromUser_IdAndToUser_Id(user.getId(), feed.getUser().getId());
                 })
 
                 //
@@ -152,8 +150,8 @@ public class FeedService {
 
                     // 팔로우 여부 (작성자가 본인이 아닌 경우에만 체크)
                     boolean isFollowing = false;
-                    if (isLoggedIn && !Objects.equals(loginUser.getId(), feed.getUser().getId())) {
-                        isFollowing = followService.isFollowing(loginUser.getId(), feed.getUser().getId()).isFollowing();
+                    if (isLoggedIn && !Objects.equals(user.getId(), feed.getUser().getId())) {
+                        isFollowing = followService.isFollowing(user.getId(), feed.getUser().getId()).isFollowing();
                     }
 
                     // 이미지 URL 추출
@@ -231,7 +229,7 @@ public class FeedService {
     }
 
     //이미지 삭제
-    private void deleteOldImgaeIfExists(Feed feed, FeedImage oldImage) {
+    private void deleteOldImageIfExists(Feed feed, FeedImage oldImage) {
         if (oldImage != null && oldImage.getBucketKey() != null && !oldImage.getBucketKey().isEmpty()) {
             s3ServiceUtils.deleteFile(oldImage.getBucketKey());
             feed.getImages().remove(oldImage);
@@ -241,11 +239,11 @@ public class FeedService {
     //이미지 처리 분기
     private void ImageUpdate(Feed feed, FeedImage oldImage, S3FileRequest newImage, Long userId) {
         if (newImage == null) {
-            deleteOldImgaeIfExists(feed, oldImage);
+            deleteOldImageIfExists(feed, oldImage);
             return;
         }
         if (newImage.bucketKey() != null && !newImage.bucketKey().isEmpty()) {
-            deleteOldImgaeIfExists(feed, oldImage);
+            deleteOldImageIfExists(feed, oldImage);
             S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(newImage, userPk);
             FeedImage updated = FeedImage.builder()
                     .url(moved.url())
@@ -268,17 +266,19 @@ public class FeedService {
 
     //피드 삭제
     @Transactional
-    public void delete(Long feedId, Long userId) {
-        Feed feed = findFeed(feedId);
-        validateWriter(feed, userId);
+    public void delete(Long feedId, User user) {
+       List<String> bucketKeys = feedImageRepository.findBucketKeysByFeedId(feedId);
+       bucketKeys.forEach(key -> {
+           if (key != null && !key.isEmpty()) {
+               s3ServiceUtils.deleteFile(key);
+           }
+       });
 
-        feed.getImages().forEach(image -> {
-            String bucketKey = image.getBucketKey();
-            if (bucketKey != null && !bucketKey.isEmpty()) {
-              s3ServiceUtils.deleteFile(bucketKey);
-            }
-        });
-        repository.delete(feed);
+       Long writerId = repository.findWriterIdByFeedId(feedId);
+       if(!Objects.equals(writerId, user.getId())) {
+           throw new CustomException(HttpStatus.FORBIDDEN, "삭제 권한이 없습니다");
+       }
+       repository.deleteById(feedId);
     }
 
     //본인 피드 조회

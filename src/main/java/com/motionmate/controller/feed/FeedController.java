@@ -30,7 +30,8 @@ public class FeedController {
     public ResponseEntity<FeedResponseDto> upload(
             @RequestBody FeedRequestDto request,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        FeedResponseDto response = service.upload(request, user.getUserId());
+
+        FeedResponseDto response = service.upload(request, user.getUser());
         return ResponseEntity.ok(response);
     }
 
@@ -45,9 +46,7 @@ public class FeedController {
             return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, null));
         }
 
-        User loginUser = userRepository.findWithProfileAndFollowById(user.getUserId())
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."));
-        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, loginUser));
+        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, user.getUser()));
     }
 
 
@@ -75,17 +74,16 @@ public class FeedController {
     public ResponseEntity<Void> deleteFeed(
             @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        service.delete(feedId, user.getUserId());
+        service.delete(feedId, user.getUser());
         return ResponseEntity.noContent().build();
     }
 
     //본인 피드 조회
     @GetMapping("/my")
     public ResponseEntity<List<FeedResponseDto>> getMyFeeds(
-            @AuthenticationPrincipal CustomOAuth2User userPrincipal) {
-        User loginUser = userPrincipal.getUser();
+            @AuthenticationPrincipal CustomOAuth2User user) {
 
-        List<FeedResponseDto> myFeeds = service.getMyFeeds(loginUser);
+        List<FeedResponseDto> myFeeds = service.getMyFeeds(user.getUser());
 
         return ResponseEntity.ok(myFeeds);
     }
