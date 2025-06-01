@@ -78,70 +78,98 @@ public class FeedService {
     }
 
 
+
     //전체 피드 조회
     @Transactional(readOnly = true)
-    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, Long userId) {
-      boolean isLoggedIn =  (userId != null);
+    public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, User loginUser) {
+        // 로그인 여부 체크
+        boolean isLoggedIn = (loginUser != null);
 
-      Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
+        // 커서 기반 페이징: 가장 마지막 피드 ID를 기준으로 최신 순 정렬 후 상위 size개 조회
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
 
-      List<Long> feedIds = repository.findFeedIds(lastFeedId, pageable);
-      if (feedIds.isEmpty()) return List.of();
+        // 먼저 페이징에 해당하는 피드 ID만 추출
+        List<Long> feedIds = repository.findFeedIds(lastFeedId, pageable);
+        if (feedIds.isEmpty()) return List.of();
 
-      List<Feed> feeds = repository.findFeedsWithUserAndProfile(feedIds);
+        // Feed + User + Profile 정보를 JOIN FETCH로 조회하여 N+1 방지
+        List<Feed> feeds = repository.findFeedsWithUserAndProfile(feedIds);
 
-      //이미지 조회
-      List<FeedImage>  imageList = feedImageRepository.findByFeedIds(feedIds);
-      Map<Long, List<FeedImage>> imageMap = imageList.stream().collect(Collectors.groupingBy(img -> img.getFeed().getId()));
+        // 피드에 포함된 이미지들을 feedId 기준으로 한 번에 조회 후 Map으로 구성
+        List<FeedImage> imageList = feedImageRepository.findByFeedIds(feedIds);
+        Map<Long, List<FeedImage>> imageMap = imageList.stream()
+                .collect(Collectors.groupingBy(img -> img.getFeed().getId()));
 
-      //좋아요 여부 일괄 조회
-      Set<Long> likedFeedIds = (userId != null)
-              ? new HashSet<>(feedLikeRepository.findLikedFeedIdByUserId(userId))
-              : Collections.emptySet();
+        // 로그인한 유저가 좋아요 누른 피드 ID 리스트 조회 (N+1 방지)
+        Set<Long> likedFeedIds = isLoggedIn
+                ? new HashSet<>(feedLikeRepository.findLikedFeedIdByUserId(loginUser.getId()))
+                : Collections.emptySet();
 
-      //좋아요 수 일괄 조회
-      Map<Long, Integer> likeCountMap = feedLikeRepository.countLikesByFeedIds(feedIds).stream()
-              .collect(Collectors.toMap(
-                      row -> (Long) row[0],
-                      row -> ((Long) row[1]).intValue()
-              ));
+        // 피드별 좋아요 수를 Group By로 한 번에 조회
+        Map<Long, Integer> likeCountMap = feedLikeRepository.countLikesByFeedIds(feedIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Long) row[1]).intValue()
+                ));
 
-      //댓글 수 일괄 조회
-      Map<Long, Integer> commentCountMap = feedCommentRepository.countByFeedIds(feedIds).stream()
-              .collect(Collectors.toMap(
-                      row -> (Long) row[0],
-                      row -> ((Long) row[1]).intValue()
-              ));
+        // 피드별 댓글 수를 Group By로 한 번에 조회
+        Map<Long, Integer> commentCountMap = feedCommentRepository.countByFeedIds(feedIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Long) row[1]).intValue()
+                ));
 
-      return feeds.stream()
-              .filter(feed ->{
-                 FeedAccessType accessType = feed.getFeedAccessType();
+        // 조회된 피드 리스트를 순회하며 응답 DTO로 변환
+        return feeds.stream()
+                // 각 피드의 공개 범위에 따라 필터링
+                .filter(feed -> {
+                    FeedAccessType accessType = feed.getFeedAccessType();
 
-                  // 전체 공개 피드는 누구나 볼 수 있음
-                 if (accessType == FeedAccessType.PUBLIC) return true;
+                    // 전체 공개(PUBLIC)는 누구나 볼 수 있음
+                    if (accessType == FeedAccessType.PUBLIC) return true;
 
-                  // 비회원은 퍼블릭만 조회 가능
-                 if (!isLoggedIn) return false;
 
-                  // 자신의 피드는 항상 볼 수 있음
-                 if (Objects.equals(feed.getUser().getId(), userId)) return true;
+                    if (!isLoggedIn) return false;
 
-                  // FOLLOWERS 피드 + 로그인 상태 → 팔로우한 경우만 볼 수 있음
-                 return accessType != FeedAccessType.FOLLOWERS || followRepository.existsByFromUser_IdAndToUser_Id(userId, feed.getUser().getId());
-              })
-              .map(feed -> {
-                  Long feedId = feed.getId();
-                  boolean liked = likedFeedIds.contains(feedId);
-                  int likeCount = likeCountMap.getOrDefault(feedId, 0);
-                  int commentCount = commentCountMap.getOrDefault(feedId, 0);
-                  boolean isFollowing = false;
-                  if(isLoggedIn && !Objects.equals(userId, feed.getUser().getId())) {
-                      isFollowing = followService.isFollowing(userId, feed.getUser().getId()).isFollowing();
-                  }
-                  return FeedMapper.fromEntity(feed, liked, likeCount, commentCount, isFollowing);
-              })
-              .toList();
+                    // 내가 작성한 피드라면 항상 볼 수 있음
+                    if (Objects.equals(feed.getUser().getId(), loginUser.getId())) return true;
+
+                    // FOLLOWERS 전용
+                    return accessType != FeedAccessType.FOLLOWERS ||
+                            followRepository.existsByFromUser_IdAndToUser_Id(loginUser.getId(), feed.getUser().getId());
+                })
+
+                //
+                .map(feed -> {
+                    Long feedId = feed.getId();
+
+                    // 좋아요 여부
+                    boolean liked = likedFeedIds.contains(feedId);
+
+                    // 좋아요 수, 댓글 수
+                    int likeCount = likeCountMap.getOrDefault(feedId, 0);
+                    int commentCount = commentCountMap.getOrDefault(feedId, 0);
+
+                    // 팔로우 여부 (작성자가 본인이 아닌 경우에만 체크)
+                    boolean isFollowing = false;
+                    if (isLoggedIn && !Objects.equals(loginUser.getId(), feed.getUser().getId())) {
+                        isFollowing = followService.isFollowing(loginUser.getId(), feed.getUser().getId()).isFollowing();
+                    }
+
+                    // 이미지 URL 추출
+                    String imageUrl = imageMap.getOrDefault(feedId, List.of())
+                            .stream().findFirst()
+                            .map(FeedImage::getUrl)
+                            .orElse(null);
+
+                    // 최종 DTO로 변환
+                    return FeedMapper.fromEntity(feed, liked, likeCount, commentCount, isFollowing, imageUrl);
+                })
+                .toList();
     }
+
+
+
 
     //피드 상세 페이지
     public FeedDetailResponseDto getFeedDetail(Long feedId,Long userId) {
@@ -254,19 +282,44 @@ public class FeedService {
     }
 
     //본인 피드 조회
-    public List<FeedResponseDto> getMyFeeds(Long userId) {
-     User user = userRePository.findById(userId)
-             .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
-     List<Feed> myFeeds = repository.findByUserIdOrderByIdDesc(userId);
+    public List<FeedResponseDto> getMyFeeds(User loginUser) {
+        Long userId = loginUser.getId();
 
-     return myFeeds.stream()
-             .map(feed -> {
-                 int likeCount = feedLikeRepository.countByFeed(feed);
-                 int commentCount = feedCommentRepository.countByFeed(feed);
-                 boolean liked = feedLikeRepository.existsByFeedAndUser(feed, user);
-                 return FeedMapper.fromEntityLikeMyFeed(feed, liked, likeCount, commentCount);
-             })
-             .toList();
+        List<Feed> myFeeds = repository.findFeedsWithUserAndProfileByUserId(userId);
+        if (myFeeds.isEmpty()) return List.of();
+
+        // feedId 목록 추출
+        List<Long> feedIds = myFeeds.stream()
+                .map(Feed::getId)
+                .toList();
+
+        //  좋아요 수 일괄 조회
+        Map<Long, Integer> likeCountMap = feedLikeRepository.countLikesByFeedIds(feedIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Long) row[1]).intValue()
+                ));
+
+        // 댓글 수 일괄 조회
+        Map<Long, Integer> commentCountMap = feedCommentRepository.countByFeedIds(feedIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Long) row[1]).intValue()
+                ));
+
+        // 좋아요 여부 일괄 조회
+        Set<Long> likedFeedIds = new HashSet<>(feedLikeRepository.findLikedFeedIdByUserId(userId));
+
+        // 매핑
+        return myFeeds.stream()
+                .map(feed -> {
+                    Long feedId = feed.getId();
+                    int likeCount = likeCountMap.getOrDefault(feedId, 0);
+                    int commentCount = commentCountMap.getOrDefault(feedId, 0);
+                    boolean liked = likedFeedIds.contains(feedId);
+                    return FeedMapper.fromEntityLikeMyFeed(feed, liked, likeCount, commentCount);
+                })
+                .toList();
     }
 
 }

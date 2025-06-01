@@ -1,12 +1,16 @@
 package com.motionmate.controller.feed;
 
+import com.motionmate.domain.user.User;
+import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
+import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.feed.FeedService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,7 @@ import java.util.List;
 public class FeedController {
 
     private final FeedService service;
+    private final UserRepository userRepository;
 
     //피드 업로드
     @PostMapping("/upload")
@@ -36,8 +41,13 @@ public class FeedController {
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomOAuth2User user) {
 
-        Long userId = (user != null) ? user.getUserId() : null;
-        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, userId));
+        if (user == null) {
+            return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, null));
+        }
+
+        User loginUser = userRepository.findWithProfileAndFollowById(user.getUserId())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."));
+        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, loginUser));
     }
 
 
@@ -72,9 +82,11 @@ public class FeedController {
     //본인 피드 조회
     @GetMapping("/my")
     public ResponseEntity<List<FeedResponseDto>> getMyFeeds(
-            @AuthenticationPrincipal CustomOAuth2User user) {
-        Long userId = user.getUserId();
-        List<FeedResponseDto> myFeeds = service.getMyFeeds(userId);
+            @AuthenticationPrincipal CustomOAuth2User userPrincipal) {
+        User loginUser = userPrincipal.getUser();
+
+        List<FeedResponseDto> myFeeds = service.getMyFeeds(loginUser);
+
         return ResponseEntity.ok(myFeeds);
     }
 
