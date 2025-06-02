@@ -90,6 +90,7 @@ public class FeedService {
         // 먼저 페이징에 해당하는 피드 ID만 추출
         List<Long> feedIds = repository.findFeedIds(lastFeedId, pageable);
         if (feedIds.isEmpty()) return List.of();
+        
 
         // Feed + User + Profile 정보를 JOIN FETCH로 조회하여 N+1 방지
         List<Feed> feeds = repository.findFeedsWithUserAndProfile(feedIds);
