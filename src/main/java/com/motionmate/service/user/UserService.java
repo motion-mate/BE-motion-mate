@@ -57,12 +57,13 @@ public class UserService {
 
         if (dto.getBucketKey() != null && !dto.getBucketKey().isBlank()) {
             S3FileRequest s3FileRequest = new S3FileRequest(finalBucketKey, finalImageUrl, dto.getNickname());
-            S3FileResponse movedFile = s3ServiceUtils.moveFromTempToUpload(s3FileRequest, user.getId().intValue());
+            S3FileResponse movedFile = s3ServiceUtils.moveFromTempToUpload(s3FileRequest, 101);
 
             finalImageUrl = movedFile.url();
             finalBucketKey = movedFile.bucketKey();
-        }
 
+            s3ServiceUtils.deleteUserTempFiles(101);
+        }
         profile.updateProfile(
                 dto.getNickname(),
                 dto.getBio(),
