@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class  ChatMessage {
 
     public enum MessageType {
-        ENTER, TALK, QUIT
+        ENTER, TALK, EXIT, LEAVE
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

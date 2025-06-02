@@ -1,12 +1,16 @@
 package com.motionmate.controller.feed;
 
+import com.motionmate.domain.user.User;
+import com.motionmate.domain.user.UserRepository;
 import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
+import com.motionmate.global.exception.CustomException;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.feed.FeedService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +23,15 @@ import java.util.List;
 public class FeedController {
 
     private final FeedService service;
+    private final UserRepository userRepository;
 
     //피드 업로드
     @PostMapping("/upload")
     public ResponseEntity<FeedResponseDto> upload(
             @RequestBody FeedRequestDto request,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        FeedResponseDto response = service.upload(request, user.getUserId());
+
+        FeedResponseDto response = service.upload(request, user.getUser());
         return ResponseEntity.ok(response);
     }
 
@@ -36,8 +42,11 @@ public class FeedController {
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomOAuth2User user) {
 
-        Long userId = (user != null) ? user.getUserId() : null;
-        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, userId));
+        if (user == null) {
+            return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, null));
+        }
+
+        return ResponseEntity.ok(service.getFeedsByCursor(lastFeedId, size, user.getUser()));
     }
 
 
@@ -65,7 +74,7 @@ public class FeedController {
     public ResponseEntity<Void> deleteFeed(
             @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        service.delete(feedId, user.getUserId());
+        service.delete(feedId, user.getUser());
         return ResponseEntity.noContent().build();
     }
 
@@ -73,8 +82,9 @@ public class FeedController {
     @GetMapping("/my")
     public ResponseEntity<List<FeedResponseDto>> getMyFeeds(
             @AuthenticationPrincipal CustomOAuth2User user) {
-        Long userId = user.getUserId();
-        List<FeedResponseDto> myFeeds = service.getMyFeeds(userId);
+
+        List<FeedResponseDto> myFeeds = service.getMyFeeds(user.getUser());
+
         return ResponseEntity.ok(myFeeds);
     }
 

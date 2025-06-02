@@ -18,12 +18,10 @@ public class ChatMessageMapper {
     public static ChatMessageResponseDto toDto(ChatMessage message) {
         boolean connected;
 
-        if (message.getType() == ChatMessage.MessageType.ENTER) {
+        if (message.getType() == ChatMessage.MessageType.ENTER || message.getType() == ChatMessage.MessageType.TALK) {
             connected = true;
-        } else if (message.getType() == ChatMessage.MessageType.QUIT) {
-            connected = false;
         } else {
-            connected = true; // TALK인 경우에도 연결 상태 유지
+            connected = false;
         }
 
         // 💡 sender나 profile이 null인 경우를 방어적으로 처리
@@ -43,7 +41,8 @@ public class ChatMessageMapper {
     }
 
     public static ChatMessageResponseDto toDto(ChatMessageRequestDto dto) {
-        boolean connected = dto.getType() != ChatMessage.MessageType.QUIT;
+        boolean connected = dto.getType() != ChatMessage.MessageType.LEAVE
+                && dto.getType() != ChatMessage.MessageType.EXIT;
 
         return ChatMessageResponseDto.builder()
                 .id(null)
