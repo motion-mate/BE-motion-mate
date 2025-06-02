@@ -26,4 +26,5 @@ public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
 
     @Query("SELECT f.feed.id FROM FeedLike f WHERE f.user.id = :userId")
     List<Long> findLikedFeedIdByUserId(@Param("userId") Long userId);
+
 }
