@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,15 +28,17 @@ public class FeedLikeService {
 
     //좋아요 토글(추가, 삭제)
     public boolean toggleLike(Long feedId, Long userId){
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "로그인이 필요합니다."));
+                .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
 
-        Optional<FeedLike> existLike = likeRepository.findByFeedAndUser(feed, user);
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지않습니다."));
+
 
         //좋아요를 눌렀는지 확인
+        Optional<FeedLike> existLike = likeRepository.findByFeedAndUser(feed, user);
+
         // 이미 눌렀으면 삭제처리(취소)
         if(existLike.isPresent()){
             likeRepository.delete(existLike.get());
