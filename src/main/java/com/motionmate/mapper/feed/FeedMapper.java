@@ -20,8 +20,14 @@ public class FeedMapper {
     }
 
     //entity -> FeedResponseDto
-    public static FeedResponseDto fromEntity(Feed entity, boolean liked, int likeCount, int commentCount, boolean isFollowing){
-        String imageUrl = entity.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
+    public static FeedResponseDto fromEntity(
+            Feed entity,
+            boolean liked,
+            int likeCount,
+            int commentCount,
+            boolean isFollowing,
+            String imageUrl
+    ) {
 
         User user = entity.getUser();
         Long userId = user.getId();
@@ -47,9 +53,11 @@ public class FeedMapper {
     }
 
     //entity -> FeedResponseDto
-    public static FeedResponseDto fromEntity(Feed entity){
-        return fromEntity(entity, false, 0, 0, false);
+    public static FeedResponseDto fromEntity(Feed entity) {
+        String imageUrl = entity.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
+        return fromEntity(entity, false, 0, 0, false, imageUrl);
     }
+
 
     //entity -> FeedDetailResponseDto
     public static FeedDetailResponseDto fromEntityDetail(Feed entity, boolean liked, int likeCount, int commentCount, boolean isFollowing, Long loginUserId){
@@ -78,6 +86,7 @@ public class FeedMapper {
 
     // 오버로딩: isFollowing 기본 false
     public static FeedResponseDto fromEntityLikeMyFeed(Feed feed, boolean liked, int likeCount, int commentCount) {
-        return fromEntity(feed, liked, likeCount, commentCount, false);
+        String imageUrl = feed.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
+        return fromEntity(feed, liked, likeCount, commentCount, false, imageUrl);
     }
 }
