@@ -40,7 +40,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
-        // ✅ 프로필이 없으면 새로 만들어 연결
         if (user.getProfile() == null) {
             UserProfile newProfile = UserProfile.createEmptyProfile();
             user.connectProfile(newProfile);
