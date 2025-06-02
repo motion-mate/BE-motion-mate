@@ -105,7 +105,7 @@ public class RedisSubscriber implements MessageListener {
                     redisTemplate.opsForSet().add(redisKey, sender.getProfile().getNickname());
                 }
 
-                if (roomMessage.getType() == ChatMessage.MessageType.QUIT) {
+                if (roomMessage.getType() == ChatMessage.MessageType.EXIT) {
                     // 퇴장 시 Redis에서 유저 제거
                     redisTemplate.opsForSet().remove(redisKey, sender.getProfile().getNickname());
                 }
