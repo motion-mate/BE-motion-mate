@@ -20,6 +20,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService; // ✅ 추가
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -43,6 +44,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         }
 
         log.info("🔀 리다이렉트 URL: {}", redirectUrl); // ✅ 로그 추가
+
+        httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(response);
 
 // 개발환경(localhost)이라면 임시로 Secure, SameSite 조정
         String tokenCookie = String.format(
