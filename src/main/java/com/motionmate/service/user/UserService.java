@@ -3,15 +3,19 @@ package com.motionmate.service.user;
 import com.motionmate.domain.user.User;
 import com.motionmate.domain.user.UserProfile;
 import com.motionmate.domain.user.UserRepository;
+import com.motionmate.dto.exercise.S3FileRequest;
+import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.dto.follow.FollowResponseDto;
 import com.motionmate.dto.user.*;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.mapper.follow.FollowMapper;
 import com.motionmate.mapper.user.UserProfileMapper;
+import com.motionmate.utils.S3ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,6 +24,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final S3ServiceUtils s3ServiceUtils;
 
     // 메인페이지 프로필 데이터
     @Transactional(readOnly = true)
@@ -35,7 +40,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
-        // ✅ 프로필이 없으면 새로 만들어 연결
         if (user.getProfile() == null) {
             UserProfile newProfile = UserProfile.createEmptyProfile();
             user.connectProfile(newProfile);
@@ -47,7 +51,26 @@ public class UserService {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 닉네임이 설정되어 있습니다.");
         }
 
-        UserProfileMapper.updateFromDto(profile, dto);
+        String finalImageUrl = dto.getProfileImageUrl();
+        String finalBucketKey = dto.getBucketKey();
+
+        if (dto.getBucketKey() != null && !dto.getBucketKey().isBlank()) {
+            S3FileRequest s3FileRequest = new S3FileRequest(finalBucketKey, finalImageUrl, dto.getNickname());
+            S3FileResponse movedFile = s3ServiceUtils.moveFromTempToUpload(s3FileRequest, 101);
+
+            finalImageUrl = movedFile.url();
+            finalBucketKey = movedFile.bucketKey();
+
+            s3ServiceUtils.deleteUserTempFiles(101);
+        }
+        profile.updateProfile(
+                dto.getNickname(),
+                dto.getBio(),
+                dto.getGoal(),
+                dto.getBirthDate(),
+                finalImageUrl,
+                finalBucketKey
+        );
     }
 
 
