@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -123,46 +126,40 @@ public class RoutineService {
     }
     @Transactional
     public void registerRoutineSchedule(List<ExerciseScheduleRequest> list) {
-        System.out.println("💬 들어온 루틴 리스트:");
-        for (ExerciseScheduleRequest dto : list) {
-            System.out.println("➡️ userId: " + dto.getUserId());
-            System.out.println("➡️ exerciseId: " + dto.getExerciseId());
-            System.out.println("➡️ date: " + dto.getDate());
-            System.out.println("➡️ setNumber: " + dto.getSetNumber());
-            System.out.println("➡️ kg: " + dto.getKg());
-            System.out.println("➡️ reps: " + dto.getReps());
-            System.out.println("➡️ time: " + dto.getTime());
-            System.out.println("----------");
-        }
         if (list == null || list.isEmpty()) {
-            throw new IllegalArgumentException("빈 루틴은 등록할 수 없습니다.");
+            throw new IllegalArgumentException("등록할 데이터가 없습니다.");
         }
 
-        String date = list.get(0).getDate(); // 동일한 날짜로 가정
-        Long userId = list.get(0).getUserId();
+        Long userId = list.get(0).getUserId(); // 모든 항목은 동일한 userId, date라고 가정
+        String date = list.get(0).getDate();
 
 
-        boolean exists = exerciseScheduleRepository.existsByUserIdAndDate(userId, date);
-        if (exists) {
-            throw new IllegalStateException("이미 해당 날짜에 등록된 일정이 있습니다.");
+        // ✅ [1] 중복 검사: 같은 유저+날짜+운동이 이미 존재하는지 확인
+        List<Long> incomingExerciseIds = list.stream()
+                .map(ExerciseScheduleRequest::getExerciseId)
+                .distinct()
+                .toList();
+
+        List<ExerciseSchedule> existingSchedules = exerciseScheduleRepository.findByUserIdAndDate(userId, date);
+
+        for (ExerciseSchedule existing : existingSchedules) {
+            if (incomingExerciseIds.contains(existing.getExercise().getExerciseId())) {
+                throw new IllegalStateException("해당 날짜에 이미 등록된 운동이 있습니다: " +
+                        existing.getExercise().getName());
+            }
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자 없음"));
-        for (ExerciseScheduleRequest dto : list) {
-            ExerciseList exercise = exerciseListRepository.findById(dto.getExerciseId())
-                    .orElseThrow(() -> new RuntimeException("운동 없음"));
 
-            ExerciseSchedule schedule = ExerciseSchedule.builder()
-                    .user(user)
-                    .exercise(exercise)
-                    .date(dto.getDate())
-                    .setNumber(dto.getSetNumber())
-                    .kg(dto.getKg())
-                    .reps(dto.getReps())
-                    .time(dto.getTime())
-                    .build();
-
-            exerciseScheduleRepository.save(schedule);
+        // ✅ [2] 저장
+        for (ExerciseScheduleRequest req : list) {
+            ExerciseSchedule entity = new ExerciseSchedule();
+            entity.setUser(userRepository.getReferenceById(req.getUserId()));
+            entity.setExercise(exerciseListRepository.getReferenceById(req.getExerciseId()));
+            entity.setSetNumber(req.getSetNumber());
+            entity.setKg(req.getKg());
+            entity.setReps(req.getReps());
+            entity.setTime(req.getTime());
+            entity.setDate(req.getDate());
+            exerciseScheduleRepository.save(entity);
         }
     }
 }

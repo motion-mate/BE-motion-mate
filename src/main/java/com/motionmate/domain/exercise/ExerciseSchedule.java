@@ -15,7 +15,7 @@ import java.util.Date;
                 columnNames = {"user_id", "date", "exercise_id", "set_number"}
         ))
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Builder
