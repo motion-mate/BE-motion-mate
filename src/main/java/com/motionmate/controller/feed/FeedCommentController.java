@@ -22,7 +22,7 @@ public class FeedCommentController {
     //댓글 등록
     @PostMapping("/comments/{feedId}")
     public ResponseEntity<FeedCommentResponseDto> createComment(
-            @PathVariable Long feedId,
+            @PathVariable("feedId") Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user,
             @RequestBody FeedCommentRequestDto dto) {
         FeedCommentResponseDto response = feedCommentService.createComment(feedId, user.getUserId(), dto);
@@ -32,7 +32,7 @@ public class FeedCommentController {
     //댓글 전체 조회
     @GetMapping("/comments/{feedId}")
     public  ResponseEntity<List<FeedCommentResponseDto>> getAllComments(
-            @PathVariable Long feedId,
+            @PathVariable("feedId") Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         Long userId = (user != null) ? user.getUserId() : null;
         return ResponseEntity.ok(feedCommentService.getAllComments(feedId, userId));
@@ -41,14 +41,14 @@ public class FeedCommentController {
     //댓글 미리 보기
     @GetMapping("/comments/{feedId}/preview")
     public ResponseEntity<List<FeedCommentResponseDto>> getPreviewComments(
-            @PathVariable Long feedId) {
+            @PathVariable("feedId") Long feedId) {
         return ResponseEntity.ok(feedCommentService.getPreviewComments(feedId));
     }
 
     //댓글 수정
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<FeedCommentResponseDto> updateComment(
-            @PathVariable Long commentId,
+            @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal CustomOAuth2User user,
             @RequestBody FeedCommentUpdateDto dto) {
         FeedCommentResponseDto response = feedCommentService.updateComment(commentId, user.getUserId(), dto);
@@ -58,7 +58,7 @@ public class FeedCommentController {
     //댓글 삭제
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
-            @PathVariable Long commentId,
+            @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         feedCommentService.deleteComment(commentId, user.getUserId());
         return ResponseEntity.noContent().build();

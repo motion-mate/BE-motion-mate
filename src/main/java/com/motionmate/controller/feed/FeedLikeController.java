@@ -21,7 +21,7 @@ public class FeedLikeController {
     //좋아요 토클
     @PostMapping("/like/{feedId}")
     public ResponseEntity<Map<String, Object>> toggleLike(
-            @PathVariable Long feedId,
+            @PathVariable("feedId") Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         boolean liked = likeService.toggleLike(feedId, user.getUserId());
 
@@ -33,7 +33,7 @@ public class FeedLikeController {
     //좋아요 수
     @GetMapping("/like/{feedId}/count")
     public ResponseEntity<Map<String, Object>> likeCount(
-            @PathVariable Long feedId,
+            @PathVariable("feedId") Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         int likeCount = likeService.getLikeCount(feedId);
         Map<String, Object> response = new HashMap<>();
@@ -44,7 +44,7 @@ public class FeedLikeController {
     //좋아요 눌렀는지 여부 확인
     @GetMapping("/like/{feedId}")
     public ResponseEntity<Map<String, Object>> isLiked(
-            @PathVariable Long feedId,
+            @PathVariable("feedId") Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         boolean liked = likeService.isLiked(feedId, user.getUserId());
         Map<String, Object> response = new HashMap<>();

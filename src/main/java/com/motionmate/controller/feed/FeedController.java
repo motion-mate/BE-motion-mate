@@ -53,7 +53,7 @@ public class FeedController {
     //피드 상세 조회
     @GetMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> getFeedDetail(
-            @PathVariable Long feedId,
+            @PathVariable("feedId") Long feedId,
             @AuthenticationPrincipal @Nullable CustomOAuth2User user) {
         Long userId = (user != null) ? user.getUserId() : null;
         return ResponseEntity.ok(service.getFeedDetail(feedId, userId));
@@ -63,7 +63,7 @@ public class FeedController {
 
     @PutMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> updateFeed(
-            @PathVariable Long feedId,
+            @PathVariable("feedId") Long feedId,
             @RequestBody FeedRequestDto request,
             @AuthenticationPrincipal CustomOAuth2User user) {
         return ResponseEntity.ok(service.update(feedId, request, user.getUserId()));
@@ -72,7 +72,7 @@ public class FeedController {
     //피드 삭제
     @DeleteMapping("/{feedId}")
     public ResponseEntity<Void> deleteFeed(
-            @PathVariable Long feedId,
+            @PathVariable("feedId") Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         service.delete(feedId, user.getUser());
         return ResponseEntity.noContent().build();
