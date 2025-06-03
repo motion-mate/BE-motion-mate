@@ -4,6 +4,7 @@ import com.motionmate.domain.user.UserRepository;
 import com.motionmate.global.jwt.JwtAuthenticationFilter;
 import com.motionmate.global.jwt.JwtTokenProvider;
 import com.motionmate.global.oauth.CustomOAuth2UserService;
+import com.motionmate.global.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.motionmate.global.oauth.JwtLogoutSuccessHandler;
 import com.motionmate.global.oauth.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,6 +27,11 @@ public class SecurityConfig {
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
 
 
     @Bean
@@ -56,6 +64,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(auth -> auth
+                                .authorizationRequestRepository(authorizationRequestRepository())
+                        )
+
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
