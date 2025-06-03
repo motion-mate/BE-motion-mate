@@ -324,4 +324,13 @@ public class FeedService {
                 .toList();
     }
 
+
+    @Transactional(readOnly = true)
+    public List<FeedResponseDto> getAllFeeds() {
+        List<Feed> feeds = repository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+        return feeds.stream()
+                .map(FeedMapper::fromEntity)  // 좋아요/댓글 개수 등 불필요, 간단 출력
+                .toList();
+    }
+
 }

@@ -3,9 +3,11 @@ package com.motionmate.global.oauth;
 import com.motionmate.domain.user.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -26,8 +28,9 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null; // 우선 권한은 필요 없으니까 null 리턴
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
+
 
     @Override
     public String getName() {
@@ -36,5 +39,9 @@ public class CustomOAuth2User implements OAuth2User {
 
     public Long getUserId() {
         return user.getId();
+    }
+
+    public String getUsername() {
+        return user.getEmail();
     }
 }
