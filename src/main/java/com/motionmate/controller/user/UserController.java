@@ -50,7 +50,11 @@ public class UserController {
 
             throw new RuntimeException("로그인이 필요한 요청입니다.");
         }
-        return userService.getMyInfo(user.getUserId());
+//        return userService.getMyInfo(user.getUserId());
+        log.info("🎯 getMyInfo 호출됨: {}", user.getUserId());
+        UserProfileDto dto = userService.getMyInfo(user.getUserId());
+        log.info("🎯 반환할 유저 프로필: {}", dto);
+        return dto;
     }
     // 공개 유저 프로필 조회
     @GetMapping("/profile/{userId}")
