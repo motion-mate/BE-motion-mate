@@ -1,6 +1,8 @@
 package com.motionmate.controller.feed;
 
 
+import com.motionmate.dto.feed.LikeCountResponseDto;
+import com.motionmate.dto.feed.LikedStatusResponseDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.feed.FeedLikeService;
 import lombok.RequiredArgsConstructor;
@@ -20,35 +22,28 @@ public class FeedLikeController {
 
     //좋아요 토클
     @PostMapping("/like/{feedId}")
-    public ResponseEntity<Map<String, Object>> toggleLike(
+    public ResponseEntity<LikedStatusResponseDto> toggleLike(
             @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        boolean liked = likeService.toggleLike(feedId, user.getUserId());
+        boolean liked = likeService.toggleLike(feedId, user.getUser());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("liked", liked);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new LikedStatusResponseDto(liked));
     }
 
     //좋아요 수
     @GetMapping("/like/{feedId}/count")
-    public ResponseEntity<Map<String, Object>> likeCount(
-            @PathVariable Long feedId,
-            @AuthenticationPrincipal CustomOAuth2User user) {
+    public ResponseEntity<LikeCountResponseDto> likeCount(@PathVariable Long feedId) {
         int likeCount = likeService.getLikeCount(feedId);
-        Map<String, Object> response = new HashMap<>();
-        response.put("likeCount", likeCount);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new LikeCountResponseDto(likeCount));
     }
 
     //좋아요 눌렀는지 여부 확인
     @GetMapping("/like/{feedId}")
-    public ResponseEntity<Map<String, Object>> isLiked(
+    public ResponseEntity<LikedStatusResponseDto> isLiked(
             @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        boolean liked = likeService.isLiked(feedId, user.getUserId());
-        Map<String, Object> response = new HashMap<>();
-        response.put("liked", liked);
-        return ResponseEntity.ok(response);
+
+        boolean liked = likeService.isLiked(feedId, user.getUser());
+        return ResponseEntity.ok(new LikedStatusResponseDto(liked));
     }
 }

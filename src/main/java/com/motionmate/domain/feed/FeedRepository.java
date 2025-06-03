@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FeedRepository extends JpaRepository<Feed, Long> {
 
@@ -33,6 +34,15 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     //삭제 권한 검증용 (작성자 ID만 추출)
     @Query("SELECT f.user.id FROM Feed f WHERE f.id = :id")
     Long findWriterIdByFeedId(@Param("id") Long id);
+
+
+    //피드 상세조회용
+    @Query("SELECT f FROM Feed f " +
+            "JOIN FETCH f.user u " +
+            "JOIN FETCH u.profile " +
+            "LEFT JOIN FETCH f.images " +
+            "WHERE f.id = :feedId")
+    Optional<Feed> findFeedWithUserAndImage(@Param("feedId") Long feedId);
 
 
 
