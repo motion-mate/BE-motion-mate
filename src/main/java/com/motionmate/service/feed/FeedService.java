@@ -124,8 +124,12 @@ public class FeedService {
                 ? new HashSet<>(followRepository.findFollowing(user.getId()))
                 : Collections.emptySet();
 
+        Map<Long, Feed> feedMap = feeds.stream().collect(Collectors.toMap(Feed::getId, feed -> feed));
+
         // 조회된 피드 리스트를 순회하며 응답 DTO로 변환
-        return feeds.stream()
+        return feedIds.stream()
+                .map(feedMap::get)
+                .filter(Objects::nonNull)
                 // 각 피드의 공개 범위에 따라 필터링
                 .filter(feed -> {
                     FeedAccessType accessType = feed.getFeedAccessType();
