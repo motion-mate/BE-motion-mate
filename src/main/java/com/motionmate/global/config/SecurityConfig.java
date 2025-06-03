@@ -43,6 +43,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/chatrooms/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/exercises/list").permitAll()
                         .requestMatchers("/redis-test/**").permitAll()
+                        // ✅ 관리자 전용 경로
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
 
                         // ✅ 나머지는 전부 인증 필요

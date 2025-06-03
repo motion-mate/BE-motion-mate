@@ -109,4 +109,11 @@ public class FeedCommentService {
         feedCommentRepository.delete(comment);
     }
 
+    @Transactional
+    public void deleteCommentByAdmin(Long commentId) {
+        FeedComment comment = feedCommentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."));
+        feedCommentRepository.delete(comment);
+    }
+
 }
