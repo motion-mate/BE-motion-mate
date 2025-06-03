@@ -15,6 +15,7 @@ public class UserProfileRegisterRequestDto {
     private String goal;
     private LocalDate birthDate;
     private String profileImageUrl;
+    private String bucketKey;
     private int followerCount;
     private int followingCount;
 }
