@@ -82,6 +82,7 @@ public class FeedService {
     public List<FeedResponseDto> getFeedsByCursor(Long lastFeedId, int size, User user) {
         // 로그인 여부 체크
         boolean isLoggedIn = (user != null);
+        Long userId = isLoggedIn ? user.getId() : null;
 
         // 커서 기반 페이징: 가장 마지막 피드 ID를 기준으로 최신 순 정렬 후 상위 size개 조회
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
@@ -89,6 +90,7 @@ public class FeedService {
         // 먼저 페이징에 해당하는 피드 ID만 추출
         List<Long> feedIds = repository.findFeedIds(lastFeedId, pageable);
         if (feedIds.isEmpty()) return List.of();
+        
 
         // Feed + User + Profile 정보를 JOIN FETCH로 조회하여 N+1 방지
         List<Feed> feeds = repository.findFeedsWithUserAndProfile(feedIds);
@@ -103,43 +105,49 @@ public class FeedService {
                 ? new HashSet<>(feedLikeRepository.findLikedFeedIdByUserId(user.getId()))
                 : Collections.emptySet();
 
-        // 피드별 좋아요 수를 Group By로 한 번에 조회
+        // 피드 좋아요 수 일괄 조회
         Map<Long, Integer> likeCountMap = feedLikeRepository.countLikesByFeedIds(feedIds).stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0],
                         row -> ((Long) row[1]).intValue()
                 ));
 
-        // 피드별 댓글 수를 Group By로 한 번에 조회
+        // 피드 댓글 수 일괄 조회
         Map<Long, Integer> commentCountMap = feedCommentRepository.countByFeedIds(feedIds).stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0],
                         row -> ((Long) row[1]).intValue()
                 ));
 
+        // 팔로우 여부
+        Set<Long> followingIds = isLoggedIn
+                ? new HashSet<>(followRepository.findFollowing(user.getId()))
+                : Collections.emptySet();
+
         // 조회된 피드 리스트를 순회하며 응답 DTO로 변환
         return feeds.stream()
                 // 각 피드의 공개 범위에 따라 필터링
                 .filter(feed -> {
                     FeedAccessType accessType = feed.getFeedAccessType();
+                    Long writerId = feed.getUser().getId();
 
                     // 전체 공개(PUBLIC)는 누구나 볼 수 있음
                     if (accessType == FeedAccessType.PUBLIC) return true;
 
-
                     if (!isLoggedIn) return false;
 
                     // 내가 작성한 피드라면 항상 볼 수 있음
-                    if (Objects.equals(feed.getUser().getId(), user.getId())) return true;
+                    if (Objects.equals(writerId,userId)) return true;
 
                     // FOLLOWERS 전용
                     return accessType != FeedAccessType.FOLLOWERS ||
-                            followRepository.existsByFromUser_IdAndToUser_Id(user.getId(), feed.getUser().getId());
+                            followingIds.contains(writerId);
                 })
 
                 //
                 .map(feed -> {
                     Long feedId = feed.getId();
+                    Long writerId = feed.getUser().getId();
 
                     // 좋아요 여부
                     boolean liked = likedFeedIds.contains(feedId);
@@ -149,10 +157,9 @@ public class FeedService {
                     int commentCount = commentCountMap.getOrDefault(feedId, 0);
 
                     // 팔로우 여부 (작성자가 본인이 아닌 경우에만 체크)
-                    boolean isFollowing = false;
-                    if (isLoggedIn && !Objects.equals(user.getId(), feed.getUser().getId())) {
-                        isFollowing = followService.isFollowing(user.getId(), feed.getUser().getId()).isFollowing();
-                    }
+                    boolean isFollowing = isLoggedIn &&
+                            !Objects.equals(userId, writerId) &&
+                            followingIds.contains(writerId);
 
                     // 이미지 URL 추출
                     String imageUrl = imageMap.getOrDefault(feedId, List.of())
@@ -166,41 +173,34 @@ public class FeedService {
                 .toList();
     }
 
-
-
-
     //피드 상세 페이지
-    public FeedDetailResponseDto getFeedDetail(Long feedId,Long userId) {
+    public FeedDetailResponseDto getFeedDetail(Long feedId, User user) {
         Feed feed = findFeed(feedId);
-
+        Long userId = (user != null) ? user.getId() : null;
         FeedAccessType accessType = feed.getFeedAccessType();
 
-        if (accessType == FeedAccessType.FOLLOWERS) {
-            boolean isAuthor = userId != null && Objects.equals(feed.getUser().getId(), userId);
-            boolean isFollowing = userId != null && followRepository.existsByFromUser_IdAndToUser_Id(userId, feed.getUser().getId());
+        boolean isAuthor = userId != null && Objects.equals(feed.getUser().getId(), userId);
+        boolean isFollowing = false;
 
-            if (!isAuthor && !isFollowing) {
-                throw new CustomException(HttpStatus.FORBIDDEN, "해당 피드에 접근할 수 없습니다.");
-            }
+        if (userId != null && !isAuthor) {
+            isFollowing = followRepository.existsByFromUser_IdAndToUser_Id(userId, feed.getUser().getId());
         }
 
-        User user = (userId != null) ? userRePository.findById(userId).orElse(null) : null;
+        if (accessType == FeedAccessType.FOLLOWERS && !isAuthor && !isFollowing) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "해당 피드에 접근할 수 없습니다.");
+        }
 
         boolean liked = false;
-        if(user != null){
+        if (user != null) {
             liked = feedLikeRepository.existsByFeedAndUser(feed, user);
         }
 
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
 
-        boolean isFollowing = false;
-        if(user != null && !Objects.equals(user.getId(), feed.getUser().getId())) {
-            isFollowing = followService.isFollowing(user.getId(), feed.getUser().getId()).isFollowing();
-        }
-
         return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, isFollowing, userId);
     }
+
 
     //피드 수정
     @Transactional
@@ -218,8 +218,10 @@ public class FeedService {
 
     //피드 찾기(수정,삭제용)
     private Feed findFeed(Long feedId) {
-        return repository.findById(feedId).orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "해당 피드를 찾을 수 없습니다"));
+        return repository.findFeedWithUserAndImage(feedId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "해당 피드를 찾을 수 없습니다"));
     }
+
 
     //작성자 확인
     private void validateWriter(Feed feed, Long userId) {
@@ -281,7 +283,7 @@ public class FeedService {
        repository.deleteById(feedId);
     }
 
-    //본인 피드 조회
+    //내 피드 조회
     public List<FeedResponseDto> getMyFeeds(User loginUser) {
         Long userId = loginUser.getId();
 
@@ -319,6 +321,15 @@ public class FeedService {
                     boolean liked = likedFeedIds.contains(feedId);
                     return FeedMapper.fromEntityLikeMyFeed(feed, liked, likeCount, commentCount);
                 })
+                .toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<FeedResponseDto> getAllFeeds() {
+        List<Feed> feeds = repository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+        return feeds.stream()
+                .map(FeedMapper::fromEntity)  // 좋아요/댓글 개수 등 불필요, 간단 출력
                 .toList();
     }
 

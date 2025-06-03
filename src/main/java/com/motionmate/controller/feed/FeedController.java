@@ -56,11 +56,10 @@ public class FeedController {
             @PathVariable("feedId") Long feedId,
             @AuthenticationPrincipal @Nullable CustomOAuth2User user) {
         Long userId = (user != null) ? user.getUserId() : null;
-        return ResponseEntity.ok(service.getFeedDetail(feedId, userId));
+        return ResponseEntity.ok(service.getFeedDetail(feedId, (user != null) ? user.getUser() : null));
     }
 
     //피드 게시글 수정
-
     @PutMapping("/{feedId}")
     public ResponseEntity<FeedDetailResponseDto> updateFeed(
             @PathVariable("feedId") Long feedId,
