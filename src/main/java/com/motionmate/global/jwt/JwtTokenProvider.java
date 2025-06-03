@@ -47,6 +47,10 @@ public class JwtTokenProvider {
 
     // 토큰 유효성 검증
     public boolean validateToken(String token) {
+        if (token == null || token.trim().isEmpty()) {
+            return false;
+        }
+
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)

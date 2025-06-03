@@ -50,6 +50,6 @@ public class UserProfileMapper {
     }
 
     public static void updateFromDto(UserProfile profile, UserProfileRegisterRequestDto dto) {
-        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl());
+        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl(), dto.getBucketKey());
     }
 }

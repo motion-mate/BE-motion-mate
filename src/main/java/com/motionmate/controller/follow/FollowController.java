@@ -23,7 +23,7 @@ public class FollowController {
 
     // 팔로우
     @PostMapping("/{toUserId}")
-    public ResponseEntity<String> follow(
+    public ResponseEntity<Void> follow(
             @PathVariable Long toUserId,
             @AuthenticationPrincipal CustomOAuth2User user) {
         followService.follow(user.getUserId(), toUserId);

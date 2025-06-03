@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,5 +23,6 @@ public interface ExerciseScheduleRepository extends JpaRepository<ExerciseSchedu
                          @Param("date") String date,
                          @Param("exerciseId") Long exerciseId);
     boolean existsByUserIdAndDate(Long userId, String date);
+    List<ExerciseSchedule> findByUserIdAndDate(Long userId, String date);
 
 }
