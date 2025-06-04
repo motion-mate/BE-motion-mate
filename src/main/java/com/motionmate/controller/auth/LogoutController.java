@@ -88,6 +88,7 @@ public class LogoutController {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, tokenCookie.toString());
+
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, userIdCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, jsessionidCookie.toString());
