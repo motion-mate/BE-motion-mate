@@ -30,10 +30,14 @@ public class Banner {
     private LocalDateTime createdAt;
 
     @PrePersist
-    public void onCreate(){
+    public void onCreate() {
+        // DB에 엔티티가 처음 저장되기 직전(createdAt이 null일 경우) 현재 시간을 createdAt에 할당
         this.createdAt = LocalDateTime.now();
+
+        // visible이 true이고, startDate가 지정되지 않았을 경우 시작일을 현재 시간으로 자동 지정
         if (visible && startDate == null) {
             this.startDate = LocalDateTime.now();
         }
     }
+
 }

@@ -65,7 +65,7 @@ public class FeedController {
             @PathVariable("feedId") Long feedId,
             @RequestBody FeedRequestDto request,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        return ResponseEntity.ok(service.update(feedId, request, user.getUserId()));
+        return ResponseEntity.ok(service.update(feedId, request, user.getUser()));
     }
 
     //피드 삭제

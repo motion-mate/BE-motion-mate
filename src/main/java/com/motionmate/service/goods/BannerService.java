@@ -2,9 +2,13 @@ package com.motionmate.service.goods;
 
 import com.motionmate.domain.goods.Banner;
 import com.motionmate.domain.goods.BannerRepository;
+import com.motionmate.dto.exercise.S3FileRequest;
+import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.dto.goods.banner.BannerRequestDto;
 import com.motionmate.dto.goods.banner.BannerResponseDto;
 import com.motionmate.mapper.goods.BannerMapper;
+import com.motionmate.mapper.s3.S3FileMapper;
+import com.motionmate.utils.S3ServiceUtils;
 import com.motionmate.service.s3.S3FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,7 @@ public class BannerService {
 
     private final BannerRepository bannerRepository;
     private final S3FileService s3FileService;
+    private final S3ServiceUtils s3ServiceUtils;
 
     /**
      * 현재 시점에 노출 가능한 배너들의 이미지 URL 목록을 반환
@@ -40,10 +45,20 @@ public class BannerService {
      * - DB에 저장 후 응답용 DTO로 변환
      */
     public BannerResponseDto saveBanner(BannerRequestDto dto) {
-        Banner banner = BannerMapper.toEntity(dto);              // DTO → Entity
-        banner = bannerRepository.save(banner);                  // DB 저장
-        return BannerMapper.toResponseDto(banner);               // Entity → Response DTO
+        S3FileRequest image = dto.getImage();
+        int userPk = 103;
+
+        if (image != null) {
+            S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(image, userPk);
+            image = S3FileMapper.toS3FileRequest(moved);
+            s3ServiceUtils.deleteUserTempFiles(userPk);
+        }
+
+        Banner banner = BannerMapper.toEntity(dto, image);
+        banner = bannerRepository.save(banner);
+        return BannerMapper.toResponseDto(banner);
     }
+
 
     /**
      * 배너를 삭제
