@@ -1,5 +1,7 @@
 package com.motionmate.global.oauth;
 
+import com.motionmate.domain.token.RefreshToken;
+import com.motionmate.domain.token.RefreshTokenRepository;
 import com.motionmate.domain.user.UserRepository;
 import com.motionmate.global.jwt.JwtTokenProvider;
 import com.motionmate.service.user.UserService;
@@ -21,6 +23,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService; // ✅ 추가
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -31,6 +35,12 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         // ✅ JWT 토큰 생성
         String token = jwtTokenProvider.generateToken(userId);
+
+        // ✅ Refresh Token 생성
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+
+        // ✅ DB에 저장 또는 갱신
+        refreshTokenRepository.save(new RefreshToken(userId, refreshToken));
 
 // ✅ 닉네임 등록 여부 확인
         boolean isRegistered = userService.isProfileRegistered(userId);
@@ -53,6 +63,15 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 token,
                 60 * 60 * 24
         );
+
+        // ✅ Refresh Token Cookie
+        String refreshCookie = String.format(
+                "refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax", // 변경됨
+                refreshToken,
+                60 * 60 * 24 * 14
+        );
+
+
         String userIdCookie = String.format(
                 "userId=%d; Max-Age=%d; Path=/",
                 userId,
@@ -60,8 +79,14 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         );
 
         response.setHeader("Set-Cookie", tokenCookie);
+        response.addHeader("Set-Cookie", refreshCookie);
         response.addHeader("Set-Cookie", userIdCookie);
 
         response.sendRedirect(redirectUrl);
     }
+
+
+
+
+
 }

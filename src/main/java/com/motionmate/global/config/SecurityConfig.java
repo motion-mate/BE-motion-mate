@@ -7,6 +7,7 @@ import com.motionmate.global.oauth.CustomOAuth2UserService;
 import com.motionmate.global.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.motionmate.global.oauth.JwtLogoutSuccessHandler;
 import com.motionmate.global.oauth.OAuth2AuthenticationSuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,11 +44,16 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                ).exceptionHandling(exception ->
+                        exception.authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        })
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // ✅ 공개 허용 경로 (GET만 허용)
                         .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/reissue").permitAll()
                         .requestMatchers("/ws-stomp/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/feeds/**").permitAll()
