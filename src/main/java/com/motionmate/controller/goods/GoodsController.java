@@ -1,21 +1,15 @@
 package com.motionmate.controller.goods;
 
 import com.motionmate.domain.user.User;
-import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.dto.goods.product.GoodsRequestDto;
 import com.motionmate.dto.goods.product.GoodsResponseDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.goods.GoodsService;
-import com.motionmate.service.s3.S3FileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-
 
 import java.util.List;
 
@@ -25,28 +19,12 @@ import java.util.List;
 public class GoodsController {
 
     private final GoodsService goodsService;
-    private final S3FileService s3FileService;
 
-    // ✅ 상품 등록  
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Long registerGoods(@RequestPart("file") MultipartFile file,
-                              @RequestPart("dto") @Valid GoodsRequestDto dto) throws IOException {
-
-        S3FileResponse response = (S3FileResponse) s3FileService.uploadTempFile(file).getBody();
-
-        GoodsRequestDto newDto = new GoodsRequestDto(
-                dto.getName(), dto.getDescription(),
-                response.url(), response.bucketKey(),  // ✅ S3 업로드 결과 주입
-                dto.getPrice(), dto.getStock(), dto.getLimited(),
-                dto.getCategory(), dto.getSubCategory(),
-                dto.getColors(), dto.getSizes()
-        );
-
-        return goodsService.registerGoods(newDto);
+    // ✅ 상품 등록 (이미지는 사전 업로드된 URL 사용)
+    @PostMapping
+    public Long registerGoods(@RequestBody @Valid GoodsRequestDto dto) {
+        return goodsService.registerGoods(dto);
     }
-
-
-
 
     // ✅ 전체 상품 목록 조회
     @GetMapping
@@ -72,21 +50,20 @@ public class GoodsController {
     // ✅ 상품 숨김 처리 (Soft Delete)
     @PatchMapping("/{id}/hide")
     public ResponseEntity<Void> hideGoods(@PathVariable Long id) {
-        goodsService.deleteGoods(id); // 내부에서는 goods.hide() 호출
+        goodsService.deleteGoods(id);
         return ResponseEntity.ok().build();
     }
 
+    // ✅ 상품 숨김 해제
     @PatchMapping("/{id}/unhide")
     public ResponseEntity<Void> unhideGoods(@PathVariable Long id) {
         goodsService.unhideGoods(id);
         return ResponseEntity.ok().build();
     }
 
-    // 추천 상품
+    // ✅ 추천 상품 조회
     @GetMapping("/recommend")
-    public List<GoodsResponseDto> getRecommendedGoods(){
+    public List<GoodsResponseDto> getRecommendedGoods() {
         return goodsService.getRecommendedGoods();
     }
-
-
 }
