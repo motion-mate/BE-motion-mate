@@ -7,8 +7,10 @@ import com.motionmate.dto.user.UserProfileUpdateRequestDto;
 import com.motionmate.dto.user.UserResponseDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.user.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -38,14 +40,22 @@ public class UserController {
 
     // 내 정보 조회
     @GetMapping("/users/me")
-    public UserProfileDto getMyInfo(@AuthenticationPrincipal CustomOAuth2User user) {
+    public UserProfileDto getMyInfo(@AuthenticationPrincipal CustomOAuth2User user,
+                                    HttpServletResponse response) {
         if (user == null) {
-            log.error("❌ 인증된 사용자 없음 (SecurityContext에 없음)");
+            int statusCode = HttpStatus.UNAUTHORIZED.value(); // ✅ 여기서 선언
+            response.setStatus(statusCode); // 상태 코드 명시
+
+            log.error("❌ 인증된 사용자 없음 (SecurityContext에 없음) → HTTP 상태코드: {}", statusCode);
+
             throw new RuntimeException("로그인이 필요한 요청입니다.");
         }
-        return userService.getMyInfo(user.getUserId());
+//        return userService.getMyInfo(user.getUserId());
+        log.info("🎯 getMyInfo 호출됨: {}", user.getUserId());
+        UserProfileDto dto = userService.getMyInfo(user.getUserId());
+        log.info("🎯 반환할 유저 프로필: {}", dto);
+        return dto;
     }
-
     // 공개 유저 프로필 조회
     @GetMapping("/profile/{userId}")
     public UserProfileDto getUserProfile(@PathVariable Long userId) {

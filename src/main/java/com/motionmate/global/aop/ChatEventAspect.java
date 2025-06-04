@@ -44,13 +44,13 @@ public class ChatEventAspect {
         }
 
         joinPoint.proceed();
-        String content=" 채팅방을 나갔습니다.";
+        String content="님이 채팅방을 나갔습니다.";
         ChatMessage.MessageType messageType=ChatMessage.MessageType.LEAVE;
         if (methodName.equals("enterRoom")) {
-            content = " 채팅방에 입장하였습니다!";
+            content = "님이 채팅방에 입장하였습니다!";
             messageType = ChatMessage.MessageType.ENTER;
         } else if (methodName.equals("exitRoom")) {
-            content = " 채팅방에서 탈퇴하였습니다.";
+            content = "님이 채팅방에서 탈퇴하였습니다.";
             messageType = ChatMessage.MessageType.EXIT;
         }
         redisPublisher.publish(ChatMessageRequestDto.builder()

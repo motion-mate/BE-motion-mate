@@ -31,20 +31,17 @@ public class FeedCommentService {
     private final NotificationService notificationService;
 
     //댓글 등록
-    public FeedCommentResponseDto createComment(Long feedId, Long userId, FeedCommentRequestDto dto) {
+    public FeedCommentResponseDto createComment(Long feedId, User user, FeedCommentRequestDto dto) {
       Feed feed =  feedRepository.findById(feedId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
 
-      if (userId == null) {
+      if (user == null) {
           throw new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다");
       }
 
-      User user = userRepository.findById(userId)
-              .orElseThrow(()-> new CustomException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다"));
-
       FeedComment saved = feedCommentRepository.save(FeedCommentMapper.toEntity(dto, user, feed));
 
-      if(!feed.getUser().getId().equals(userId)) {
+      if(!feed.getUser().getId().equals(user.getId())) {
           notificationService.createNotification (
                   NotificationRequestDto.builder()
                           .userId(feed.getUser().getId())
@@ -58,10 +55,8 @@ public class FeedCommentService {
 
     //댓글 전체 조회
     public List<FeedCommentResponseDto> getAllComments(Long feedId, Long userId) {
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
 
-        List<FeedComment> comments = feedCommentRepository.findByFeedOrderByCreatedAtDesc(feed);
+        List<FeedComment> comments = feedCommentRepository.findWithUserProfileByFeedId(feedId);
 
         return comments.stream()
                 .map(comment -> {
@@ -70,42 +65,38 @@ public class FeedCommentService {
                 .toList();
     }
 
-    //댓글 미리보기
-    public List<FeedCommentResponseDto> getPreviewComments(Long feedId){
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "피드가 존재하지 않습니다."));
-        return feedCommentRepository.findTop10ByFeedOrderByCreatedAtDesc(feed).stream()
-                .map(FeedCommentMapper::fromEntity)
-                .toList();
-    }
-
     //댓글 수정
     @Transactional
-    public FeedCommentResponseDto updateComment(Long commentId, Long userId, FeedCommentUpdateDto dto) {
-        FeedComment comment = feedCommentRepository.findById(commentId)
+    public FeedCommentResponseDto updateComment(Long commentId, User user, FeedCommentUpdateDto dto) {
+        FeedComment comment = feedCommentRepository.findWithUserProfileById(commentId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."));
 
-        if(!comment.getUser().getId().equals(userId)){
+        if(!comment.getUser().getId().equals(user.getId())){
             throw new CustomException(HttpStatus.FORBIDDEN, "수정 권한이 없습니다.");
         }
 
         comment.updateContent(dto.getContent());
 
-       FeedComment updated = feedCommentRepository.findById(commentId)
-                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "댓글을 다시 불러오지 못했습니다."));
-        return FeedCommentMapper.fromEntity(updated);
+        return FeedCommentMapper.fromEntity(comment);
     }
 
     //댓글 삭제
     @Transactional
-    public void deleteComment(Long commentId, Long userId) {
-        FeedComment comment = feedCommentRepository.findById(commentId)
+    public void deleteComment(Long commentId, User user) {
+        FeedComment comment = feedCommentRepository.findWithUserById(commentId)
                 .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."));
 
-        if(!comment.getUser().getId().equals(userId)){
+        if(!comment.getUser().getId().equals(user.getId())){
             throw new CustomException(HttpStatus.FORBIDDEN, "삭제 권한이 없습니다.");
         }
 
+        feedCommentRepository.delete(comment);
+    }
+
+    @Transactional
+    public void deleteCommentByAdmin(Long commentId) {
+        FeedComment comment = feedCommentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."));
         feedCommentRepository.delete(comment);
     }
 

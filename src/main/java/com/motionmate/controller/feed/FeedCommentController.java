@@ -25,7 +25,7 @@ public class FeedCommentController {
             @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user,
             @RequestBody FeedCommentRequestDto dto) {
-        FeedCommentResponseDto response = feedCommentService.createComment(feedId, user.getUserId(), dto);
+        FeedCommentResponseDto response = feedCommentService.createComment(feedId, user.getUser(), dto);
         return ResponseEntity.ok(response);
     }
 
@@ -38,12 +38,6 @@ public class FeedCommentController {
         return ResponseEntity.ok(feedCommentService.getAllComments(feedId, userId));
     }
 
-    //댓글 미리 보기
-    @GetMapping("/comments/{feedId}/preview")
-    public ResponseEntity<List<FeedCommentResponseDto>> getPreviewComments(
-            @PathVariable Long feedId) {
-        return ResponseEntity.ok(feedCommentService.getPreviewComments(feedId));
-    }
 
     //댓글 수정
     @PutMapping("/comments/{commentId}")
@@ -51,7 +45,7 @@ public class FeedCommentController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomOAuth2User user,
             @RequestBody FeedCommentUpdateDto dto) {
-        FeedCommentResponseDto response = feedCommentService.updateComment(commentId, user.getUserId(), dto);
+        FeedCommentResponseDto response = feedCommentService.updateComment(commentId, user.getUser(), dto);
         return ResponseEntity.ok(response);
     }
 
@@ -60,7 +54,7 @@ public class FeedCommentController {
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        feedCommentService.deleteComment(commentId, user.getUserId());
+        feedCommentService.deleteComment(commentId, user.getUser());
         return ResponseEntity.noContent().build();
     }
 

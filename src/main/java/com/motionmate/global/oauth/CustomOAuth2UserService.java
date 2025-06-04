@@ -59,6 +59,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                                 .oauthNickname(nicknameFinal)
                                 .provider(provider)
                                 .profile(profile)
+                                .role(User.Role.USER)
                                 .build()
                 );
             });

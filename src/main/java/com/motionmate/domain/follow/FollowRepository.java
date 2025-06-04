@@ -24,4 +24,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     List<Follow> findAllByToUser_IdWithUser(@Param("userId") Long userId);
 
     boolean existsByFromUserAndToUser(User user, User user1);
+
+    @Query("SELECT f.toUser.id FROM Follow f WHERE f.fromUser.id = :userId")
+    List<Long> findFollowing(@Param("userId") Long userId);
 }
