@@ -40,6 +40,7 @@ public class UserProfileMapper {
                 .birthDate(profile != null ? profile.getBirthDate() : null)
                 .followerCount(followerCount)
                 .followingCount(followingCount)
+                .role(user.getRole().name())
                 .build();
     }
 

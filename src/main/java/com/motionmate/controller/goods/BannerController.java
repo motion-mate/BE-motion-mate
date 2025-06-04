@@ -29,30 +29,14 @@ public class BannerController {
     }
 
     // ✅ 배너 등록 (S3에 업로드 + DB 저장)
-    @PostMapping(value = "/admin/banners", consumes = "multipart/form-data")
-    public BannerResponseDto uploadBanner(
-            @RequestPart("file") MultipartFile file,
-            @RequestPart("dto") @Valid BannerRequestDto requestDto
-    ) throws IOException {
-
-        // 1. S3에 임시 업로드 → 이미지 URL 획득
-        S3FileResponse response = (S3FileResponse) s3FileService.uploadTempFile(file).getBody();
-        String imageUrl = response.url();
-
-        // 2. DTO 불변성 유지: 새 객체 생성
-        BannerRequestDto newDto = new BannerRequestDto(
-                imageUrl,
-                response.bucketKey(),
-                requestDto.getOrderIndex(),
-                requestDto.isVisible()
-        );
-
-        // 3. 저장 및 응답
-        return bannerService.saveBanner(newDto);
+    @PostMapping("/banners")
+    public BannerResponseDto registerBanner(@RequestBody @Valid BannerRequestDto requestDto) {
+        return bannerService.saveBanner(requestDto);
     }
 
+
     // ✅ 배너 삭제
-    @DeleteMapping("/admin/banners/{id}")
+    @DeleteMapping("/banners/{id}")
     public void deleteBanner(@PathVariable Long id) {
         bannerService.deleteBanner(id);
     }
