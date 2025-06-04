@@ -50,7 +50,7 @@ public class FeedCommentService {
                           .build()
           );
       }
-      return FeedCommentMapper.fromEntity(saved);
+      return FeedCommentMapper.fromEntity(saved, user.getId());
     }
 
     //댓글 전체 조회
@@ -77,7 +77,9 @@ public class FeedCommentService {
 
         comment.updateContent(dto.getContent());
 
-        return FeedCommentMapper.fromEntity(comment);
+        FeedComment updated = feedCommentRepository.save(comment);
+
+        return FeedCommentMapper.fromEntity(updated, user.getId());
     }
 
     //댓글 삭제

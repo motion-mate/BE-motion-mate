@@ -208,15 +208,15 @@ public class FeedService {
 
     //피드 수정
     @Transactional
-    public FeedDetailResponseDto update(Long feedId, FeedRequestDto request, Long userId) {
+    public FeedDetailResponseDto update(Long feedId, FeedRequestDto request, User user) {
        Feed feed = findFeed(feedId);
-       validateWriter(feed, userId);
+       validateWriter(feed, user.getId());
 
        FeedImage oldImage = feed.getImages().stream().findFirst().orElse(null);
-       ImageUpdate(feed, oldImage, request.getImageUrl(), userId);
+       imageUpdate(feed, oldImage, request.getImageUrl(), user.getId());
        feed.update(request.getDescription(), request.getFeedAccessType());
 
-       return mapToDetailResponse(feed, userId);
+       return mapToDetailResponse(feed, user);
 
     }
 
@@ -225,7 +225,6 @@ public class FeedService {
         return repository.findFeedWithUserAndImage(feedId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "해당 피드를 찾을 수 없습니다"));
     }
-
 
     //작성자 확인
     private void validateWriter(Feed feed, Long userId) {
@@ -243,11 +242,17 @@ public class FeedService {
     }
 
     //이미지 처리 분기
-    private void ImageUpdate(Feed feed, FeedImage oldImage, S3FileRequest newImage, Long userId) {
+    private void imageUpdate(Feed feed, FeedImage oldImage, S3FileRequest newImage, Long userId) {
+        //이미지 유지
         if (newImage == null) {
+            return;
+        }
+        //수정 시 이미지 삭제
+        if ((newImage.bucketKey() == null || newImage.bucketKey().isEmpty()) && oldImage != null) {
             deleteOldImageIfExists(feed, oldImage);
             return;
         }
+        //이미지 교체
         if (newImage.bucketKey() != null && !newImage.bucketKey().isEmpty()) {
             deleteOldImageIfExists(feed, oldImage);
             S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(newImage, userPk);
@@ -259,15 +264,14 @@ public class FeedService {
             feed.addImage(updated);
         }
     }
-
     //응답 DTO 구성
-    private FeedDetailResponseDto mapToDetailResponse(Feed feed, Long userId) {
-        boolean liked = feedLikeRepository.existsByFeedAndUser(feed, feed.getUser());
+    private FeedDetailResponseDto mapToDetailResponse(Feed feed, User user) {
+        boolean liked = feedLikeRepository.existsByFeedAndUser(feed, user);
         int likeCount = feedLikeRepository.countByFeed(feed);
         int commentCount = feedCommentRepository.countByFeed(feed);
         boolean isFollowing = false;
 
-        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, isFollowing, userId);
+        return FeedMapper.fromEntityDetail(feed, liked, likeCount, commentCount, isFollowing, user.getId());
     }
 
     //피드 삭제

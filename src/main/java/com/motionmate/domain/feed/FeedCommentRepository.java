@@ -31,6 +31,7 @@ public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> 
 
     @Query("SELECT fc FROM FeedComment fc " +
             "JOIN FETCH fc.user u " +
+            "JOIN FETCH u.profile " +
             "WHERE fc.id = :commentId")
     Optional<FeedComment> findWithUserById(@Param("commentId") Long commentId);
 
