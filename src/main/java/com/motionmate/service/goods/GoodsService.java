@@ -4,11 +4,15 @@ import com.motionmate.domain.goods.Goods;
 import com.motionmate.domain.goods.GoodsLikeRepository;
 import com.motionmate.domain.goods.GoodsRepository;
 import com.motionmate.domain.user.User;
+import com.motionmate.dto.exercise.S3FileRequest;
+import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.dto.goods.product.GoodsRequestDto;
 import com.motionmate.dto.goods.product.GoodsResponseDto;
 import com.motionmate.mapper.goods.GoodsMapper;
+import com.motionmate.mapper.s3.S3FileMapper;
 import com.motionmate.service.redis.LimitedGoodsRedisService;
 import com.motionmate.service.s3.S3FileService;
+import com.motionmate.utils.S3ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,19 +28,31 @@ public class GoodsService {
     private final GoodsRepository goodsRepository;
     private final GoodsLikeRepository goodsLikeRepository;
     private final LimitedGoodsRedisService limitedGoodsRedisService;
-    private final S3FileService s3FileService;
+    private final S3ServiceUtils s3ServiceUtils;
 
-    @Transactional
-    public Long registerGoods(GoodsRequestDto dto) {
-        Goods goods = GoodsMapper.toEntity(dto);
+    int userPk = 103;
+
+    public GoodsResponseDto registerGoods(GoodsRequestDto dto, User user) {
+        S3FileRequest imageInfo = dto.getImage();
+
+        if (imageInfo != null) {
+            S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(imageInfo, userPk);
+            imageInfo = S3FileMapper.toS3FileRequest(moved);
+            s3ServiceUtils.deleteUserTempFiles(userPk);
+        }
+
+        Goods goods = GoodsMapper.toEntity(dto, imageInfo);
         Goods saved = goodsRepository.save(goods);
 
         if (saved.isLimited()) {
             limitedGoodsRedisService.setInitialStock(saved.getId(), saved.getStock());
         }
 
-        return saved.getId();
+        return GoodsMapper.toDto(saved, false, limitedGoodsRedisService);
     }
+
+
+
 
     @Transactional(readOnly = true)
     public List<GoodsResponseDto> getGoodsList(User user) {

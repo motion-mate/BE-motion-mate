@@ -1,5 +1,6 @@
 package com.motionmate.dto.goods.product;
 
+import com.motionmate.dto.exercise.S3FileRequest;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class GoodsRequestDto {
 
     @NotBlank(message = "상품 이름은 필수입니다.")
@@ -21,10 +23,8 @@ public class GoodsRequestDto {
     @NotBlank(message = "상품 설명은 필수입니다.")
     private String description;
 
-    @NotBlank(message = "이미지 URL은 필수입니다.")
-    private String imageUrl;
-
-    private String bucketKey;
+    @NotNull(message = "이미지는 필수입니다.")
+    private S3FileRequest image;
 
     @NotNull(message = "가격은 필수입니다.")
     @Min(value = 0, message = "가격은 0 이상이어야 합니다.")
@@ -46,3 +46,4 @@ public class GoodsRequestDto {
     private List<String> colors;
     private List<String> sizes;
 }
+
