@@ -51,7 +51,6 @@ public class ChatMessageController {
 
     @PostMapping("/api/chatrooms/{roomId}/messages")
     public void sendTalkMessage(@PathVariable("roomId") Long roomId, @RequestBody ChatMessageRequestDto request) {
-        //System.out.println("request>>>>:"+request);
         chatMessageService.save(roomId,request);
     }
 

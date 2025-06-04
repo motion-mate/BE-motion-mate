@@ -16,23 +16,20 @@ public class ChatMessageMapper {
     }
 
     public static ChatMessageResponseDto toDto(ChatMessage message) {
-        boolean connected;
+        boolean connected = message.getType() == ChatMessage.MessageType.ENTER || message.getType() == ChatMessage.MessageType.TALK;
 
-        if (message.getType() == ChatMessage.MessageType.ENTER || message.getType() == ChatMessage.MessageType.TALK) {
-            connected = true;
-        } else {
-            connected = false;
-        }
-
-        // 💡 sender나 profile이 null인 경우를 방어적으로 처리
         String nickname = "알 수 없음";
+        String profileImageUrl = null;
+
         if (message.getSender() != null && message.getSender().getProfile() != null) {
             nickname = message.getSender().getProfile().getNickname();
+            profileImageUrl = message.getSender().getProfile().getProfileImageUrl();
         }
 
         return ChatMessageResponseDto.builder()
                 .id(message.getId())
                 .senderNickname(nickname)
+                .senderProfileImageUrl(profileImageUrl)
                 .message(message.getMessage())
                 .sentAt(message.getSentAt())
                 .type(message.getType())
