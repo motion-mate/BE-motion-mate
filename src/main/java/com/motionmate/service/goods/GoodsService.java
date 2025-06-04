@@ -24,8 +24,7 @@ public class GoodsService {
     private final GoodsRepository goodsRepository;
     private final GoodsLikeRepository goodsLikeRepository;
     private final LimitedGoodsRedisService limitedGoodsRedisService;
-    // private final S3FileService s3FileService;
-
+    private final S3FileService s3FileService;
 
     @Transactional
     public Long registerGoods(GoodsRequestDto dto) {
@@ -54,7 +53,6 @@ public class GoodsService {
         return GoodsMapper.toDto(goods, liked, limitedGoodsRedisService);
     }
 
-
     @Transactional
     public void updateGoods(Long id, GoodsRequestDto dto) {
         Goods goods = goodsRepository.findById(id)
@@ -66,9 +64,16 @@ public class GoodsService {
     public void deleteGoods(Long id) {
         Goods goods = goodsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
-        // s3FileService.deleteFile(goods.getBucketKey());
-        goods.hide(); // ❗ 실제 삭제하지 않고 숨김 처리
+
+        // ✅ 실제 삭제하지 않고 숨김 처리
+        goods.hide();
+
+        // ✅ S3 파일도 삭제
+//        if (goods.getBucketKey() != null) {
+//            s3FileService.deleteFile(goods.getBucketKey());
+//        }
     }
+
 
     @Transactional
     public void unhideGoods(Long id) {

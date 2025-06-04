@@ -18,19 +18,23 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
+    // 📌 전체 공지 목록 조회
     @GetMapping
-    public ResponseEntity<List<NoticeResponseDto>> getAllNotices(){
+    public ResponseEntity<List<NoticeResponseDto>> getAllNotices() {
         return ResponseEntity.ok(noticeService.getAllNotices());
     }
 
+    // 📌 공지 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<NoticeResponseDto> getNotice(@PathVariable Long id){
+    public ResponseEntity<NoticeResponseDto> getNotice(@PathVariable Long id) {
         return ResponseEntity.ok(noticeService.getNotice(id));
     }
 
+    // 📌 공지 등록 (추후 관리자 권한 필요)
     @PostMapping
-    // 추후 관리자 인증 필요
-    public ResponseEntity<NoticeResponseDto> createNotice(@Valid @RequestBody NoticeRequestDto requestDto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(noticeService.createNotice(requestDto));
+    public ResponseEntity<NoticeResponseDto> createNotice(@Valid @RequestBody NoticeRequestDto requestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(noticeService.createNotice(requestDto));
     }
 }
+
