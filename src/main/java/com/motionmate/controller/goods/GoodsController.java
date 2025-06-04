@@ -21,9 +21,13 @@ public class GoodsController {
     private final GoodsService goodsService;
 
     // ✅ 상품 등록 (이미지는 사전 업로드된 URL 사용)
-    @PostMapping
-    public Long registerGoods(@RequestBody @Valid GoodsRequestDto dto) {
-        return goodsService.registerGoods(dto);
+    @PostMapping("/goods")
+    public ResponseEntity<GoodsResponseDto> registerGoods(
+            @RequestBody GoodsRequestDto request,
+            @AuthenticationPrincipal CustomOAuth2User user
+    ) {
+        GoodsResponseDto response = goodsService.registerGoods(request, user.getUser());
+        return ResponseEntity.ok(response);
     }
 
     // ✅ 전체 상품 목록 조회

@@ -55,25 +55,25 @@ public class ChatRoomService {
     // 단일 채팅방 조회
     @Transactional(readOnly = true)
     public ChatRoomResponseDto getChatRoom(Long roomId) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
+        ChatRoom room = chatRoomRepository.findByIdWithCreator(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
         return ChatRoomMapper.toDto(room);
     }
-    
+
     // 사용자가 참가한 채팅방 검색
     @Transactional(readOnly = true)
     public List<ChatRoomResponseDto> getChatRoomsByParticipant(String nickname) {
         User user = userProfileRepository.findUserByNickname(nickname)
                 .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
 
-        List<ChatRoomParticipant> participations = chatRoomParticipantRepository.findByUser(user);
+        List<ChatRoomParticipant> participations =
+                chatRoomParticipantRepository.findByUserWithChatRoomAndCreator(user);
 
         return participations.stream()
                 .map(ChatRoomParticipant::getChatRoom)
                 .map(ChatRoomMapper::toDto)
                 .toList();
     }
-
 
     // 필터 조건 기반 채팅방 검색
     @Transactional(readOnly = true)
@@ -173,14 +173,12 @@ public class ChatRoomService {
     // 채팅방 나가기
     @Transactional
     public void disconnectFromRoom(Long roomId, String nickname) {
-        //ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
-        //User user = userProfileRepository.findUserByNickname(nickname).orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
+
         System.out.println(">>>채팅방나가기? disconnectFromRoom?");
         chatRoomParticipantRepository.findByChatRoom_idAndUser_profile_nickname(roomId, nickname)
                 .map(ChatRoomParticipant::disconnect)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방 참가 정보가 없습니다."));
 
-        //chatRoomParticipantRepository.save(participant); // 반드시 저장!
     }
 
 
@@ -190,7 +188,8 @@ public class ChatRoomService {
         ChatRoom room = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
 
-        List<ChatRoomParticipant> participants = chatRoomParticipantRepository.findByChatRoom(room);
+        List<ChatRoomParticipant> participants =
+                chatRoomParticipantRepository.findByChatRoomWithUserProfile(room);
 
         return participants.stream()
                 .map(p -> ChatRoomMemberDto.builder()
@@ -204,22 +203,18 @@ public class ChatRoomService {
     // 채팅방 삭제 (생성자 nickname 일치 시에만 허용)
     @Transactional
     public void deleteChatRoomByCreator(Long roomId, String nickname) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
+        ChatRoom room = chatRoomRepository.findByIdWithCreator(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("삭제할 채팅방이 존재하지 않습니다."));
 
         if (!room.getCreator().getProfile().getNickname().equals(nickname)) {
             throw new SecurityException("채팅방 생성자만 삭제할 수 있습니다.");
         }
 
-        // ✅ 1. 메시지 먼저 삭제
         chatMessageRepository.deleteByChatRoomId(roomId);
-
-        // ✅ 2. 참가자 삭제
         chatRoomParticipantRepository.deleteByChatRoomId(roomId);
-
-        // ✅ 3. 채팅방 삭제
         chatRoomRepository.deleteById(roomId);
     }
+
 
 
 }

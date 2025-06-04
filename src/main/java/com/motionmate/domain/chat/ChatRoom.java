@@ -50,7 +50,7 @@ public class ChatRoom {
 
     private LocalTime promiseTime; // 운동 예정 시간
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User creator; // 방의 생성자
 
     @Builder.Default

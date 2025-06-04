@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
@@ -25,5 +26,17 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             @Param("date") LocalDate date,
             @Param("keyword") String keyword
     );
+
+    @Query("SELECT cr FROM ChatRoom cr " +
+            "LEFT JOIN FETCH cr.chatRoomParticipants crp " +
+            "LEFT JOIN FETCH crp.user " +
+            "WHERE cr.id = :id")
+    Optional<ChatRoom> findByIdWithParticipants(@Param("id") Long id);
+
+    @Query("SELECT cr FROM ChatRoom cr " +
+            "JOIN FETCH cr.creator c " +
+            "JOIN FETCH c.profile " +
+            "WHERE cr.id = :id")
+    Optional<ChatRoom> findByIdWithCreator(@Param("id") Long id);
 
 }

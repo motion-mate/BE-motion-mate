@@ -12,6 +12,7 @@ public class ChatMessageResponseDto {
 
     private Long id;
     private String senderNickname;
+    private String senderProfileImageUrl;
     private String message;
     private LocalDateTime sentAt;
     private ChatMessage.MessageType type;
