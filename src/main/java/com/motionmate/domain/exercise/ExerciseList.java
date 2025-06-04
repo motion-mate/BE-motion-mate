@@ -27,5 +27,4 @@ public class ExerciseList {
     private List<ExerciseImage> imageUrl;
 
 
-
 }
