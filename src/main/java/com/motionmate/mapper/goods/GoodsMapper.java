@@ -47,12 +47,12 @@ public class GoodsMapper {
                 .build();
     }
 
-    public static Goods toEntity(GoodsRequestDto dto) {
+    public static Goods toEntity(GoodsRequestDto dto, com.motionmate.dto.exercise.S3FileRequest imageInfo) {
         return new Goods(
                 dto.getName(),
                 dto.getDescription(),
-                dto.getImageUrl(),
-                dto.getBucketKey(),
+                imageInfo.url(),
+                imageInfo.bucketKey(),
                 dto.getStock(),
                 dto.getPrice(),
                 dto.getLimited(),
@@ -62,6 +62,7 @@ public class GoodsMapper {
                 JsonUtil.toJsonArray(dto.getSizes())
         );
     }
+
 
     public static List<GoodsResponseDto> toDtoList(List<Goods> goodsList, LimitedGoodsRedisService redisService){
         return goodsList.stream()
