@@ -41,7 +41,7 @@ public class User {
     // User 클래스에 필드 추가
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private Role role = Role.USER;
 
     @Column(name = "following_count")
     private int followingCount = 0;
@@ -69,7 +69,7 @@ public class User {
         this.oauthNickname = oauthNickname;
         this.provider = provider;
         this.profile = profile;
-        this.role = role;
+        this.role = Role.USER;
 
     }
 

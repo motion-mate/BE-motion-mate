@@ -285,7 +285,7 @@ public class FeedService {
        });
 
        Long writerId = repository.findWriterIdByFeedId(feedId);
-       if(!Objects.equals(writerId, user.getId())) {
+       if(!Objects.equals(writerId, user.getId()) && !user.getRole().equals(User.Role.ADMIN)) {
            throw new CustomException(HttpStatus.FORBIDDEN, "삭제 권한이 없습니다");
        }
        repository.deleteById(feedId);

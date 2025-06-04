@@ -15,6 +15,10 @@ public class Banner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String title;           // ✅ 배너 제목
+    private String link;            // ✅ 클릭 시 이동할 링크
+
     private String imageUrl;
     private String bucketKey;
 
@@ -28,9 +32,8 @@ public class Banner {
     @PrePersist
     public void onCreate(){
         this.createdAt = LocalDateTime.now();
-        if(visible && startDate == null){
+        if (visible && startDate == null) {
             this.startDate = LocalDateTime.now();
         }
     }
-
 }
