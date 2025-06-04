@@ -25,7 +25,7 @@ public class FeedCommentController {
             @PathVariable Long feedId,
             @AuthenticationPrincipal CustomOAuth2User user,
             @RequestBody FeedCommentRequestDto dto) {
-        FeedCommentResponseDto response = feedCommentService.createComment(feedId, user.getUserId(), dto);
+        FeedCommentResponseDto response = feedCommentService.createComment(feedId, user.getUser(), dto);
         return ResponseEntity.ok(response);
     }
 
@@ -54,7 +54,7 @@ public class FeedCommentController {
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomOAuth2User user) {
-        feedCommentService.deleteComment(commentId, user.getUserId());
+        feedCommentService.deleteComment(commentId, user.getUser());
         return ResponseEntity.noContent().build();
     }
 

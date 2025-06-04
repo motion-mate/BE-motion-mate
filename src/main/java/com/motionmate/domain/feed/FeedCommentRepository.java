@@ -13,12 +13,6 @@ public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> 
     //해당 피드에 달린 댓글 수
     int countByFeed(Feed feed);
 
-    @EntityGraph(attributePaths = {"user", "user.profile"})
-    List<FeedComment> findByFeedOrderByCreatedAtDesc(Feed feed);
-
-    List<FeedComment> findTop10ByFeedOrderByCreatedAtDesc(Feed feed);
-
-
     @Query("SELECT fc.feed.id, COUNT(fc) FROM FeedComment fc WHERE fc.feed.id IN :feedIds GROUP BY fc.feed.id")
     List<Object[]> countByFeedIds (@Param("feedIds") List<Long> feedIds);
 
@@ -35,7 +29,9 @@ public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> 
             "ORDER BY fc.createdAt DESC")
     List<FeedComment> findWithUserProfileByFeedId(@Param("feedId") Long feedId);
 
-
-
+    @Query("SELECT fc FROM FeedComment fc " +
+            "JOIN FETCH fc.user u " +
+            "WHERE fc.id = :commentId")
+    Optional<FeedComment> findWithUserById(@Param("commentId") Long commentId);
 
 }

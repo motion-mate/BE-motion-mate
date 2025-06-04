@@ -44,12 +44,17 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                ).exceptionHandling(exception ->
+                        exception.authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        })
                 )
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // ✅ 공개 허용 경로 (GET만 허용)
                         .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/reissue").permitAll()
                         .requestMatchers("/ws-stomp/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/feeds/**").permitAll()

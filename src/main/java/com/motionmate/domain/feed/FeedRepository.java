@@ -13,18 +13,18 @@ import java.util.Optional;
 
 public interface FeedRepository extends JpaRepository<Feed, Long> {
 
-    //커서 기반 페이징용 메서드
-
+    //내 피드 조회용
     @Query("SELECT DISTINCT f FROM Feed f " +
             "JOIN FETCH f.user u " +
             "JOIN FETCH u.profile " +
             "WHERE u.id = :userId ORDER BY f.id DESC")
     List<Feed> findFeedsWithUserAndProfileByUserId(@Param("userId") Long userId);
 
+    //커서 기반 페이징을 위한 피드 ID 목록 조회
     @Query("SELECT f.id FROM Feed f WHERE (:lastFeedId IS NULL OR f.id < :lastFeedId) ORDER BY f.id DESC")
     List<Long> findFeedIds(@Param("lastFeedId") Long lastFeedId, Pageable pageable);
 
-
+    //N+1 방지를 위한 전체 피드 목록 조회용
     @Query("SELECT DISTINCT f FROM Feed f " +
             "JOIN FETCH f.user u " +
             "JOIN FETCH u.profile " +
