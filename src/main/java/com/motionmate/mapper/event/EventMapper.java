@@ -11,10 +11,14 @@ public class EventMapper {
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .imageUrl(dto.getImageUrl())
+                .orgName(dto.getOrgName())           // ✅ 추가
+                .bucketKey(dto.getBucketKey())       // ✅ 추가
                 .type(dto.getType())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .stock(dto.getStock())
+                .hidden(false)                       // ✅ 명시적으로
+                .manualDeactivated(dto.isManualDeactivated()) // ✅ 추가
                 .build();
     }
 
@@ -24,10 +28,13 @@ public class EventMapper {
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .imageUrl(event.getImageUrl())
+                .orgName(event.getOrgName())
+                .bucketKey(event.getBucketKey())
                 .type(event.getType())
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .active(event.isActive())
+                .hidden(event.isHidden())            // ✅ 누락 보완
                 .stock(event.getStock())
                 .build();
     }
