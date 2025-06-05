@@ -40,7 +40,7 @@ public class GoodsController {
     @GetMapping("/{id}")
     public GoodsResponseDto getGoodsDetail(@PathVariable Long id,
                                            @AuthenticationPrincipal CustomOAuth2User user) {
-        return goodsService.getGoodsDetail(id, user.getUser());
+        return goodsService.getGoodsDetail(id, user.getUser(), user.getUser().getEmail());
     }
 
     // ✅ 상품 수정

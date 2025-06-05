@@ -47,6 +47,43 @@ public class GoodsMapper {
                 .build();
     }
 
+    // 결제 시 email 이 필수라서 toDto 오버로딩
+    public static GoodsResponseDto toDto(Goods goods, boolean liked, LimitedGoodsRedisService redisService, String email) {
+
+        String status;
+
+        int stock = goods.getStock();
+        if (goods.isLimited()) {
+            stock = redisService.getStock(goods.getId()); // Redis 재고 반영
+        }
+
+        if (goods.isHidden()) {
+            status = "HIDDEN";
+        } else if (stock == 0) {
+            status = "SOLD_OUT";
+        } else {
+            status = "FOR_SALE";
+        }
+
+        return GoodsResponseDto.builder()
+                .id(goods.getId())
+                .name(goods.getName())
+                .description(goods.getDescription())
+                .imageUrl(goods.getImageUrl())
+                .price(goods.getPrice())
+                .stock(stock)
+                .liked(liked)
+                .limited(goods.isLimited())
+                .category(goods.getCategory())
+                .subCategory(goods.getSubCategory())
+                .colors(JsonUtil.fromJsonArray(goods.getColorsJson()))
+                .status(status)
+                .sizes(JsonUtil.fromJsonArray(goods.getSizesJson()))
+                .email(email)  // 새 필드 추가
+                .build();
+    }
+
+
     public static Goods toEntity(GoodsRequestDto dto, com.motionmate.dto.exercise.S3FileRequest imageInfo) {
         return new Goods(
                 dto.getName(),

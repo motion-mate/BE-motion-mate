@@ -62,11 +62,11 @@ public class GoodsService {
     }
 
     @Transactional(readOnly = true)
-    public GoodsResponseDto getGoodsDetail(Long goodsId, User user) {
+    public GoodsResponseDto getGoodsDetail(Long goodsId, User user, String email) {
         Goods goods = goodsRepository.findById(goodsId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
         boolean liked = goodsLikeRepository.existsByUserAndGoods(user, goods);
-        return GoodsMapper.toDto(goods, liked, limitedGoodsRedisService);
+        return GoodsMapper.toDto(goods, liked, limitedGoodsRedisService, email);
     }
 
     @Transactional
