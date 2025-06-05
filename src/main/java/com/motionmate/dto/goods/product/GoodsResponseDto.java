@@ -34,5 +34,5 @@ public class GoodsResponseDto {
     private boolean hidden; // ✅ 이 줄 추가
 
 
-
+    private String email;
 }
