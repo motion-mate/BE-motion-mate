@@ -16,6 +16,8 @@ public class GoodsResponseDto {
     private String name;
     private String description;
     private String imageUrl;
+    private String bucketKey;
+    private String orgName;
     private int price;
     private int stock;
     private boolean soldOut; // ✅ 이 필드 추가 (Redis 기준)
@@ -29,6 +31,8 @@ public class GoodsResponseDto {
 
     private List<String> colors;
     private List<String> sizes;
+    private boolean hidden; // ✅ 이 줄 추가
+
 
 
 }
