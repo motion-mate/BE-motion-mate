@@ -73,8 +73,19 @@ public class GoodsService {
     public void updateGoods(Long id, GoodsRequestDto dto) {
         Goods goods = goodsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+        if (dto.getImage() != null && dto.getImage().bucketKey().startsWith("temp/")) {
+            // ✅ 기존 이미지 먼저 삭제
+            s3ServiceUtils.deleteFile(goods.getBucketKey());
+
+            // ✅ 새 이미지 이동 후 대체
+            S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(dto.getImage(), 101); // 실제 유저 ID로 교체
+            goods.updateImage(moved);
+        }
+
         goods.update(dto.getName(), dto.getDescription(), dto.getPrice(), dto.getStock());
     }
+
 
     @Transactional
     public void deleteGoods(Long id) {
@@ -101,5 +112,19 @@ public class GoodsService {
     public List<GoodsResponseDto> getRecommendedGoods(){
         List<Goods> goodsList = goodsRepository.findTop3ByOrderByCreatedAtDesc();
         return GoodsMapper.toDtoList(goodsList, limitedGoodsRedisService);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GoodsResponseDto> getGoodsListForAdmin() {
+        return goodsRepository.findAll().stream()
+                .map(goods -> GoodsMapper.toDto(goods, false, limitedGoodsRedisService))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public GoodsResponseDto getGoodsById(Long id) {
+        Goods goods = goodsRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        return GoodsMapper.toDto(goods, false, limitedGoodsRedisService);
     }
 }

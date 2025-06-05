@@ -35,6 +35,8 @@ public class GoodsMapper {
                 .name(goods.getName())
                 .description(goods.getDescription())
                 .imageUrl(goods.getImageUrl())
+                .bucketKey(goods.getBucketKey())  // ✅ 추가
+                .orgName(goods.getOrgName())      // ✅ 추가
                 .price(goods.getPrice())
                 .stock(stock)
                 .liked(liked)
@@ -43,6 +45,7 @@ public class GoodsMapper {
                 .subCategory(goods.getSubCategory())
                 .colors(JsonUtil.fromJsonArray(goods.getColorsJson()))
                 .status(status)
+                .hidden(goods.isHidden()) // ✅ 이 줄 추가
                 .sizes(JsonUtil.fromJsonArray(goods.getSizesJson()))
                 .build();
     }
@@ -90,6 +93,7 @@ public class GoodsMapper {
                 dto.getDescription(),
                 imageInfo.url(),
                 imageInfo.bucketKey(),
+                imageInfo.orgName(),
                 dto.getStock(),
                 dto.getPrice(),
                 dto.getLimited(),

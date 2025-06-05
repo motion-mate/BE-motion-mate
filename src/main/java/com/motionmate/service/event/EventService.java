@@ -27,6 +27,7 @@ public class EventService {
     // ✅ 1. 이벤트 생성
     public Event createEvent(EventRequestDto dto) {
         Event event = EventMapper.toEntity(dto);
+        event.updateActiveStatus(); // ✅ 자동 설정
         return eventRepository.save(event);
     }
 
@@ -82,11 +83,14 @@ public class EventService {
                 dto.getTitle(),
                 dto.getDescription(),
                 dto.getImageUrl(),
+                dto.getOrgName(),
+                dto.getBucketKey(),
                 dto.getType(),
                 dto.getStartDate(),
                 dto.getEndDate(),
                 dto.getStock()
         );
+        event.updateActiveStatus();
     }
 
     // ✅ 6. 이벤트 숨김 처리 (soft delete)
@@ -94,5 +98,17 @@ public class EventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "이벤트 없음"));
         event.deactivate(); // active = false
+    }
+
+    public void hideEvent(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "이벤트 없음"));
+        event.hide();
+    }
+
+    public void unhideEvent(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "이벤트 없음"));
+        event.unhide();
     }
 }
