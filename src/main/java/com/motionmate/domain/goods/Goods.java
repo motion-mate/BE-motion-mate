@@ -1,5 +1,6 @@
 package com.motionmate.domain.goods;
 
+import com.motionmate.dto.exercise.S3FileResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class Goods {
     private String imageUrl;
     @Column(nullable = false)
     private String bucketKey;
-
+    private String orgName;
     @Column(nullable = false)
     private Integer stock = 0;
 
@@ -57,13 +58,14 @@ public class Goods {
     @Column(columnDefinition = "TEXT")
     private String sizesJson;
 
-    public Goods(String name, String description, String imageUrl,String bucketKey, Integer stock, Integer price,
+    public Goods(String name, String description, String imageUrl,String bucketKey,String orgName, Integer stock, Integer price,
                  boolean isLimited, String category, String subCategory,
                  String colorsJson, String sizesJson) {
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
         this.bucketKey = bucketKey;
+        this.orgName = orgName; // ✅ 추가
         this.stock = stock;
         this.price = price;
         this.isLimited = isLimited;
@@ -80,6 +82,13 @@ public class Goods {
         }
         this.stock -= quantity;
     }
+
+    public void updateImage(S3FileResponse moved) {
+        this.bucketKey = moved.bucketKey();
+        this.orgName = moved.orgName();
+        this.imageUrl = moved.url();
+    }
+
 
     public void update(String name, String description, int price, int stock) {
         this.name = name;
