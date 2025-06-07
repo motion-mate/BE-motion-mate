@@ -44,11 +44,9 @@ public class OrderController {
     @GetMapping
     public List<OrderResponseDto> getOrders(@AuthenticationPrincipal CustomOAuth2User userPrincipal) {
         User user = userPrincipal.getUser();
-        List<Order> orders = orderRepository.findByUser(user);
-        return orders.stream()
-                .map(orderMapper::toResponseDto)
-                .toList();
+        return orderService.getOrders(user); // ✅ 서비스 계층 호출로 교체
     }
+
 
 
 
