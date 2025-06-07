@@ -56,10 +56,22 @@ public class GoodsService {
 
     @Transactional(readOnly = true)
     public List<GoodsResponseDto> getGoodsList(User user) {
-        return goodsRepository.findAllByHiddenFalse().stream()
-                .map(goods -> GoodsMapper.toDto(goods, goodsLikeRepository.existsByUserAndGoods(user, goods), limitedGoodsRedisService))
+        List<Goods> goodsList = goodsRepository.findAllByHiddenFalse();
+        List<Long> goodsIds = goodsList.stream()
+                .map(Goods::getId)
+                .toList();
+
+        List<Long> likedGoodsIds = goodsLikeRepository.findLikedGoodsIdsByUserAndGoodsIds(user, goodsIds);
+
+        return goodsList.stream()
+                .map(goods -> GoodsMapper.toDto(
+                        goods,
+                        likedGoodsIds.contains(goods.getId()), // ✅ 좋아요 여부 직접 매핑
+                        limitedGoodsRedisService
+                ))
                 .toList();
     }
+
 
     @Transactional(readOnly = true)
     public GoodsResponseDto getGoodsDetail(Long goodsId, User user, String email) {

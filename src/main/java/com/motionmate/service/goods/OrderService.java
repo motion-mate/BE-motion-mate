@@ -95,7 +95,7 @@ public class OrderService {
      */
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrders(User user) {
-        return orderRepository.findByUser(user).stream()
+        return orderRepository.findAllWithAllData(user).stream() // ✅ 여기!
                 .map(orderMapper::toResponseDto)
                 .toList();
     }

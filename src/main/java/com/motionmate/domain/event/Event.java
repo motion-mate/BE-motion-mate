@@ -40,7 +40,6 @@ public class Event {
     private boolean active;
     private boolean manualDeactivated;
 
-    // 선착순 재고: GIVEAWAY일 때만 사용
     private Integer stock;
 
     @CreationTimestamp
