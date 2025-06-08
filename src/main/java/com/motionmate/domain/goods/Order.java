@@ -1,6 +1,7 @@
 package com.motionmate.domain.goods;
 
 import com.motionmate.domain.delivery.Delivery;
+import com.motionmate.domain.payment.Payment;
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,6 +45,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
 
     /**
      * 연관관계 세팅용 (Order → OrderItem)
