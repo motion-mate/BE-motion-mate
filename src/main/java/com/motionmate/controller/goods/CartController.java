@@ -43,7 +43,8 @@ public class CartController {
 
     // ✅ 장바구니 목록 조회
     @GetMapping
-    public List<CartItemResponseDto> getCartList(@AuthenticationPrincipal User user) {
-        return cartService.getCartList(user);
+    public List<CartItemResponseDto> getCartList(@AuthenticationPrincipal CustomOAuth2User customUser) {
+        System.out.println(">>>> user id: " + customUser.getUser().getId());
+        return cartService.getCartList(customUser.getUser());
     }
 }
