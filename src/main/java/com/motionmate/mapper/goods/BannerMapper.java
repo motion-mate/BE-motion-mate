@@ -28,11 +28,14 @@ public class BannerMapper {
     public static BannerResponseDto toResponseDto(Banner banner) {
         return BannerResponseDto.builder()
                 .id(banner.getId())
-                .title(banner.getTitle())                  // ✅ title 추가
-                .link(banner.getLink())                    // ✅ link 추가
+                .title(banner.getTitle())
+                .link(banner.getLink())
                 .imageUrl(banner.getImageUrl())
+                .bucketKey(banner.getBucketKey()) // ✅ 추가
                 .orderIndex(banner.getOrderIndex())
                 .visible(banner.isVisible())
+                .startDate(banner.getStartDate()) // ✅ 추가
+                .endDate(banner.getEndDate())     // ✅ 추가
                 .build();
     }
 }
