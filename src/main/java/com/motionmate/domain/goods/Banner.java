@@ -1,5 +1,7 @@
 package com.motionmate.domain.goods;
 
+import com.motionmate.dto.exercise.S3FileRequest;
+import com.motionmate.dto.goods.banner.BannerRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,6 +40,20 @@ public class Banner {
         if (visible && startDate == null) {
             this.startDate = LocalDateTime.now();
         }
+    }
+
+    public void updateInfo(BannerRequestDto dto) {
+        this.title = dto.getTitle();
+        this.link = dto.getLink();
+        this.orderIndex = dto.getOrderIndex();
+        this.visible = dto.isVisible();
+        this.startDate = dto.getStartDate();
+        this.endDate = dto.getEndDate();
+    }
+
+    public void updateImage(S3FileRequest image) {
+        this.imageUrl = image.url();
+        this.bucketKey = image.bucketKey();
     }
 
 }
