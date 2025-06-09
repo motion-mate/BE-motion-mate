@@ -5,6 +5,7 @@ import com.motionmate.domain.goods.*;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.goods.cart.CartItemRequestDto;
 import com.motionmate.dto.goods.cart.CartItemResponseDto;
+import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.mapper.goods.CartItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
