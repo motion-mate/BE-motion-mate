@@ -8,7 +8,7 @@ WORKDIR /app
 # 예시:
 # - 원본 파일: build/libs/[프로젝트명]-0.0.1-SNAPSHOT.jar
 # - 복사 후: /app/app.jar
-COPY build/libs/BE-MOTION-MATE-0.0.1-SNAPSHOT.jar app.jar
+COPY build/libs/motionmate-0.0.1-SNAPSHOT.jar app.jar
 
 # 애플리케이션 실행
 # app.jar로 실행 (복사된 파일명 사용)
