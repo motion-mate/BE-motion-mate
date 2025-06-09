@@ -25,7 +25,7 @@ pipeline {
                 // Docker 이미지 빌드
                 // -t: 태그 지정
                 // .: 현재 디렉토리의 Dockerfile 사용
-                sh 'docker build -t BE-MOTION-MATE:latest .'
+                sh 'docker build -t be-motion-mate:latest .'
             }
         }
 
