@@ -11,6 +11,7 @@ import com.motionmate.mapper.s3.S3FileMapper;
 import com.motionmate.utils.S3ServiceUtils;
 import com.motionmate.service.s3.S3FileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -71,5 +72,40 @@ public class BannerService {
 
         s3FileService.deleteFile(banner.getBucketKey());         // S3에서 파일 삭제
         bannerRepository.delete(banner);                         // DB에서 삭제
+    }
+
+    public List<BannerResponseDto> getAllBannerList() {
+        return bannerRepository.findAll(Sort.by(Sort.Direction.ASC, "orderIndex"))
+                .stream()
+                .map(BannerMapper::toResponseDto)
+                .toList();
+    }
+
+    public BannerResponseDto getBannerById(Long id) {
+        Banner banner = bannerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("배너를 찾을 수 없습니다."));
+        return BannerMapper.toResponseDto(banner);
+    }
+
+    public BannerResponseDto updateBanner(Long id, BannerRequestDto dto) {
+        Banner banner = bannerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("배너를 찾을 수 없습니다."));
+
+        S3FileRequest image = dto.getImage();
+        int userPk = 103;
+
+        if (image != null && !image.bucketKey().equals(banner.getBucketKey())) {
+            // 기존 이미지 삭제
+            s3FileService.deleteFile(banner.getBucketKey());
+
+            // 새 이미지 처리
+            S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(image, userPk);
+            image = S3FileMapper.toS3FileRequest(moved);
+            banner.updateImage(image); // 아래에 정의 필요
+            s3ServiceUtils.deleteUserTempFiles(userPk);
+        }
+
+        banner.updateInfo(dto); // 아래에 정의 필요
+        return BannerMapper.toResponseDto(banner);
     }
 }
