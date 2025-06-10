@@ -59,7 +59,7 @@ public class LogoutController {
                 .secure(false)
                 .maxAge(0)
                 .sameSite("Lax")
-                .domain("localhost")
+                .domain("52.79.118.166")
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
@@ -68,7 +68,7 @@ public class LogoutController {
                 .secure(false)
                 .maxAge(0)
                 .sameSite("Lax")
-                .domain("localhost")
+                .domain("52.79.118.166")
                 .build();
 
         ResponseCookie userIdCookie = ResponseCookie.from("userId", "")
@@ -76,7 +76,7 @@ public class LogoutController {
                 .secure(false)
                 .maxAge(0)
                 .sameSite("Lax")
-                .domain("localhost")
+                .domain("52.79.118.166")
                 .build();
 
         ResponseCookie jsessionidCookie = ResponseCookie.from("JSESSIONID", "")
@@ -84,7 +84,7 @@ public class LogoutController {
                 .maxAge(0)
                 .sameSite("Lax")
                 .secure(false)
-                .domain("localhost")
+                .domain("52.79.118.166")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, tokenCookie.toString());

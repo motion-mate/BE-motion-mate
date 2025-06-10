@@ -21,17 +21,17 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
         tokenCookie.setSecure(false); // 🔥 배포 시 true
         tokenCookie.setPath("/");
         tokenCookie.setMaxAge(0);
-        tokenCookie.setDomain("localhost"); // 🔥 이거 반드시 추가
+        tokenCookie.setDomain("52.79.118.166"); // 🔥 이거 반드시 추가
         response.addCookie(tokenCookie);
 
         Cookie userIdCookie = new Cookie("userId", null);
         userIdCookie.setSecure(false);
         userIdCookie.setPath("/");
         userIdCookie.setMaxAge(0);
-        userIdCookie.setDomain("localhost"); // 🔥 이것도!
+        userIdCookie.setDomain("52.79.118.166"); // 🔥 이것도!
         response.addCookie(userIdCookie);
 
         // ✅ 리다이렉트
-        response.sendRedirect("http://localhost:3000/main");
+        response.sendRedirect("http://52.79.118.166:3000/main");
     }
 }

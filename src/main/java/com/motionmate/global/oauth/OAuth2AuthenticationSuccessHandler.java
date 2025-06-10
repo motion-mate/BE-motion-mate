@@ -48,9 +48,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 // ✅ 리다이렉트 URL 분기
         String redirectUrl;
         if (isRegistered) {
-            redirectUrl = "http://localhost:3000/social/success?userId=" + userId + "&loginSuccess=true";
+            redirectUrl = "http://52.79.118.166:3000/social/success?userId=" + userId + "&loginSuccess=true";
         } else {
-            redirectUrl = "http://localhost:3000/profile/register?userId=" + userId + "&loginSuccess=true";
+            redirectUrl = "http://52.79.118.166:3000/profile/register?userId=" + userId + "&loginSuccess=true";
         }
 
         log.info("🔀 리다이렉트 URL: {}", redirectUrl); // ✅ 로그 추가
