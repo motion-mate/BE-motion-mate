@@ -16,6 +16,7 @@ public class UserProfileDto {
     private Long userId;
     private String nickname;
     private String profileImageUrl;
+    private String role;
 
     private String bio;
     private String goal;

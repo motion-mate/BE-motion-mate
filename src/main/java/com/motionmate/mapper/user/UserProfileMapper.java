@@ -40,6 +40,7 @@ public class UserProfileMapper {
                 .birthDate(profile != null ? profile.getBirthDate() : null)
                 .followerCount(followerCount)
                 .followingCount(followingCount)
+                .role(user.getRole().name())
                 .build();
     }
 
@@ -50,6 +51,6 @@ public class UserProfileMapper {
     }
 
     public static void updateFromDto(UserProfile profile, UserProfileRegisterRequestDto dto) {
-        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl());
+        profile.updateProfile(dto.getNickname(), dto.getBio(), dto.getGoal(), dto.getBirthDate(), dto.getProfileImageUrl(), dto.getBucketKey());
     }
 }

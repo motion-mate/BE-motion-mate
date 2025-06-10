@@ -14,16 +14,16 @@ import java.time.LocalDateTime;
 public class  ChatMessage {
 
     public enum MessageType {
-        ENTER, TALK, QUIT
+        ENTER, TALK, EXIT, LEAVE
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User sender; // 수신자
 
     private String message; // 메시지

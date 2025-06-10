@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Delivery {
+public class    Delivery {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

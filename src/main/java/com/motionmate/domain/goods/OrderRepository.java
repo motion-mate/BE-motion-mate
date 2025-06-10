@@ -18,4 +18,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     boolean existsByUserAndGoods(@Param("user") User user, @Param("goods") Goods goods);
 
     List<Order> findByUser(User user);  // ✅ 사용자 주문 목록 조회
+
+    @Query("SELECT o FROM Order o " +
+            "JOIN FETCH o.delivery " +
+            "JOIN FETCH o.orderItems oi " +
+            "JOIN FETCH oi.goods " +
+            "WHERE o.user = :user")
+    List<Order> findAllWithAllData(@Param("user") User user);
 }

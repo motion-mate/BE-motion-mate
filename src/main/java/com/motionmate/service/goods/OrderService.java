@@ -14,6 +14,7 @@ import com.motionmate.mapper.delivery.DeliveryMapper;
 import com.motionmate.mapper.goods.OrderMapper;
 import com.motionmate.domain.goods.GoodsRepository;
 
+import com.motionmate.service.redis.LimitedGoodsRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final GoodsRepository goodsRepository;
     private final OrderMapper orderMapper;
+    private final LimitedGoodsRedisService limitedGoodsRedisService;
+
 
     /**
      * 주문 생성
@@ -47,6 +50,33 @@ public class OrderService {
 
         // 4. 주문상품 생성
         List<OrderItem> orderItems = orderMapper.toOrderItemEntityList(requestDto.getItems(), goodsList);
+
+        // ✅ 낙관적 락 기반 재고 감소
+        for (OrderItem item : orderItems) {
+            Goods goods = item.getGoods();
+            int quantity = item.getQuantity();
+
+            if (goods.isLimited()) {
+                boolean success = limitedGoodsRedisService.tryDecreaseStock(goods.getId(), quantity);
+                if (!success) {
+                    throw new CustomException(HttpStatus.CONFLICT, "한정 상품 '" + goods.getName() + "'의 재고가 부족합니다.");
+                }
+                int remain = limitedGoodsRedisService.getStock(goods.getId());
+                if (remain == 0) {
+                    goods.markSoldOut(); // Redis 기준 SOLD_OUT 처리
+                }
+            } else {
+                try {
+                    goods.decreaseStock(quantity);
+                    if (goods.getStock() == 0) {
+                        goods.markSoldOut(); // ✅ 일반 상품도 SOLD_OUT 처리 추가
+                    }
+                } catch (Exception e) {
+                    throw new CustomException(HttpStatus.CONFLICT, "상품 '" + goods.getName() + "'의 재고가 부족합니다.");
+                }
+            }
+        }
+
         order.applyOrderItems(orderItems);
 
         // ✅ 5. 배송 정보 생성 및 연결
@@ -65,7 +95,7 @@ public class OrderService {
      */
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrders(User user) {
-        return orderRepository.findByUser(user).stream()
+        return orderRepository.findAllWithAllData(user).stream() // ✅ 여기!
                 .map(orderMapper::toResponseDto)
                 .toList();
     }
@@ -87,6 +117,18 @@ public class OrderService {
         }
 
         return orderMapper.toResponseDto(order);
+    }
+
+    // ✅ 관리자용: Redis 한정상품 재고 조회
+    @Transactional(readOnly = true)
+    public int getLimitedGoodsStock(Long goodsId) {
+        return limitedGoodsRedisService.getStock(goodsId);
+    }
+
+    // ✅ 관리자용: Redis 한정상품 재고 수정
+    @Transactional
+    public void updateLimitedGoodsStock(Long goodsId, int quantity) {
+        limitedGoodsRedisService.setInitialStock(goodsId, quantity);
     }
 
 }

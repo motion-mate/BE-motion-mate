@@ -19,10 +19,10 @@ public class FeedComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Feed feed;
 
     private String content;
@@ -41,6 +41,8 @@ public class FeedComment {
     }
 
     public void updateContent(String content){
+
         this.content = content;
+        this.updatedAt = LocalDateTime.now();
     }
 }

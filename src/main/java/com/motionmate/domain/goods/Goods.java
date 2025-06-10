@@ -1,9 +1,13 @@
 package com.motionmate.domain.goods;
 
+import com.motionmate.dto.exercise.S3FileResponse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -25,7 +29,9 @@ public class Goods {
     private String name;
     private String description;
     private String imageUrl;
-
+    @Column(nullable = false)
+    private String bucketKey;
+    private String orgName;
     @Column(nullable = false)
     private Integer stock = 0;
 
@@ -34,6 +40,13 @@ public class Goods {
     private boolean isLimited;
     private String category;
     private String subCategory;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Version // ✅ 낙관적 락 버전 필드 추가
+    private Long version;
+
     @Column(nullable = false)
     private boolean hidden = false;
 
@@ -45,12 +58,14 @@ public class Goods {
     @Column(columnDefinition = "TEXT")
     private String sizesJson;
 
-    public Goods(String name, String description, String imageUrl, Integer stock, Integer price,
+    public Goods(String name, String description, String imageUrl,String bucketKey,String orgName, Integer stock, Integer price,
                  boolean isLimited, String category, String subCategory,
                  String colorsJson, String sizesJson) {
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.bucketKey = bucketKey;
+        this.orgName = orgName; // ✅ 추가
         this.stock = stock;
         this.price = price;
         this.isLimited = isLimited;
@@ -68,6 +83,13 @@ public class Goods {
         this.stock -= quantity;
     }
 
+    public void updateImage(S3FileResponse moved) {
+        this.bucketKey = moved.bucketKey();
+        this.orgName = moved.orgName();
+        this.imageUrl = moved.url();
+    }
+
+
     public void update(String name, String description, int price, int stock) {
         this.name = name;
         this.description = description;
@@ -75,6 +97,10 @@ public class Goods {
         this.stock = stock;
         this.status = stock == 0 ? GoodsStatus.SOLD_OUT : GoodsStatus.FOR_SALE; // ✅ 상태 동기화
 
+    }
+
+    public void markSoldOut() {
+        this.status = GoodsStatus.SOLD_OUT;
     }
 
 //    public boolean isHidden() {

@@ -3,19 +3,22 @@ package com.motionmate.domain.exercise;
 
 import com.motionmate.domain.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
-@Table(name = "exercise_schedule")
+@Table(name = "exercise_schedule",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uc_schedule_unique", // 제약조건 이름 (명시적으로 지정)
+                columnNames = {"user_id", "date", "exercise_id", "set_number"}
+        ))
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Builder
 public class ExerciseSchedule {
 
     @Id

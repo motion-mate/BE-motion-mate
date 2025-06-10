@@ -3,6 +3,7 @@ package com.motionmate.mapper.feed;
 import com.motionmate.domain.feed.Feed;
 import com.motionmate.domain.feed.FeedImage;
 import com.motionmate.domain.user.User;
+import com.motionmate.domain.user.UserProfile;
 import com.motionmate.dto.feed.FeedDetailResponseDto;
 import com.motionmate.dto.feed.FeedRequestDto;
 import com.motionmate.dto.feed.FeedResponseDto;
@@ -19,14 +20,26 @@ public class FeedMapper {
     }
 
     //entity -> FeedResponseDto
-    public static FeedResponseDto fromEntity(Feed entity, boolean liked, int likeCount, int commentCount, boolean isFollowing){
-        String imageUrl = entity.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
+    public static FeedResponseDto fromEntity(
+            Feed entity,
+            boolean liked,
+            int likeCount,
+            int commentCount,
+            boolean isFollowing,
+            String imageUrl
+    ) {
+
+        User user = entity.getUser();
+        Long userId = user.getId();
+        UserProfile profile = user.getProfile();
+        String nickName = profile.getNickname();
+        String profileImageUrl = profile.getProfileImageUrl();
 
         return FeedResponseDto.builder()
                 .id(entity.getId())
-                .userId(entity.getUser().getId())
-                .nickname(entity.getUser().getProfile().getNickname())
-                .profileImageUrl(entity.getUser().getProfile().getProfileImageUrl())
+                .userId(userId)
+                .nickname(nickName)
+                .profileImageUrl(profileImageUrl)
                 .imageUrl(imageUrl)
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())
@@ -40,20 +53,24 @@ public class FeedMapper {
     }
 
     //entity -> FeedResponseDto
-    public static FeedResponseDto fromEntity(Feed entity){
-        return fromEntity(entity, false, 0, 0, false);
+    public static FeedResponseDto fromEntity(Feed entity) {
+        String imageUrl = entity.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
+        return fromEntity(entity, false, 0, 0, false, imageUrl);
     }
+
 
     //entity -> FeedDetailResponseDto
     public static FeedDetailResponseDto fromEntityDetail(Feed entity, boolean liked, int likeCount, int commentCount, boolean isFollowing, Long loginUserId){
         String imageUrl = entity.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
         boolean isAuthor = entity.getUser().getId().equals(loginUserId);
+        User user = entity.getUser();
+        UserProfile profile = user.getProfile();
 
         return FeedDetailResponseDto.builder()
                 .id(entity.getId())
-                .userId(entity.getUser().getId())
-                .nickname(entity.getUser().getProfile().getNickname())
-                .profileImageUrl(entity.getUser().getProfile().getProfileImageUrl())
+                .userId(user.getId())
+                .nickname(profile.getNickname())
+                .profileImageUrl(profile.getProfileImageUrl())
                 .imageUrl(imageUrl)
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())
@@ -69,6 +86,7 @@ public class FeedMapper {
 
     // 오버로딩: isFollowing 기본 false
     public static FeedResponseDto fromEntityLikeMyFeed(Feed feed, boolean liked, int likeCount, int commentCount) {
-        return fromEntity(feed, liked, likeCount, commentCount, false);
+        String imageUrl = feed.getImages().stream().findFirst().map(FeedImage::getUrl).orElse(null);
+        return fromEntity(feed, liked, likeCount, commentCount, false, imageUrl);
     }
 }

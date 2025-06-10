@@ -33,6 +33,16 @@ public class User {
 
     private String provider; // google, kakao, naver 등
 
+    // enum 정의
+    public enum Role {
+        USER, ADMIN
+    }
+
+    // User 클래스에 필드 추가
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+
     @Column(name = "following_count")
     private int followingCount = 0;
 
@@ -53,12 +63,14 @@ public class User {
     private List<Notification> notifications;
 
     @Builder
-    public User(String email, String oauthNickname, String provider, UserProfile profile) {
+    public User(String email, String oauthNickname, String provider, UserProfile profile, Role role) {
         this.email = email;
         //this.password = password;
         this.oauthNickname = oauthNickname;
         this.provider = provider;
         this.profile = profile;
+        this.role = Role.USER;
+
     }
 
     public void connectProfile(UserProfile profile) {
