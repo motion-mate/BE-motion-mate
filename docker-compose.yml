@@ -12,6 +12,15 @@ services:
     # - Jenkins 파이프라인에서 컨테이너 관리
     networks:
       - app-network  # 여기에 네트워크 지정 추가
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
 networks:
   app-network:
     external: true     # 이미 존재하는 네트워크 사용
