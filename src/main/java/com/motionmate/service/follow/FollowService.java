@@ -15,6 +15,7 @@ import com.motionmate.service.notification.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 @Service
 @Getter
+@Slf4j
 public class FollowService {
 
     private final FollowRepository followRepository;
@@ -95,7 +97,8 @@ public class FollowService {
 
     // 내가 팔로우한 유저 목록
     public List<FollowResponseDto> getFollowings(Long userId) {
-        List<Follow> followings = followRepository.findAllByToUser_IdWithUser(userId);
+        log.info("팔로잉 목록 요청 - 유저 ID: {}", userId);
+        List<Follow> followings = followRepository.findAllByFromUser_IdWithUser(userId);
         return followings.stream()
                 .map(follow -> FollowMapper.toDto(follow.getToUser()))
                 .toList();

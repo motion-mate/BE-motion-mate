@@ -14,8 +14,10 @@ CartItemRepository extends JpaRepository<CartItem, Long> {
     List<CartItem> findAllByUser(User user);
 
     // 유저 + 상품 기준으로 기존 장바구니 항목 존재 여부 확인
-    Optional<CartItem> findByUserAndGoods(User user, Goods goods);
+    Optional<CartItem> findByUserAndGoodsAndSizeAndColor(User user, Goods goods, String size, String color);
 
     // 장바구니 항목 삭제 (유저 검증 포함용)
     void deleteByUserAndId(User user, Long id);
+
+    void deleteByIdInAndUser(List<Long> cartItemIds, User user);
 }
