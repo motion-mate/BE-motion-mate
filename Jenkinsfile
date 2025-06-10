@@ -1,6 +1,16 @@
 pipeline {
     agent any  // 모든 Jenkins 에이전트에서 실행 가능
 
+    // 환경 변수 설정
+    environment {
+        // Docker 이미지 이름 설정
+        DOCKER_IMAGE = 'be-motion-mate'
+        // 빌드 번호를 태그로 사용 (버전 관리)
+        DOCKER_TAG = "${BUILD_NUMBER}"
+        // Jenkins Credentials에서 가져올 환경 변수들
+        // 실제 운영 환경에서는 이 값들을 Jenkins Credentials에서 관리
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -16,7 +26,7 @@ pipeline {
                 // Gradle을 사용하여 애플리케이션 빌드
                 // clean: 이전 빌드 결과물 삭제
                 // build: 새로운 빌드 실행
-                sh './gradlew clean build'
+                sh './gradlew clean build -Pprod'
             }
         }
 
@@ -25,7 +35,9 @@ pipeline {
                 // Docker 이미지 빌드
                 // -t: 태그 지정
                 // .: 현재 디렉토리의 Dockerfile 사용
-                sh 'docker build -t be-motion-mate:latest .'
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                // latest 태그도 함께 추가
+                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
             }
         }
 
@@ -34,9 +46,16 @@ pipeline {
                 // 이전 컨테이너와 네트워크 정리
                 // --remove-orphans: 관련 없는 컨테이너도 함께 제거
                 sh 'docker-compose down --remove-orphans'
-                // 새로운 컨테이너 시작
+
                 // -d: 백그라운드에서 실행
                 sh 'docker-compose up -d'
+            }
+        }
+        // Cleanup 단계 추가
+        stage('Cleanup') {
+            steps {
+                // 오래된 이미지 정리
+                sh 'docker image prune -f'
             }
         }
     }
