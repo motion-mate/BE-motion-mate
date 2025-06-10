@@ -25,10 +25,13 @@ public class CartService {
         Goods goods = goodsRepository.findById(dto.getGoodsId())
                 .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
 
-        cartItemRepository.findByUserAndGoods(user, goods)
+        cartItemRepository.findByUserAndGoodsAndSizeAndColor(user, goods, dto.getSize(), dto.getColor())
                 .ifPresentOrElse(
                         item -> item.updateQuantity(item.getQuantity() + dto.getQuantity()),
-                        () -> cartItemRepository.save(new CartItem(user, goods, dto.getQuantity()))
+                        () -> {
+                            CartItem newItem = new CartItem(user, goods, dto.getQuantity(), dto.getSize(), dto.getColor());
+                            cartItemRepository.save(newItem);
+                        }
                 );
     }
 
@@ -52,5 +55,9 @@ public class CartService {
         return cartItemRepository.findAllByUser(user).stream()
                 .map(CartItemMapper::toDto)
                 .toList();
+    }
+
+    public void removeFromCartList(User user, List<Long> cartItemId) {
+        cartItemRepository.deleteByIdInAndUser(cartItemId, user);
     }
 }

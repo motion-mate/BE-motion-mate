@@ -36,9 +36,9 @@ public class CartController {
 
     // ✅ 항목 삭제
     @DeleteMapping("/{cartItemId}")
-    public void removeCartItem(@AuthenticationPrincipal User user,
+    public void removeCartItem(@AuthenticationPrincipal CustomOAuth2User user,
                                @PathVariable Long cartItemId) {
-        cartService.removeFromCart(user, cartItemId);
+        cartService.removeFromCart(user.getUser(), cartItemId);
     }
 
     // ✅ 장바구니 목록 조회
@@ -46,5 +46,11 @@ public class CartController {
     public List<CartItemResponseDto> getCartList(@AuthenticationPrincipal CustomOAuth2User customUser) {
         System.out.println(">>>> user id: " + customUser.getUser().getId());
         return cartService.getCartList(customUser.getUser());
+    }
+
+    @DeleteMapping
+    public void removeCartItems(@AuthenticationPrincipal CustomOAuth2User user,
+                                @RequestBody List<Long> cartItemId) {
+        cartService.removeFromCartList(user.getUser(), cartItemId);
     }
 }

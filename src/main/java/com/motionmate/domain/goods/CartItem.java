@@ -26,10 +26,18 @@ public class CartItem {
     // 수량
     private int quantity;
 
-    public CartItem(User user, Goods goods, int quantity) {
+    // 사이즈
+    private String size;
+
+    // 컬러
+    private String color;
+
+    public CartItem(User user, Goods goods, int quantity, String size, String color) {
         this.user = user;
         this.goods = goods;
         this.quantity = quantity;
+        this.size = size;
+        this.color = color;
     }
 
     // 수량 업데이트 (예: 기존 항목 수량 변경 시)
