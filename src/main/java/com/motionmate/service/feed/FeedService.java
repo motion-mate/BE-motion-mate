@@ -277,20 +277,23 @@ public class FeedService {
     //피드 삭제
     @Transactional
     public void delete(Long feedId, User user) {
-       List<String> bucketKeys = feedImageRepository.findBucketKeysByFeedId(feedId);
-       bucketKeys.forEach(key -> {
-           if (key != null && !key.isEmpty()) {
-               s3ServiceUtils.deleteFile(key);
-           }
-       });
+        Feed feed = repository.findById(feedId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "피드를 찾을 수 없습니다"));
 
-       Long writerId = repository.findWriterIdByFeedId(feedId);
-       if(!Objects.equals(writerId, user.getId()) && !user.getRole().equals(User.Role.ADMIN)) {
-           throw new CustomException(HttpStatus.FORBIDDEN, "삭제 권한이 없습니다");
-       }
-       repository.deleteById(feedId);
+        if (!Objects.equals(feed.getUser().getId(), user.getId())) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "삭제 권한이 없습니다");
+        }
+
+        feed.getImages().forEach(image -> {
+            String key = image.getBucketKey();
+            if ( key != null && !key.isEmpty()) {
+                s3ServiceUtils.deleteFile(key);
+            }
+        });
+
+        feedCommentRepository.deleteByFeedId(feedId);
+        feedLikeRepository.deleteByFeedId(feedId);
+        repository.delete(feed);
     }
-
     //내 피드 조회
     public List<FeedResponseDto> getMyFeeds(User loginUser) {
         Long userId = loginUser.getId();

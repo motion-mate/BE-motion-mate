@@ -1,5 +1,7 @@
 package com.motionmate.controller.user;
 
+import com.motionmate.domain.user.UserProfile;
+import com.motionmate.domain.user.UserProfileImageRepository;
 import com.motionmate.dto.user.MainPageUserProfileDto;
 import com.motionmate.dto.user.UserProfileDto;
 import com.motionmate.dto.user.UserProfileRegisterRequestDto;
@@ -7,6 +9,8 @@ import com.motionmate.dto.user.UserProfileUpdateRequestDto;
 import com.motionmate.dto.user.UserResponseDto;
 import com.motionmate.global.oauth.CustomOAuth2User;
 import com.motionmate.service.user.UserService;
+import com.motionmate.utils.S3ServiceUtils;
+import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final UserProfileImageRepository userProfileImageRepository;
+    private final S3ServiceUtils s3ServiceUtils;
 
     @GetMapping("/mainprofile/{userId}")
     public ResponseEntity<MainPageUserProfileDto> getMainPageUserProfile(@PathVariable Long userId) {
@@ -86,5 +92,23 @@ public class UserController {
         return userService.getUserProfile(user.getUserId());
     }
 
+    //프로필 이미지 삭제
+    @DeleteMapping("/profile/image")
+    public ResponseEntity<?> deleteProfileImage(@AuthenticationPrincipal CustomOAuth2User user) {
+        Long userId = user.getUser().getId();
+        UserProfile profile = user.getUser().getProfile();
 
-}
+        userProfileImageRepository.findByUserProfileId(profile.getId()).ifPresent(existing->{
+            profile.setUserProfileImage(null);
+            s3ServiceUtils.deleteFile(existing.getBucketKey());
+            userProfileImageRepository.delete(existing);
+            userProfileImageRepository.flush();
+        });
+
+        return ResponseEntity.noContent().build();
+
+        }
+    }
+
+
+

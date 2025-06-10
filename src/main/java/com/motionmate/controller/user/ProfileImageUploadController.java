@@ -1,4 +1,4 @@
-package com.motionmate.controller.s3;
+package com.motionmate.controller.user;
 
 import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.utils.S3ServiceUtils;
