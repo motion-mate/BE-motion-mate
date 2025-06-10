@@ -11,6 +11,8 @@ public class UserProfileUpdateRequestDto {
     private String goal;
     private LocalDate birthDate;
     private String profileImageUrl;
+    private String bucketKey;
+    private String orgName;
     private int followerCount;
     private int followingCount;
 }

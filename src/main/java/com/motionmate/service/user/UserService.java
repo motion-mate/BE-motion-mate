@@ -1,14 +1,13 @@
 package com.motionmate.service.user;
 
-import com.motionmate.domain.user.User;
-import com.motionmate.domain.user.UserProfile;
-import com.motionmate.domain.user.UserRepository;
+import com.motionmate.domain.user.*;
 import com.motionmate.dto.exercise.S3FileRequest;
 import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.dto.follow.FollowResponseDto;
 import com.motionmate.dto.user.*;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.mapper.follow.FollowMapper;
+import com.motionmate.mapper.s3.S3FileMapper;
 import com.motionmate.mapper.user.UserProfileMapper;
 import com.motionmate.utils.S3ServiceUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final S3ServiceUtils s3ServiceUtils;
+    private final UserProfileImageRepository userProfileImageRepository;
+
+    int userPk = 101;
 
     // 메인페이지 프로필 데이터
     @Transactional(readOnly = true)
@@ -54,12 +56,21 @@ public class UserService {
         String finalImageUrl = dto.getProfileImageUrl();
         String finalBucketKey = dto.getBucketKey();
 
-        if (dto.getBucketKey() != null && !dto.getBucketKey().isBlank()) {
+        if (finalBucketKey != null && !finalBucketKey.isBlank()) {
             S3FileRequest s3FileRequest = new S3FileRequest(finalBucketKey, finalImageUrl, dto.getNickname());
             S3FileResponse movedFile = s3ServiceUtils.moveFromTempToUpload(s3FileRequest, 101);
 
             finalImageUrl = movedFile.url();
             finalBucketKey = movedFile.bucketKey();
+
+            UserProfileImage profileImage = UserProfileImage.builder()
+                    .url(finalImageUrl)
+                    .bucketKey(finalBucketKey)
+                    .orgName(movedFile.orgName())
+                    .userProfile(profile)
+                    .build();
+
+            userProfileImageRepository.save(profileImage);
 
             s3ServiceUtils.deleteUserTempFiles(101);
         }
@@ -155,16 +166,78 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         UserProfile profile = user.getProfile();
-
-        // profile == null 은 일반적으로 발생하지 않지만 방어 코드로 남겨둠
         if (profile == null) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "아직 프로필이 생성되지 않았습니다.");
         }
 
-        // 닉네임은 여기서도 수정 가능 (인스타그램처럼 바꾸는 구조 허용)
-        UserProfileMapper.updateFromDto(profile, dto);
+        UserProfileImage oldImage = userProfileImageRepository.findByUserProfileId(profile.getId()).orElse(null);
 
+
+        String finalImageUrl = profile.getProfileImageUrl();
+        String finalBucketKey = profile.getBucketKey();
+
+        String newImageUrl = dto.getProfileImageUrl();
+        String newBucketKey = dto.getBucketKey();
+
+        boolean isNewImageUploaded = newBucketKey != null
+                && !newBucketKey.isBlank()
+                && !newBucketKey.equals(profile.getBucketKey());
+
+        boolean isImageDeleted =  newBucketKey != null && newBucketKey.isBlank();
+
+        // 새 이미지가 업로드된 경우 → 피드 방식처럼 처리
+        if (isImageDeleted) {
+            // 기존 이미지 삭제
+            if (oldImage != null) {
+                profile.setUserProfileImage(null);
+                s3ServiceUtils.deleteFile(oldImage.getBucketKey());
+                userProfileImageRepository.delete(oldImage);
+                userProfileImageRepository.flush();
+            }
+            finalImageUrl = null;
+            finalBucketKey = null;
+        } else if (isNewImageUploaded) {
+            // 기존 이미지 삭제
+            if (oldImage != null) {
+                profile.setUserProfileImage(null);
+                s3ServiceUtils.deleteFile(oldImage.getBucketKey());
+                userProfileImageRepository.delete(oldImage);
+                userProfileImageRepository.flush();
+            }
+
+            // move 처리
+            S3FileRequest s3FileRequest = new S3FileRequest(newImageUrl, newBucketKey, dto.getOrgName());
+            S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(s3FileRequest, userPk);
+            S3FileRequest imageInfo = S3FileMapper.toS3FileRequest(moved);
+
+            finalImageUrl = imageInfo.url();
+            finalBucketKey = imageInfo.bucketKey();
+
+            // 새 이미지 저장
+            UserProfileImage newImage = UserProfileImage.builder()
+                    .url(imageInfo.url())
+                    .bucketKey(imageInfo.bucketKey())
+                    .orgName(imageInfo.orgName())
+                    .userProfile(profile)
+                    .build();
+
+            userProfileImageRepository.save(newImage);
+            profile.setUserProfileImage(newImage);
+            s3ServiceUtils.deleteUserTempFiles(userPk);
+        }
+
+        // 프로필 정보 업데이트 (닉네임, 바이오 등 포함)
+        profile.updateProfile(
+                dto.getNickname(),
+                dto.getBio(),
+                dto.getGoal(),
+                dto.getBirthDate(),
+                finalImageUrl,
+                finalBucketKey
+        );
     }
+
+
 
 
 //    // TODO 피드 목록

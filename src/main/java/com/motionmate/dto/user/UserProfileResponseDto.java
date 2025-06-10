@@ -13,4 +13,5 @@ public class UserProfileResponseDto {
     private String bio;
     private String goal;
     private LocalDate birthDate;
+    private String profileImageUrl;
 }

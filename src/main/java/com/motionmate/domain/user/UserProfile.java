@@ -16,24 +16,16 @@ public class UserProfile {
     @Column(unique = true)
     private String nickname; // 사용자 설정 닉네임 (중복 불가)
     private String profileImageUrl;
-
-
     private String bio;
     private String goal;
     private LocalDate birthDate;
     private String bucketKey;
 
+    @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserProfileImage userProfileImage;
+
     @Builder
     public UserProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl) {
-        this.nickname = nickname;
-        this.bio = bio;
-        this.goal = goal;
-        this.birthDate = birthDate;
-        this.profileImageUrl = profileImageUrl;
-    }
-
-
-    public void updateProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl) {
         this.nickname = nickname;
         this.bio = bio;
         this.goal = goal;
@@ -65,6 +57,10 @@ public class UserProfile {
                 .birthDate(null)
                 .profileImageUrl(null)
                 .build();
+    }
+
+    public void setUserProfileImage(UserProfileImage userProfileImage) {
+        this.userProfileImage = userProfileImage;
     }
 
 
