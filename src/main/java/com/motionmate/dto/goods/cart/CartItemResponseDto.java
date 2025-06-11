@@ -15,4 +15,7 @@ public class CartItemResponseDto {
     private String imageUrl; // 상품 이미지
     private int price;       // 상품 가격
     private int quantity;    // 담긴 수량
+    private String size;
+    private String color;
+    private boolean soldOut;
 }
