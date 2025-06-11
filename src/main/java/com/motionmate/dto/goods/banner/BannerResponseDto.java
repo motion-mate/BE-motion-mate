@@ -21,6 +21,8 @@ public class BannerResponseDto {
 
     private String bucketKey;
 
+    private String orgName;
+
     private Integer orderIndex;
 
     private boolean visible;

@@ -23,6 +23,7 @@ public class Banner {
 
     private String imageUrl;
     private String bucketKey;
+    private String orgName;
 
     private Integer orderIndex;
     private boolean visible;
@@ -54,6 +55,7 @@ public class Banner {
     public void updateImage(S3FileRequest image) {
         this.imageUrl = image.url();
         this.bucketKey = image.bucketKey();
+        this.orgName = image.orgName();
     }
 
 }

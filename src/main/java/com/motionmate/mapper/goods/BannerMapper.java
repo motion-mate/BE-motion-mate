@@ -32,6 +32,7 @@ public class BannerMapper {
                 .link(banner.getLink())
                 .imageUrl(banner.getImageUrl())
                 .bucketKey(banner.getBucketKey()) // ✅ 추가
+                .orgName(banner.getOrgName())
                 .orderIndex(banner.getOrderIndex())
                 .visible(banner.isVisible())
                 .startDate(banner.getStartDate()) // ✅ 추가
