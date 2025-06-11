@@ -41,14 +41,16 @@ public class FollowController {
 
     // 공개 프로필 팔로우 중인 유저들(following)
     @GetMapping("/followings/{userId}")
-    public ResponseEntity<List<FollowResponseDto>> getFollowings(@PathVariable Long userId) {
-        return ResponseEntity.ok(followService.getFollowings(userId));
+    public ResponseEntity<List<FollowResponseDto>> getFollowings(@PathVariable Long userId,
+                                                                 @AuthenticationPrincipal CustomOAuth2User currentUser) {
+        return ResponseEntity.ok(followService.getFollowings(userId, currentUser.getUserId()));
     }
 
     // 공개 프로필 팔로우한 유저들(follower)
     @GetMapping("/followers/{userId}")
-    public ResponseEntity<List<FollowResponseDto>> getFollowers(@PathVariable Long userId) {
-        return ResponseEntity.ok(followService.getFollowers(userId));
+    public ResponseEntity<List<FollowResponseDto>> getFollowers(@PathVariable Long userId,
+                                                                @AuthenticationPrincipal CustomOAuth2User currentUser) {
+        return ResponseEntity.ok(followService.getFollowers(userId, currentUser.getUserId()));
     }
 
     // 특정유저를 팔로우했는지 유무(중복체크)
@@ -63,13 +65,13 @@ public class FollowController {
     // 내 팔로잉
     @GetMapping("/followings/me")
     public ResponseEntity<List<FollowResponseDto>> getMyFollowings(@AuthenticationPrincipal CustomOAuth2User user) {
-        return ResponseEntity.ok(followService.getFollowings(user.getUserId()));
+        return ResponseEntity.ok(followService.getFollowings(user.getUserId(), user.getUserId()));
     }
 
     // 내 팔로워
     @GetMapping("/followers/me")
     public ResponseEntity<List<FollowResponseDto>> getMyFollowers(@AuthenticationPrincipal CustomOAuth2User user) {
-        return ResponseEntity.ok(followService.getFollowers(user.getUserId()));
+        return ResponseEntity.ok(followService.getFollowers(user.getUserId(), user.getUserId()));
     }
 
     @GetMapping("/counts/{userId}")
