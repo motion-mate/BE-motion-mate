@@ -59,21 +59,21 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
 // 개발환경(localhost)이라면 임시로 Secure, SameSite 조정
         String tokenCookie = String.format(
-                "token=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Strict",
+                "token=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Strict; Domain=52.79.118.166",
                 token,
                 60 * 60 * 24
         );
 
         // ✅ Refresh Token Cookie
         String refreshCookie = String.format(
-                "refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax", // 변경됨
+                "refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax; Domain=52.79.118.166", // 변경됨
                 refreshToken,
                 60 * 60 * 24 * 14
         );
 
 
         String userIdCookie = String.format(
-                "userId=%d; Max-Age=%d; Path=/",
+                "userId=%d; Max-Age=%d; Path=/; Domain=52.79.118.166",
                 userId,
                 60 * 60 * 24
         );
