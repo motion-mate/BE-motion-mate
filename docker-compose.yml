@@ -1,6 +1,7 @@
 # Spring Boot 애플리케이션 배포를 위한 Docker Compose 설정
 services:
   app:  # 서비스 이름 (컨테이너 이름의 접두사로 사용됨)
+    container_name: be-motion-mate-app-1
     image: be-motion-mate:latest  # 사용할 Docker 이미지 (Jenkins 파이프라인에서 빌드한 이미지)
     ports:
       - "8080:8080"  # 포트 매핑 (호스트:컨테이너)
