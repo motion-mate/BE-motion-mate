@@ -1,5 +1,6 @@
 package com.motionmate.service.user;
 
+import com.motionmate.domain.follow.FollowRepository;
 import com.motionmate.domain.user.*;
 import com.motionmate.dto.exercise.S3FileRequest;
 import com.motionmate.dto.exercise.S3FileResponse;
@@ -23,6 +24,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
     private final S3ServiceUtils s3ServiceUtils;
     private final UserProfileImageRepository userProfileImageRepository;
 
@@ -111,11 +113,13 @@ public class UserService {
         int followerCount = user.getFollowers().size();
         int followingCount = user.getFollowings().size();
 
+        List<Long> followingIds = followRepository.findFollowing(userId);
+
         List<FollowResponseDto> followers = user.getFollowers().stream()
-                .map(f -> FollowMapper.toDto(f.getFromUser()))
+                .map(f -> FollowMapper.toDto(f.getFromUser(), followingIds))
                 .toList();
         List<FollowResponseDto> followings = user.getFollowings().stream()
-                .map(f -> FollowMapper.toDto(f.getToUser()))
+                .map(f -> FollowMapper.toDto(f.getToUser(), followingIds))
                 .toList();
         return UserProfileMapper.toUserProfileDto(user, profile);
     }
@@ -144,12 +148,14 @@ public class UserService {
         int followerCount = user.getFollowers().size();
         int followingCount = user.getFollowings().size();
 
+        List<Long> followingIds = followRepository.findFollowing(userId);
+
         List<FollowResponseDto> followers = user.getFollowers().stream()
-                .map(f -> FollowMapper.toDto(f.getFromUser()))
+                .map(f -> FollowMapper.toDto(f.getFromUser(), followingIds))
                 .toList();
 
         List<FollowResponseDto> followings = user.getFollowings().stream()
-                .map(f -> FollowMapper.toDto(f.getToUser()))
+                .map(f -> FollowMapper.toDto(f.getToUser(), followingIds))
                 .toList();
 
         return UserProfileMapper.toUserProfileDto(user, profile);
