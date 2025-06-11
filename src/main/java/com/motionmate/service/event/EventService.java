@@ -7,8 +7,12 @@ import com.motionmate.domain.event.EventRepository;
 import com.motionmate.domain.user.User;
 import com.motionmate.dto.event.EventRequestDto;
 import com.motionmate.dto.event.EventResponseDto;
+import com.motionmate.dto.exercise.S3FileRequest;
+import com.motionmate.dto.exercise.S3FileResponse;
 import com.motionmate.global.exception.CustomException;
 import com.motionmate.mapper.event.EventMapper;
+import com.motionmate.mapper.s3.S3FileMapper;
+import com.motionmate.utils.S3ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,11 +27,25 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final EventParticipationRepository participationRepository;
+    private final S3ServiceUtils s3ServiceUtils;
+    private final int dummyUserPk = 0;
 
     // ✅ 1. 이벤트 생성
     public Event createEvent(EventRequestDto dto) {
-        Event event = EventMapper.toEntity(dto);
-        event.updateActiveStatus(); // ✅ 자동 설정
+        S3FileRequest imageInfo = null;
+
+        if (dto.getBucketKey() != null && !dto.getBucketKey().isBlank()) {
+            imageInfo = new S3FileRequest(dto.getImageUrl(), dto.getBucketKey(), dto.getOrgName());
+
+            // 이동 및 삭제 처리
+            S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(imageInfo, dummyUserPk);
+            imageInfo = S3FileMapper.toS3FileRequest(moved);
+            s3ServiceUtils.deleteUserTempFiles(dummyUserPk);
+        }
+
+        Event event = EventMapper.toEntity(dto, imageInfo);
+        event.updateActiveStatus();
+
         return eventRepository.save(event);
     }
 
