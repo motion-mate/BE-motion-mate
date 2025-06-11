@@ -14,4 +14,5 @@ public class FollowResponseDto {
     private Long userId;
     private String nickname;
     private String profileImageUrl;
+    private boolean isFollowing;
 }
