@@ -21,7 +21,7 @@ public class ChatConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
                 .addInterceptors(jwtHandshakeInterceptor)
-                .setAllowedOrigins("http://52.79.118.166");
+                .setAllowedOrigins("http://motionmate.store");
     }
 
     @Override
