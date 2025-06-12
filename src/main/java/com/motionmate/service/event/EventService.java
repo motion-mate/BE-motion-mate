@@ -97,17 +97,55 @@ public class EventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "이벤트 없음"));
 
+        String oldBucketKey = event.getBucketKey();
+        String newBucketKey = dto.getBucketKey();
+
+        boolean isNewImageUploaded = newBucketKey != null
+                && !newBucketKey.isBlank()
+                && !newBucketKey.equals(oldBucketKey);
+
+        boolean isImageDeleted = newBucketKey != null && newBucketKey.isBlank();
+
+        String finalImageUrl = event.getImageUrl();
+        String finalBucketKey = event.getBucketKey();
+        String finalOrgName = event.getOrgName();
+        // 이미지 삭제 요청
+        if (isImageDeleted) {
+            if (oldBucketKey != null && !oldBucketKey.isBlank()) {
+                s3ServiceUtils.deleteFile(oldBucketKey);
+            }
+            finalImageUrl = null;
+            finalBucketKey = null;
+            finalOrgName = null;
+        }  // 새 이미지가 업로드된 경우
+        else if (isNewImageUploaded) {
+            if (oldBucketKey != null && !oldBucketKey.isBlank()) {
+                s3ServiceUtils.deleteFile(oldBucketKey);
+            }
+
+            S3FileRequest s3FileRequest = new S3FileRequest(dto.getImageUrl(), newBucketKey, dto.getOrgName());
+            S3FileResponse moved = s3ServiceUtils.moveFromTempToUpload(s3FileRequest, 0);
+
+            finalImageUrl = moved.url();
+            finalBucketKey = moved.bucketKey();
+            finalOrgName = moved.orgName();
+
+            s3ServiceUtils.deleteUserTempFiles(0); // 선택
+        }
+
+        // 최종 이벤트 정보 업데이트
         event.update(
                 dto.getTitle(),
                 dto.getDescription(),
-                dto.getImageUrl(),
-                dto.getOrgName(),
-                dto.getBucketKey(),
+                finalImageUrl,
+                finalOrgName,
+                finalBucketKey,
                 dto.getType(),
                 dto.getStartDate(),
                 dto.getEndDate(),
                 dto.getStock()
         );
+
         event.updateActiveStatus();
     }
 
