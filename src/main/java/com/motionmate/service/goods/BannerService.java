@@ -13,6 +13,7 @@ import com.motionmate.service.s3.S3FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -87,6 +88,7 @@ public class BannerService {
         return BannerMapper.toResponseDto(banner);
     }
 
+    @Transactional
     public BannerResponseDto updateBanner(Long id, BannerRequestDto dto) {
         Banner banner = bannerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("배너를 찾을 수 없습니다."));

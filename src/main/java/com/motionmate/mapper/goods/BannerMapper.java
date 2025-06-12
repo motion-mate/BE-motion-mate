@@ -16,6 +16,7 @@ public class BannerMapper {
                 .link(dto.getLink())
                 .imageUrl(image.url())
                 .bucketKey(image.bucketKey())
+                .orgName(image.orgName())
                 .orderIndex(dto.getOrderIndex())
                 .visible(dto.isVisible())
                 .startDate(LocalDateTime.now())
@@ -30,8 +31,11 @@ public class BannerMapper {
                 .id(banner.getId())
                 .title(banner.getTitle())
                 .link(banner.getLink())
-                .imageUrl(banner.getImageUrl())
-                .bucketKey(banner.getBucketKey()) // ✅ 추가
+                .image(new S3FileRequest(
+                        banner.getImageUrl(),
+                        banner.getBucketKey(),
+                        banner.getOrgName()
+                ))
                 .orderIndex(banner.getOrderIndex())
                 .visible(banner.isVisible())
                 .startDate(banner.getStartDate()) // ✅ 추가
