@@ -21,48 +21,55 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        String provider = userRequest.getClientRegistration().getRegistrationId(); // google, naver, kakao
+        String provider = userRequest.getClientRegistration().getRegistrationId(); // google, kakao, naver
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         String email = null;
         String nickname = null;
         String profileImageUrl = null;
+        String socialId = null;
 
         if ("naver".equals(provider)) {
             Map<String, Object> response = (Map<String, Object>) attributes.get("response");
             email = (String) response.get("email");
             nickname = (String) response.get("name");
             profileImageUrl = (String) response.get("profile_image");
+            socialId = (String) response.get("id");
         } else if ("kakao".equals(provider)) {
             Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
             Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-            email = (String) kakaoAccount.get("email"); // 카카오는 email 없을 수도 있음
+            email = (String) kakaoAccount.get("email"); // 카카오는 null 가능
             nickname = (String) profile.get("nickname");
             profileImageUrl = (String) profile.get("profile_image_url");
+            socialId = attributes.get("id").toString();
         } else { // google
             email = (String) attributes.get("email");
             nickname = (String) attributes.get("name");
             profileImageUrl = (String) attributes.get("picture");
+            socialId = attributes.get("sub").toString();
         }
 
-        String principalName = (email != null) ? email : nickname;
+        final String fixedSocialId = socialId;
+        final String fixedEmail = email;
+        final String fixedNickname = nickname;
+        final String fixedProvider = provider;
 
-        final String nicknameFinal = nickname;
+        User user = userRepository.findByProviderAndSocialId(provider, socialId)
+                .orElseGet(() -> {
+                    UserProfile profile = UserProfile.builder().build();
+                    return userRepository.save(
+                            User.builder()
+                                    .email(fixedEmail)
+                                    .oauthNickname(fixedNickname)
+                                    .provider(fixedProvider)
+                                    .socialId(fixedSocialId)
+                                    .profile(profile)
+                                    .role(User.Role.USER)
+                                    .build()
+                    );
+                });
 
-
-        User user = userRepository.findByEmail(principalName)
-            .orElseGet(() -> {
-                UserProfile profile = UserProfile.builder().build();
-                return userRepository.save(
-                        User.builder()
-                                .email(principalName)
-                                .oauthNickname(nicknameFinal)
-                                .provider(provider)
-                                .profile(profile)
-                                .role(User.Role.USER)
-                                .build()
-                );
-            });
         return new CustomOAuth2User(user, attributes);
     }
+
 }
