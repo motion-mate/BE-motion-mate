@@ -33,6 +33,9 @@ public class User {
 
     private String provider; // google, kakao, naver 등
 
+    @Column(nullable = false)
+    private String socialId; // ✅ 소셜 고유 ID (provider별 sub, id)
+
     // enum 정의
     public enum Role {
         USER, ADMIN
@@ -63,11 +66,12 @@ public class User {
     private List<Notification> notifications;
 
     @Builder
-    public User(String email, String oauthNickname, String provider, UserProfile profile, Role role) {
+    public User(String email, String oauthNickname, String provider,String socialId, UserProfile profile, Role role) {
         this.email = email;
         //this.password = password;
         this.oauthNickname = oauthNickname;
         this.provider = provider;
+        this.socialId = socialId;
         this.profile = profile;
         this.role = Role.USER;
 

@@ -1,10 +1,9 @@
 package com.motionmate.controller.routine;
 
-import com.motionmate.domain.exercise.ExerciseSchedule;
 import com.motionmate.domain.exercise.ExerciseScheduleRepository;
 import com.motionmate.dto.exercise.ExerciseScheduleRequest;
 import com.motionmate.dto.routine.*;
-import com.motionmate.service.RoutineService;
+import com.motionmate.service.routine.RoutineService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
