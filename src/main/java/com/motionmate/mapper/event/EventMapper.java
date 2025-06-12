@@ -3,16 +3,17 @@ package com.motionmate.mapper.event;
 import com.motionmate.domain.event.Event;
 import com.motionmate.dto.event.EventRequestDto;
 import com.motionmate.dto.event.EventResponseDto;
+import com.motionmate.dto.exercise.S3FileRequest;
 
 public class EventMapper {
 
-    public static Event toEntity(EventRequestDto dto) {
+    public static Event toEntity(EventRequestDto dto, S3FileRequest imageInfo) {
         return Event.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
-                .imageUrl(dto.getImageUrl())
-                .orgName(dto.getOrgName())           // ✅ 추가
-                .bucketKey(dto.getBucketKey())       // ✅ 추가
+                .imageUrl(imageInfo != null ? imageInfo.url() : null)
+                .orgName(imageInfo != null ? imageInfo.orgName() : null)           // ✅ 추가
+                .bucketKey(imageInfo != null ? imageInfo.bucketKey() : null)     // ✅ 추가
                 .type(dto.getType())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
