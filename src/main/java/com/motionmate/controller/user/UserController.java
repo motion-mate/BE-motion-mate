@@ -37,7 +37,7 @@ public class UserController {
 
     // 최초 닉네임 등록 (회원가입 이후 첫 프로필 설정)
 //    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
-    @PatchMapping("/profile/register")
+    @PostMapping("/profile/register")
     public void registerProfile(@AuthenticationPrincipal CustomOAuth2User user,
                                 @RequestBody UserProfileRegisterRequestDto dto) {
         userService.registerUser(user.getUserId(), dto);
