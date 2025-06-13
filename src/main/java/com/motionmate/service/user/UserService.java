@@ -84,6 +84,8 @@ public class UserService {
                 finalImageUrl,
                 finalBucketKey
         );
+        user.markAsRegistered();
+        userRepository.save(user);
     }
 
 
