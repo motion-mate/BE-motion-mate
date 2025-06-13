@@ -18,6 +18,7 @@ public class UserProfileDto {
     private String nickname;
     private String profileImageUrl;
     private String role;
+    private boolean isRegistered;
 
     private String bio;
     private String goal;
