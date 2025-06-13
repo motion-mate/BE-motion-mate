@@ -25,12 +25,13 @@ public class UserProfile {
     private UserProfileImage userProfileImage;
 
     @Builder
-    public UserProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl) {
+    public UserProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl, String bucketKey) {
         this.nickname = nickname;
         this.bio = bio;
         this.goal = goal;
         this.birthDate = birthDate;
         this.profileImageUrl = profileImageUrl;
+        this.bucketKey = bucketKey;
     }
 
     public void updateProfile(String nickname, String bio, String goal, LocalDate birthDate, String profileImageUrl, String bucketKey) {
