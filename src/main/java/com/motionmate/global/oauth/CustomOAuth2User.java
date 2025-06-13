@@ -34,7 +34,7 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public String getName() {
-        return user.getEmail(); // 유저 email을 name으로 반환
+        return String.valueOf(user.getId()); // 🔒 항상 null 아님!
     }
 
     public Long getUserId() {
