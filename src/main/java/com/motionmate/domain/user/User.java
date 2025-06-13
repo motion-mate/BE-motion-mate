@@ -65,6 +65,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Notification> notifications;
 
+    @Column(name = "is_registered", nullable = false)
+    private boolean isRegistered = false;
+
     @Builder
     public User(String email, String oauthNickname, String provider,String socialId, UserProfile profile, Role role) {
         this.email = email;
@@ -74,6 +77,7 @@ public class User {
         this.socialId = socialId;
         this.profile = profile;
         this.role = Role.USER;
+        this.isRegistered = false;
 
     }
 
@@ -96,5 +100,9 @@ public class User {
     public void decrementFollowerCount() {
         if(this.followerCount > 0) this.followerCount--;
     }
+    public void markAsRegistered() {
+        this.isRegistered = true;
+    }
+
 }
 
