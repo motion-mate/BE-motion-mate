@@ -26,7 +26,7 @@ public class Payment {
     private Order order;
 
     @Enumerated(EnumType.STRING)
-    private PaymentStatus status;
+    private PaymentStatus paymentStatus;
 
     private LocalDateTime paidAt;
 
@@ -39,21 +39,22 @@ public class Payment {
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.order = order;
-        this.status = status;
+        this.paymentStatus = status;
         this.paidAt = paidAt;
     }
 
     // 상태 변경 메서드
     public void updateStatus(PaymentStatus status) {
-        this.status = status;
+        this.paymentStatus = status;
     }
 
     public void markSuccess(LocalDateTime successTime) {
-        this.status = PaymentStatus.SUCCESS;
+        this.paymentStatus = PaymentStatus.SUCCESS;
         this.paidAt = successTime;
     }
 
-    public void markFail() {
-        this.status = PaymentStatus.FAIL;
+    public void markFail(LocalDateTime failTime) {
+        this.paymentStatus = PaymentStatus.FAIL;
+        this.paidAt = failTime;
     }
 }
