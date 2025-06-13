@@ -6,13 +6,13 @@ import com.motionmate.dto.payment.PaymentResponseDto;
 
 public class PaymentMapper {
 
-    public static Payment toEntity(String paymentKey, int amount, Order order) {
+    public static Payment toEntity(String paymentKey, int amount, Order order, Payment.PaymentStatus status) {
         return Payment.builder()
                 .paymentKey(paymentKey)
                 .amount(amount)
-                .status(Payment.PaymentStatus.SUCCESS)
-                .paidAt(null)
                 .order(order)
+                .status(status)
+                .paidAt(null)
                 .build();
     }
 
@@ -21,9 +21,8 @@ public class PaymentMapper {
                 .paymentId(payment.getId())
                 .paymentKey(payment.getPaymentKey())
                 .amount(payment.getAmount())
-                .status(payment.getStatus().name())
+                .paymentStatus(payment.getPaymentStatus())
                 .paidAt(payment.getPaidAt())
-                .orderId(payment.getOrder().getId())
                 .build();
     }
 }

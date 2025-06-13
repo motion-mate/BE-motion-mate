@@ -13,6 +13,8 @@ import java.util.Optional;
 
 public interface FeedRepository extends JpaRepository<Feed, Long> {
 
+    List<Feed> findAllByUserIdOrderByCreatedAtDesc(Long userId);
+
     //내 피드 조회용
     @Query("SELECT DISTINCT f FROM Feed f " +
             "JOIN FETCH f.user u " +

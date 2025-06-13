@@ -1,5 +1,6 @@
 package com.motionmate.dto.payment;
 
+import com.motionmate.domain.payment.Payment;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,7 +13,6 @@ public class PaymentResponseDto {
     private Long paymentId;
     private String paymentKey;
     private int amount;
-    private String status;
+    private Payment.PaymentStatus paymentStatus;
     private LocalDateTime paidAt;
-    private Long orderId;
 }

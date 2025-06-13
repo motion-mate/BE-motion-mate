@@ -294,6 +294,7 @@ public class FeedService {
         feedLikeRepository.deleteByFeedId(feedId);
         repository.delete(feed);
     }
+
     //내 피드 조회
     public List<FeedResponseDto> getMyFeeds(User loginUser) {
         Long userId = loginUser.getId();
@@ -301,38 +302,7 @@ public class FeedService {
         List<Feed> myFeeds = repository.findFeedsWithUserAndProfileByUserId(userId);
         if (myFeeds.isEmpty()) return List.of();
 
-        // feedId 목록 추출
-        List<Long> feedIds = myFeeds.stream()
-                .map(Feed::getId)
-                .toList();
-
-        //  좋아요 수 일괄 조회
-        Map<Long, Integer> likeCountMap = feedLikeRepository.countLikesByFeedIds(feedIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> ((Long) row[1]).intValue()
-                ));
-
-        // 댓글 수 일괄 조회
-        Map<Long, Integer> commentCountMap = feedCommentRepository.countByFeedIds(feedIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> ((Long) row[1]).intValue()
-                ));
-
-        // 좋아요 여부 일괄 조회
-        Set<Long> likedFeedIds = new HashSet<>(feedLikeRepository.findLikedFeedIdByUserId(userId));
-
-        // 매핑
-        return myFeeds.stream()
-                .map(feed -> {
-                    Long feedId = feed.getId();
-                    int likeCount = likeCountMap.getOrDefault(feedId, 0);
-                    int commentCount = commentCountMap.getOrDefault(feedId, 0);
-                    boolean liked = likedFeedIds.contains(feedId);
-                    return FeedMapper.fromEntityLikeMyFeed(feed, liked, likeCount, commentCount);
-                })
-                .toList();
+        return mapFeedsToDtoWithLikesComments(myFeeds, loginUser.getId());
     }
 
 
@@ -342,6 +312,49 @@ public class FeedService {
         return feeds.stream()
                 .map(FeedMapper::fromEntity)  // 좋아요/댓글 개수 등 불필요, 간단 출력
                 .toList();
+    }
+
+    public List<FeedResponseDto> getUserFeed(Long targetUserId, Long userId) {
+        User targetUser  = userRePository.findById(targetUserId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
+
+        List<Feed> userFeeds = repository.findAllByUserIdOrderByCreatedAtDesc(targetUserId);
+
+        return mapFeedsToDtoWithLikesComments(userFeeds, userId);
+    }
+
+    private List<FeedResponseDto> mapFeedsToDtoWithLikesComments(
+            List<Feed> feeds, Long userId) {
+
+        if (feeds.isEmpty()) return List.of();
+
+        List<Long> feedIds = feeds.stream()
+                .map(Feed::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, Integer> likeCountMap = feedLikeRepository.countLikesByFeedIds(feedIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Long) row[1]).intValue()
+                ));
+
+        Map<Long, Integer> commentCountMap = feedCommentRepository.countByFeedIds(feedIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Long) row[1]).intValue()
+                ));
+
+        Set<Long> likedFeedIds = new HashSet<>(feedLikeRepository.findLikedFeedIdByUserId(userId));
+
+        return feeds.stream()
+                .map(feed -> {
+                    Long feedId = feed.getId();
+                    int likeCount = likeCountMap.getOrDefault(feedId, 0);
+                    int commentCount = commentCountMap.getOrDefault(feedId, 0);
+                    boolean liked = likedFeedIds.contains(feedId);
+                    return FeedMapper.fromEntityLikeMyFeed(feed, liked, likeCount, commentCount);
+                })
+                .collect(Collectors.toList());
     }
 
 }
