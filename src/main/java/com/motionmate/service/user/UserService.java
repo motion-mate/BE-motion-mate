@@ -47,6 +47,7 @@ public class UserService {
         if (user.getProfile() == null) {
             UserProfile newProfile = UserProfile.createEmptyProfile();
             user.connectProfile(newProfile);
+            userRepository.save(user);
         }
 
         UserProfile profile = user.getProfile();
