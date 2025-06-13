@@ -27,8 +27,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(profileCompletionInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/profile/register", // 등록 페이지는 제외
-                        "/api/auth/**",      // 로그인 관련 경로
+                        "/api/profile/register",
+                        "/api/users/complete-profile",
+                        "/api/exercises/list",// ✅ 프로필 등록 API 제외
+                        "/api/users/me",                 // ✅ 유저 정보 조회도 보통 제외
+                        "/api/auth/**",
                         "/api/logout", "/api/reissue",
                         "/css/**", "/js/**", "/images/**",
                         "/swagger-ui/**", "/v3/api-docs/**"

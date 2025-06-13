@@ -18,7 +18,7 @@ public class ProfileCompletionInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
+        System.out.println("🚨 요청 URI: " + request.getRequestURI());
         // 인증 객체 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -30,12 +30,13 @@ public class ProfileCompletionInterceptor implements HandlerInterceptor {
         User user = userDetails.getUser();
 
         if (!user.isRegistered()) {
-            response.sendRedirect("/profile/register?userId=" + user.getId() + "&loginSuccess=true");
+            response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT); // 307
+            response.setHeader("X-Redirect-To", "/profile/register?userId=" + user.getId() + "&loginSuccess=true");
             return false;
         }
 
 
-        
+
         return true;
     }
 }

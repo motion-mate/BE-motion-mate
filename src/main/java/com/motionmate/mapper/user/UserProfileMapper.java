@@ -42,6 +42,7 @@ public class UserProfileMapper {
                 .followerCount(followerCount)
                 .followingCount(followingCount)
                 .role(user.getRole().name())
+                .isRegistered(user.isRegistered())
                 .build();
     }
 
