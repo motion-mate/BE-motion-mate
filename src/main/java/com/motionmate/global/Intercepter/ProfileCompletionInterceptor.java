@@ -34,6 +34,8 @@ public class ProfileCompletionInterceptor implements HandlerInterceptor {
             return false;
         }
 
+
+        
         return true;
     }
 }
