@@ -19,4 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findWithProfileAndFollowById(@Param("id") Long id);
 
     Optional<User> findByProfile_nickname(String senderNickname);
+
+    Optional<User> findByProviderAndSocialId(String provider, String socialId);
+
 }

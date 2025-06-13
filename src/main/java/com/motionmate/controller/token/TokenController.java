@@ -37,14 +37,24 @@ public class TokenController {
         // access token 재발급
         String newAccessToken = jwtTokenProvider.generateToken(userId);
 
-        // access token을 쿠키로 내려주거나 프론트에 맞게 처리
+// ✅ refresh token도 함께 갱신
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(userId); // 새 리프레시 토큰 생성
+        stored.updateToken(newRefreshToken); // DB 값 갱신
+        refreshTokenRepository.save(stored); // 저장
+
+// ✅ 쿠키 설정
         String tokenCookie = String.format(
                 "token=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Strict",
-                newAccessToken,
-                60 * 30 // 30분
+                newAccessToken, 60 * 30
         );
+        String refreshTokenCookie = String.format(
+                "refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Strict",
+                newRefreshToken, 60 * 60 * 24 * 7
+        );
+
         return ResponseEntity.ok()
                 .header("Set-Cookie", tokenCookie)
+                .header("Set-Cookie", refreshTokenCookie)
                 .build();
     }
 }
