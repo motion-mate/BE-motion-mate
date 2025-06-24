@@ -23,11 +23,15 @@
 |------------|--|--|
 | ![루틴목록](./images/routine-list.png) |  |  |
 
+---
+
 ## 📷 피드(SNS)
 
 | 피드 메인 | 피드 업로드 | 피드 상세조회 |
 |-----------|--------------|----------------|
 | ![피드](./images/feed.png) | ![업로드](./images/feed-upload.png) | ![상세조회](./images/feed-detail.png) |
+
+---
 
 ## 💬 채팅
 
@@ -35,15 +39,23 @@
 |-----------|--------------|----------------|
 | ![채팅목록](./images/chat-list.png) | ![채팅방](./images/chat-room.png) | ![방생성](./images/chat-create.png) |
 
+---
+
 ## 🛍️ 굿즈 마켓
 
-| 마켓 홈 | 상품 목록 | 이벤트 |
-|-----------|--------------|----------|
-| ![마켓홈](./images/goods-home.png) | ![상품목록](./images/goods-list.png) | ![이벤트](./images/goods-event.png) |
+| 마켓 홈 | 상품 상세 |  |
+|-----------|--------------|--|
+| ![마켓홈](./images/goods-home.png) | ![상세조회](./images/goods-detail.png) |  |
 
-| 고객 문의 | 마이페이지 |  |
-|--------------|-------------|--|
-| ![문의](./images/goods-inquiry.png) | ![마이페이지](./images/mypage.png) |  |
+| 상품 목록 | 이벤트 |  |
+|--------------|----------|--|
+| ![상품목록](./images/goods-list.png) | ![이벤트](./images/goods-event.png) |  |
+
+| 고객 문의 | 문의 작성 | 마이페이지 |
+|--------------|--------------|-------------|
+| ![문의](./images/goods-inquiry.png) | ![문의작성](./images/goods-inquiry-create.png) | ![마이페이지](./images/mypage.png) |
+
+---
 
 ## 🛠️ 기술 스택
 ![기술 스택](./images/stack.png)
