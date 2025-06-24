@@ -11,55 +11,39 @@
 
 ## 💪 운동 기록 기능
 
-| 운동 선택 화면 | 운동 수정 화면 |
-|----------------|----------------|
-| ![운동선택](./images/exercise-select.png) | ![수정화면](./images/exercise-edit.png) |
+| 운동 선택 | 운동 수정 | 운동 목록 |
+|-----------|-----------|-----------|
+| ![운동선택](./images/exercise-select.png) | ![수정화면](./images/exercise-edit.png) | ![운동목록](./images/exercise-list.png) |
 
-| 운동 목록 | 운동 기록 1 |
-|-----------|--------------|
-| ![운동목록](./images/exercise-list.png) | ![운동기록1](./images/exercise-record1.png) |
+| 운동 기록 1 | 운동 기록 2 | 루틴 생성 |
+|--------------|--------------|--------------|
+| ![운동기록1](./images/exercise-record1.png) | ![운동기록2](./images/exercise-record2.png) | ![루틴생성](./images/routine-create.png) |
 
-| 운동 기록 2 | 루틴 생성 |
-|--------------|-------------|
-| ![운동기록2](./images/exercise-record2.png) | ![루틴생성](./images/routine-create.png) |
-
-| 루틴 목록 |  |
-|------------|--|
-| ![루틴목록](./images/routine-list.png) |  |
+| 루틴 목록 |  |  |
+|------------|--|--|
+| ![루틴목록](./images/routine-list.png) |  |  |
 
 ## 📷 피드(SNS)
 
-| 피드 메인 | 피드 업로드 |
-|-----------|--------------|
-| ![피드](./images/feed.png) | ![업로드](./images/feed-upload.png) |
-
-| 피드 상세 조회 |  |
-|----------------|--|
-| ![상세조회](./images/feed-detail.png) |  |
+| 피드 메인 | 피드 업로드 | 피드 상세조회 |
+|-----------|--------------|----------------|
+| ![피드](./images/feed.png) | ![업로드](./images/feed-upload.png) | ![상세조회](./images/feed-detail.png) |
 
 ## 💬 채팅
 
-| 채팅방 목록 | 채팅방 입장 |
-|-------------|-------------|
-| ![채팅목록](./images/chat-list.png) | ![채팅방](./images/chat-room.png) |
-
-| 채팅방 생성 |  |
-|---------------|--|
-| ![방생성](./images/chat-create.png) |  |
+| 채팅 목록 | 채팅방 입장 | 채팅방 생성 |
+|-----------|--------------|----------------|
+| ![채팅목록](./images/chat-list.png) | ![채팅방](./images/chat-room.png) | ![방생성](./images/chat-create.png) |
 
 ## 🛍️ 굿즈 마켓
 
-| 마켓 홈 | 상품 목록 |
-|----------|-------------|
-| ![마켓홈](./images/goods-home.png) | ![상품목록](./images/goods-list.png) |
+| 마켓 홈 | 상품 목록 | 이벤트 |
+|-----------|--------------|----------|
+| ![마켓홈](./images/goods-home.png) | ![상품목록](./images/goods-list.png) | ![이벤트](./images/goods-event.png) |
 
-| 이벤트 | 고객 문의 |
-|---------|-------------|
-| ![이벤트](./images/goods-event.png) | ![문의](./images/goods-inquiry.png) |
-
-| 마이페이지 |  |
-|--------------|--|
-| ![마이페이지](./images/mypage.png) |  |
+| 고객 문의 | 마이페이지 |  |
+|--------------|-------------|--|
+| ![문의](./images/goods-inquiry.png) | ![마이페이지](./images/mypage.png) |  |
 
 ## 🛠️ 기술 스택
 ![기술 스택](./images/stack.png)
