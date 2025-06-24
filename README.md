@@ -15,13 +15,13 @@
 |-----------|-----------|-----------|
 | ![운동선택](./images/exercise-select.png) | ![수정화면](./images/exercise-edit.png) | ![운동목록](./images/exercise-list.png) |
 
-| 운동 기록 1 | 운동 기록 2 | 루틴 생성 |
-|--------------|--------------|--------------|
-| ![운동기록1](./images/exercise-record1.png) | ![운동기록2](./images/exercise-record2.png) | ![루틴생성](./images/routine-create.png) |
+| 운동 기록 1 | 운동 기록 2 |
+|--------------|--------------|
+| ![운동기록1](./images/exercise-record1.png) | ![운동기록2](./images/exercise-record2.png) |
 
-| 루틴 목록 |  |  |
-|------------|--|--|
-| ![루틴목록](./images/routine-list.png) |  |  |
+| 루틴 생성 | 루틴 목록 |
+|--------------|--------------|
+| ![루틴생성](./images/routine-create.png) | ![루틴목록](./images/routine-list.png) |
 
 ---
 
